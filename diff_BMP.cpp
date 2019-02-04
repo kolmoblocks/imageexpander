@@ -52,7 +52,6 @@ cerr<<lowResImage.width()<<endl;
    int diffHeight = (highResImage.width() % highFactor == 0 ? highResImage.width() / highFactor : highResImage.width() / highFactor + 1 )
                   * (highResImage.height() % highFactor == 0 ? highResImage.height() / highFactor : highResImage.height() / highFactor + 1 );
 
-   cerr<<diffWidth<<diffHeight;
    bitmap_image diff(diffWidth, diffHeight);
 
    if (!highResImage){
@@ -73,16 +72,18 @@ cerr<<lowResImage.width()<<endl;
          diffX = 0;
          for (int innerX = x; innerX < x+highFactor; ++innerX) {
             for (int innerY = y; innerY < y+highFactor; ++innerY) {
+               cout << innerX << "," << innerY << endl;
                // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                if (!(innerX < x+lowFactor) && !(innerY < y+lowFactor)) {
                   // set pixel of the diff at diffX , diffY with the color at the highResImage at innerX , innerY
                   diff.set_pixel(diffX, diffY, highResImage.get_pixel(innerX, innerY));
+                  //cout << diffX << " " << diffY << " " << highResImage.get_pixel(innerX, innerY).blue << endl;
                   // increment diffX every time we increment through the inner block.
                   ++diffX;
                }
             }
          }
-
+         cout << "coords " << x << "," << y << endl;
       }
    }
    diff.save_image("diff.bmp");
