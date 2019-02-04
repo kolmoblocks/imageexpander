@@ -2,6 +2,8 @@
   <body>
     <script src="expand_image.js"></script>
     <script>
+      
+      Module.onRuntimeInitialized = function() {
         // set arg 0 (old image)
         // let pointer = Module._set_arg(0, old_size );
         // var pWasmData = new Uint8ClampedArray(Module.wasmMemory.buffer, pointer, old_size);
@@ -21,6 +23,7 @@
         let result_size = Module._get_result_size();
         // reading from 
         // var pResultData = new Uint8ClampedArray(Module.wasmMemory.buffer, result_pointer, result_size);
+      }
 
     </script>
   </body>
