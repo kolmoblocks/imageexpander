@@ -428,13 +428,70 @@ public:
       }
    }
 
+   class OBufStream {
+      char *pBuff;
+      int &buffLen;
+      public:
+         OBufStream(char *pBuff, int &buffLen): pBuff{pBuff}, buffLen{buffLen} {}
+
+         void write(char *s){
+            int slen = strlen(s);
+            for (int i=0; i<slen; ++i) {
+               pBuff[0] = s[i];
+               ++pBuff;
+            }
+         }
+
+   }
+
    void save_image_to_buffer(char* pOutBuffer, int &BufferLength)
    {
-      // todo: implement it!
-      
-      // int res_size = 10;
-      // pOutBuffer = new char[res_size];
       // BufferLength = res_size;
+      OBufStream stream(pOutBuffer, BufferLength);
+
+      if (!stream)
+      {
+         std::cerr << "bitmap_image::save_image(): Error - Could not open file "  << file_name << " for writing!" << std::endl;
+         return;
+      }
+
+      bitmap_information_header bih;
+
+      bih.width            = width_;
+      bih.height           = height_;
+      bih.bit_count        = static_cast<unsigned short>(bytes_per_pixel_ << 3);
+      bih.clr_important    = 0;
+      bih.clr_used         = 0;
+      bih.compression      = 0;
+      bih.planes           = 1;
+      bih.size             = bih.struct_size();
+      bih.x_pels_per_meter = 0;
+      bih.y_pels_per_meter = 0;
+      bih.size_image       = (((bih.width * bytes_per_pixel_) + 3) & 0x0000FFFC) * bih.height;
+
+      bitmap_file_header bfh;
+
+      bfh.type             = 19778;
+      bfh.size             = bfh.struct_size() + bih.struct_size() + bih.size_image;
+      bfh.reserved1        = 0;
+      bfh.reserved2        = 0;
+      bfh.off_bits         = bih.struct_size() + bfh.struct_size();
+
+      write_bfh(stream,bfh);
+      write_bih(stream,bih);
+
+      unsigned int padding = (4 - ((3 * width_) % 4)) % 4;
+      char padding_data[4] = { 0x00, 0x00, 0x00, 0x00 };
+
+      for (unsigned int i = 0; i < height_; ++i)
+      {
+         const unsigned char* data_ptr = &data_[(row_increment_ * (height_ - i - 1))];
+
+         stream.write(reinterpret_cast<const char*>(data_ptr), sizeof(unsigned char) * bytes_per_pixel_ * width_);
+         stream.write(padding_data,padding);
+      }
+
+      stream.close();
    }
 
    void save_image(const std::string& file_name) const
@@ -1298,7 +1355,99 @@ public:
 
    bool LoadFromBuffer( char* pBuffer, const int size )
    {
-      // todo: implement it!
+      std::istringstream stream(pBuffer,size);
+
+      if (!stream)
+      {
+         std::cerr << "bitmap_image::load_bitmap() ERROR: bitmap_image - file " << file_name_ << " not found!" << std::endl;
+         return;
+      }
+
+      width_  = 0;
+      height_ = 0;
+
+      bitmap_file_header bfh;
+      bitmap_information_header bih;
+
+      bfh.clear();
+      bih.clear();
+
+      read_bfh(stream,bfh);
+      read_bih(stream,bih);
+
+      if (bfh.type != 19778)
+      {
+         bfh.clear();
+         bih.clear();
+
+         stream.close();
+
+         std::cerr << "bitmap_image::load_bitmap() ERROR: bitmap_image - Invalid type value " << bfh.type << " expected 19778." << std::endl;
+         return;
+      }
+
+      if (bih.bit_count != 24)
+      {
+         bfh.clear();
+         bih.clear();
+
+         stream.close();
+
+         std::cerr << "bitmap_image::load_bitmap() ERROR: bitmap_image - Invalid bit depth " << bih.bit_count << " expected 24." << std::endl;
+
+         return;
+      }
+
+      if (bih.size != bih.struct_size())
+      {
+         bfh.clear();
+         bih.clear();
+
+         stream.close();
+
+         std::cerr << "bitmap_image::load_bitmap() ERROR: bitmap_image - Invalid BIH size " << bih.size << " expected " << bih.struct_size() << std::endl;
+
+         return;
+      }
+
+      width_  = bih.width;
+      height_ = bih.height;
+
+      bytes_per_pixel_ = bih.bit_count >> 3;
+
+      unsigned int padding = (4 - ((3 * width_) % 4)) % 4;
+      char padding_data[4] = {0,0,0,0};
+
+      std::size_t bitmap_file_size = file_size(file_name_);
+
+      std::size_t bitmap_logical_size = (height_ * width_ * bytes_per_pixel_) +
+                                        (height_ * padding)                   +
+                                         bih.struct_size()                    +
+                                         bfh.struct_size()                    ;
+
+      if (bitmap_file_size != bitmap_logical_size)
+      {
+         bfh.clear();
+         bih.clear();
+
+         stream.close();
+
+         std::cerr << "bitmap_image::load_bitmap() ERROR: bitmap_image - Mismatch between logical and physical sizes of bitmap. " <<
+                      "Logical: "  << bitmap_logical_size << " " <<
+                      "Physical: " << bitmap_file_size    << std::endl;
+
+         return;
+      }
+
+      create_bitmap();
+
+      for (unsigned int i = 0; i < height_; ++i)
+      {
+         unsigned char* data_ptr = row(height_ - i - 1); // read in inverted row order
+
+         stream.read(reinterpret_cast<char*>(data_ptr), sizeof(char) * bytes_per_pixel_ * width_);
+         stream.read(padding_data,padding);
+      }
       return false;
    }
 
