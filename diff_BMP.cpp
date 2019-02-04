@@ -52,11 +52,7 @@ void generateDiff (string lowRes, string highRes){
                   * (highResImage.height() % highFactor == 0 ? highResImage.height() / highFactor : highResImage.height() / highFactor + 1 );
 
    bitmap_image diff(diffWidth, diffHeight);
-
-   if (!highResImage){
-      printf("Error - Failed to open file\n");
-   }
-
+   
    const unsigned int height = highResImage.height();
    const unsigned int width  = highResImage.width();
    // iterating through blocks, x and y indicate the top left positions of each block.

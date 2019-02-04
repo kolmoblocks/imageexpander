@@ -13,12 +13,12 @@ bool isInt(float num) {
 void expand_image(bitmap_image oldImg, bitmap_image diff) {
     int diffW = diff.width();
     int diffH = diff.height();
-    int cur = diffW;
+    int cur = diffW+1;
     int curSqrt = sqrt(cur);
 
     while (true) {
         if (isInt(curSqrt)) {
-            smallSqrt = cur - diffW;
+            float smallSqrt = cur - diffW;
             if (isInt(smallSqrt)) {
                 break;
             }
@@ -29,7 +29,6 @@ void expand_image(bitmap_image oldImg, bitmap_image diff) {
 
     int loFactor = round(sqrt(cur-diffW));
     int hiFactor = round(curSqrt);
-
     int newW = oldImg.width() * hiFactor / loFactor;
     int newH = oldImg.height() * hiFactor / loFactor;
 
@@ -38,8 +37,8 @@ void expand_image(bitmap_image oldImg, bitmap_image diff) {
     int diffX = 0;
     int diffY = 0;
 
-    for (std::size_t y=0; y<height; y+= hiFactor) {
-      for (std::size_t x=0; x<width; x+= hiFactor) {
+    for (std::size_t y=0; y<newH; y+= hiFactor) {
+      for (std::size_t x=0; x<newW; x+= hiFactor) {
          // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
          // increment diffY, reset diffX to 0 each time we go to a new block
          ++diffY;
@@ -68,7 +67,7 @@ void expand_image(bitmap_image oldImg, bitmap_image diff) {
 }
 
 int main(int argc, char *argv[]){
-    bitmap_image diff(argv[1]);
-    bitmap_image old(argv[2]);
+    bitmap_image diff(argv[2]);
+    bitmap_image old(argv[1]);
     expand_image(old, diff);
 }
