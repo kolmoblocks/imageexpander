@@ -1,45 +1,35 @@
-#include <cstdio>
 #include "bitmap_image.hpp"
 using namespace std;
 
 unsigned int gcd(unsigned int u, unsigned int v)
 {
-  int shift;
+    // simple cases (termination)
+    if (u == v)
+        return u;
 
-  /* GCD(0,v) == v; GCD(u,0) == u, GCD(0,0) == 0 */
-  if (u == 0) return v;
-  if (v == 0) return u;
- 
-  /* Let shift := lg K, where K is the greatest power of 2
-        dividing both u and v. */
-  for (shift = 0; ((u | v) & 1) == 0; ++shift) {
-         u >>= 1;
-         v >>= 1;
-  }
- 
-  while ((u & 1) == 0)
-    u >>= 1;
- 
-  /* From here on, u is always odd. */
-  do {
-       /* remove all factors of 2 in v -- they are not common */
-       /*   note: v is not zero, so while will terminate */
-       while ((v & 1) == 0)  /* Loop X */
-           v >>= 1;
+    if (u == 0)
+        return v;
 
-       /* Now u and v are both odd. Swap if necessary so u <= v,
-          then set v = v - u (which is even). For bignums, the
-          swapping is just pointer movement, and the subtraction
-          can be done in-place. */
-       if (u > v) {
-         unsigned int t = v; v = u; u = t; // Swap u and v.
-       }
-       
-       v = v - u; // Here v >= u.
-     } while (v != 0);
+    if (v == 0)
+        return u;
 
-  /* restore common factors of 2 */
-  return u << shift;
+    // look for factors of 2
+    if (~u & 1) // u is even
+    {
+        if (v & 1) // v is odd
+            return gcd(u >> 1, v);
+        else // both u and v are even
+            return gcd(u >> 1, v >> 1) << 1;
+    }
+
+    if (~v & 1) // u is odd, v is even
+        return gcd(u, v >> 1);
+
+    // reduce larger argument
+    if (u > v)
+        return gcd((u - v) >> 1, v);
+
+    return gcd((v - u) >> 1, u);
 }
 
 // generateDiff(string, string) 
@@ -48,13 +38,12 @@ unsigned int gcd(unsigned int u, unsigned int v)
 void generateDiff (string lowRes, string highRes){
    bitmap_image lowResImage(lowRes);
    bitmap_image highResImage(highRes);
+cerr<<lowResImage.width()<<endl;
 
    unsigned int denom = gcd(lowResImage.width(), highResImage.width());
-
    // finding numerator and denominator of ratio (lowFactor, highFactor respectively)
    int lowFactor = lowResImage.width() / denom;
    int highFactor = highResImage.width() / denom;
-
    // finding diffWidth from the difference between smaller vs newer chunk sizes
    int diffWidth = highFactor * highFactor - lowFactor * lowFactor;
    int highResArea = highResImage.width() * highResImage.height();
@@ -63,6 +52,7 @@ void generateDiff (string lowRes, string highRes){
    int diffHeight = (highResImage.width() % highFactor == 0 ? highResImage.width() / highFactor : highResImage.width() / highFactor + 1 )
                   * (highResImage.height() % highFactor == 0 ? highResImage.height() / highFactor : highResImage.height() / highFactor + 1 );
 
+   cerr<<diffWidth<<diffHeight;
    bitmap_image diff(diffWidth, diffHeight);
 
    if (!highResImage){
@@ -74,6 +64,7 @@ void generateDiff (string lowRes, string highRes){
    // iterating through blocks, x and y indicate the top left positions of each block.
    int diffX = 0;
    int diffY = 0;
+   rgb_t colour;
    for (std::size_t y=0; y<height; y+= highFactor) {
       for (std::size_t x=0; x<width; x+= highFactor) {
          // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
@@ -94,19 +85,10 @@ void generateDiff (string lowRes, string highRes){
 
       }
    }
-   for (std::size_t y = 0; y < height; ++y){
-      for (std::size_t x = 0; x < width; ++x){
-         if (y % 2 == 1 || x % 2 == 1){
-            rgb_t colour;
-            highResImage.get_pixel(x, y, colour);
-            image.set_pixel(x, y, colour);
-         }
-      }
-   }
-   image.save_image("diff-720.bmp");
+   diff.save_image("diff.bmp");
 }
 
 
 int main(int argc, char *argv[]){
-   generateDiff("480p.bmp", "720p.bmp");
+   generateDiff("360p.bmp", "720p.bmp");
 }
