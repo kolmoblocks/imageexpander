@@ -1,3 +1,4 @@
+#include "emscripten.h"
 #include <cstdio>
 #include <cmath>
 #include "bitmap_image.hpp"
@@ -10,7 +11,7 @@ bool isInt(float num) {
 // expand_image(bitmap_image, bitmap_image):
 // recieves the old image and image diff as parameters to 
 // construct the image of higher resolution.
-void expand_image(bitmap_image oldImg, bitmap_image diff) {
+void expand_image_to_buffer(bitmap_image oldImg, bitmap_image diff, char* pOutBuffer, int &BufferLength ) {
     int diffW = diff.width();
     int diffH = diff.height();
     int cur = diffW+1;
@@ -63,11 +64,84 @@ void expand_image(bitmap_image oldImg, bitmap_image diff) {
       }
    }
 
-    newImg.save_image("expanded.bmp");
+    newImg.save_image_to_buffer(pOutBuffer, BufferLength);
 }
 
-int main(int argc, char *argv[]){
+/*int main(int argc, char *argv[]){
     bitmap_image diff(argv[2]);
     bitmap_image old(argv[1]);
     expand_image(old, diff);
+}*/
+
+extern "C" {
+    int* set_arg(uint8_t arg_index, int size);
+    int* get_result();
+    int get_result_size();
+    int exec();
+}
+
+char* g_Old = NULL;
+int g_Old_size = 0;
+
+char* g_Diff = NULL;
+int g_Diff_size = 0;
+
+char* g_Result = NULL;
+int g_Result_size = 0;
+
+
+int* set_arg(uint8_t arg_index, int size)
+{
+    if ( 0 == arg_index ) // old
+    {
+        g_Old = new char[size];
+        
+        g_Old_size = size;
+
+        return (int*)g_Old;
+    }
+
+    if ( 1 == arg_index ) // diff
+    {
+        g_Diff = new char[size];
+        
+        g_Diff_size = size;
+
+        return (int*)g_Diff;
+    }
+
+    return NULL;
+}
+
+
+int* get_result()
+{
+    return (int*)g_Result;
+}
+
+
+int get_result_size()
+{
+    return g_Result_size;
+}
+
+
+int exec()
+{
+    if ( g_Diff && g_Old )
+    {
+        bitmap_image old;
+        if ( !old.LoadFromBuffer(g_Old, g_Old_size) )
+            return false;
+
+        bitmap_image diff;
+        if ( !diff.LoadFromBuffer(g_Diff, g_Diff_size) )
+            return false;
+
+        expand_image_to_buffer(old, diff, g_Result, g_Result_size );
+
+        return true;
+    }
+
+    return false;
 }

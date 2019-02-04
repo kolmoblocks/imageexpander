@@ -428,6 +428,15 @@ public:
       }
    }
 
+   void save_image_to_buffer(char* pOutBuffer, int &BufferLength)
+   {
+      // todo: implement it!
+      
+      // int res_size = 10;
+      // pOutBuffer = new char[res_size];
+      // BufferLength = res_size;
+   }
+
    void save_image(const std::string& file_name) const
    {
       std::ofstream stream(file_name.c_str(),std::ios::binary);
@@ -1285,6 +1294,12 @@ public:
       {
          std::swap(*(itr + 0),*(itr + 2));
       }
+   }
+
+   bool LoadFromBuffer( char* pBuffer, const int size )
+   {
+      // todo: implement it!
+      return false;
    }
 
 private:
