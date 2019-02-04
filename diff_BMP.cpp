@@ -38,8 +38,7 @@ unsigned int gcd(unsigned int u, unsigned int v)
 void generateDiff (string lowRes, string highRes){
    bitmap_image lowResImage(lowRes);
    bitmap_image highResImage(highRes);
-cerr<<lowResImage.width()<<endl;
-
+   
    unsigned int denom = gcd(lowResImage.width(), highResImage.width());
    // finding numerator and denominator of ratio (lowFactor, highFactor respectively)
    int lowFactor = lowResImage.width() / denom;
@@ -72,9 +71,8 @@ cerr<<lowResImage.width()<<endl;
          diffX = 0;
          for (int innerX = x; innerX < x+highFactor; ++innerX) {
             for (int innerY = y; innerY < y+highFactor; ++innerY) {
-               cout << innerX << "," << innerY << endl;
                // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
-               if (!(innerX < x+lowFactor) && !(innerY < y+lowFactor)) {
+               if (!(innerX < x+lowFactor) || !(innerY < y+lowFactor)) {
                   // set pixel of the diff at diffX , diffY with the color at the highResImage at innerX , innerY
                   diff.set_pixel(diffX, diffY, highResImage.get_pixel(innerX, innerY));
                   //cout << diffX << " " << diffY << " " << highResImage.get_pixel(innerX, innerY).blue << endl;
@@ -83,7 +81,6 @@ cerr<<lowResImage.width()<<endl;
                }
             }
          }
-         cout << "coords " << x << "," << y << endl;
       }
    }
    diff.save_image("diff.bmp");
