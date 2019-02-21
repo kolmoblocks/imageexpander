@@ -41,17 +41,19 @@ void generateDiff (const char *lowRes, const char *highRes){
    std::vector<unsigned char> highResImage;
    unsigned lowResWidth, lowResHeight, highResWidth, highResHeight;
 
-   unsigned error = lodepng::decode(lowResImage, lowResWidth, lowResHeight, lowRes);
+   unsigned error = lodepng::decode(lowResImage, lowResWidth, lowResHeight, lowRes, LCT_RGB, 8);
    if (error) {
        std::cout << error;
        return;
    }
 
-   error = lodepng::decode(highResImage, highResWidth, highResHeight, highRes);
+   error = lodepng::decode(highResImage, highResWidth, highResHeight, highRes, LCT_RGB, 8);
    if (error) {
        std::cout << error;
        return;
    }
+   
+   
 
    unsigned denom = gcd(lowResWidth, highResWidth);
    // finding numerator and denominator of ratio (lowFactor, highFactor respectively)
@@ -77,15 +79,18 @@ void generateDiff (const char *lowRes, const char *highRes){
                // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                if (!(innerX < x+lowFactor) || !(innerY < y+lowFactor)) {
                   // set pixel of the diff at diffX , diffY with the color at the highResImage at innerX , innerY
-                  diffVec.push_back(highResImage.at(innerX+innerY*highResWidth));
-                  diffVec.push_back(highResImage.at(innerX+innerY*highResWidth + 1));
-                  diffVec.push_back(highResImage.at(innerX+innerY*highResWidth + 2));
+                  diffVec.push_back(highResImage.at((innerX+innerY*highResWidth)*3));
+                  diffVec.push_back(highResImage.at((innerX+innerY*highResWidth)*3+1));
+                  diffVec.push_back(highResImage.at((innerX+innerY*highResWidth)*3+2));
                }
             }
          }
       }
    }
-   lodepng::encode("diff.png", diffVec, diffWidth, diffHeight);
+
+   error = lodepng::encode("diff.png", diffVec, diffWidth, diffHeight, LCT_RGB ,8);
+   cout<<diffVec.size()<<' ' << diffWidth << ' ' << diffHeight <<endl;
+   std::cout << lodepng_error_text(error) << std::endl;
 }
 
 

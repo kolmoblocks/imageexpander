@@ -1,7 +1,7 @@
 #include "emscripten.h"
 #include <cstdio>
 #include <cmath>
-#include "bitmap_image.hpp"
+#include "lodepng.h"
 using namespace std;
 
 bool isInt(float num) {
