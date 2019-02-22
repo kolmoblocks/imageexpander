@@ -65,9 +65,9 @@ void expand_image(const char *oldImgName, const char *diffImgName) {
                // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
                if (!(innerX < x+loFactor) || !(innerY < y+loFactor)) {
                   // grab pixel from the diff
-                   newImgVec[innerX + innerY*newW].r = diffVec[3*(diffX + diffY*diffW)];
-                    newImgVec[innerX + innerY*newW].g = diffVec[3*(diffX + diffY*diffW)+1];
-                    newImgVec[innerX + innerY*newW].b = diffVec[3*(diffX + diffY*diffW)+2];
+                   newImgVec[innerX + innerY*newW + 4].r = diffVec[3*(diffX + diffY*diffW)];
+                    newImgVec[innerX + innerY*newW + 4].g = diffVec[3*(diffX + diffY*diffW)+1];
+                    newImgVec[innerX + innerY*newW + 4].b = diffVec[3*(diffX + diffY*diffW)+2];
                   // increment diffX every time we increment through the inner block.
                   ++diffX;
                }
