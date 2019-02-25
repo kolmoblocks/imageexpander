@@ -1,25 +1,33 @@
-#include "emscripten.h"
-#include <cstdio>
+#include <iostream>
 #include <cmath>
 #include "lodepng.h"
-using namespace std;
 
 bool isInt(float num) {
     return floor(num) == ceil(num);
 }
-
+struct color {
+    unsigned char r,g,b;
+};
 // expand_image(bitmap_image, bitmap_image):
 // recieves the old image and image diff as parameters to 
 // construct the image of higher resolution.
-void expand_image_to_buffer(bitmap_image oldImg, bitmap_image diff, char* pOutBuffer, int &BufferLength ) {
-    int diffW = diff.width();
-    int diffH = diff.height();
-    int cur = diffW+1;
-    int curSqrt = sqrt(cur);
+void expand_image(const char *oldImgName, const char *diffImgName) {
+    std::vector<unsigned char> oldImgVec, diffVec;
+    unsigned diffW, diffH, oldImgH, oldImgW;
+
+    unsigned error = lodepng::decode(diffVec, diffW, diffH, diffImgName, LCT_RGB, 8);
+    if (error) {
+          std::cout << lodepng_error_text(error) << std::endl;
+
+       return;
+   }
+    
+    unsigned cur = diffW+1;
+    float curSqrt = sqrt(cur);
 
     while (true) {
         if (isInt(curSqrt)) {
-            float smallSqrt = cur - diffW;
+            float smallSqrt = sqrt(cur - diffW);
             if (isInt(smallSqrt)) {
                 break;
             }
@@ -28,16 +36,24 @@ void expand_image_to_buffer(bitmap_image oldImg, bitmap_image diff, char* pOutBu
         curSqrt = sqrt(cur);
     }
 
-    int loFactor = round(sqrt(cur-diffW));
-    int hiFactor = round(curSqrt);
-    int newW = oldImg.width() * hiFactor / loFactor;
-    int newH = oldImg.height() * hiFactor / loFactor;
+    error = lodepng::decode(oldImgVec, oldImgW, oldImgH, oldImgName, LCT_RGB, 8);
+    if (error) {
+          std::cout << lodepng_error_text(error) << std::endl;
 
-    bitmap_image newImg(newW, newH);
+       return;
+   }
+
+   
+    unsigned loFactor = round(sqrt(cur-diffW));
+    unsigned hiFactor = round(curSqrt);
+    unsigned newW = oldImgW * hiFactor / loFactor;
+    unsigned newH = oldImgH * hiFactor / loFactor;
+
+    std::vector<struct color> newImgVec(newW * newH * 3);
 
     int diffX = 0;
     int diffY = 0;
-
+    
     for (std::size_t y=0; y<newH; y+= hiFactor) {
       for (std::size_t x=0; x<newW; x+= hiFactor) {
          // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
@@ -49,99 +65,35 @@ void expand_image_to_buffer(bitmap_image oldImg, bitmap_image diff, char* pOutBu
                // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
                if (!(innerX < x+loFactor) || !(innerY < y+loFactor)) {
                   // grab pixel from the diff
-                  newImg.set_pixel(innerX, innerY, diff.get_pixel(diffX, diffY));
+                   newImgVec[innerX + innerY*newW + 4].r = diffVec[3*(diffX + diffY*diffW)];
+                    newImgVec[innerX + innerY*newW + 4].g = diffVec[3*(diffX + diffY*diffW)+1];
+                    newImgVec[innerX + innerY*newW + 4].b = diffVec[3*(diffX + diffY*diffW)+2];
                   // increment diffX every time we increment through the inner block.
                   ++diffX;
                }
                else {
                    // grab pixel from the old image
-                   newImg.set_pixel(innerX,innerY, oldImg.get_pixel(x * loFactor/hiFactor + (innerX - x), 
-                                                                    y * loFactor/hiFactor + (innerY - y)));
+                    newImgVec[innerX + innerY*newW].r = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y)))];
+                    newImgVec[innerX + innerY*newW].g = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y))) + 1];
+                    newImgVec[innerX + innerY*newW].b = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y))) + 2];
                }
                
             }
          }
       }
    }
-
-    newImg.save_image_to_buffer(pOutBuffer, BufferLength);
-}
-
-/*int main(int argc, char *argv[]){
-    bitmap_image diff(argv[2]);
-    bitmap_image old(argv[1]);
-    expand_image(old, diff);
-}*/
-
-extern "C" {
-    int* set_arg(uint8_t arg_index, int size);
-    int* get_result();
-    int get_result_size();
-    int exec();
-}
-
-char* g_Old = NULL;
-int g_Old_size = 0;
-
-char* g_Diff = NULL;
-int g_Diff_size = 0;
-
-char* g_Result = NULL;
-int g_Result_size = 0;
-
-
-int* set_arg(uint8_t arg_index, int size)
-{
-    if ( 0 == arg_index ) // old
-    {
-        g_Old = new char[size];
-        
-        g_Old_size = size;
-
-        return (int*)g_Old;
+    std::cout << newW << ' ' << newH;
+    std::vector<unsigned char> finalImage;
+    for (auto it : newImgVec) {
+        finalImage.push_back(it.r);
+        finalImage.push_back(it.g);
+        finalImage.push_back(it.b);
     }
-
-    if ( 1 == arg_index ) // diff
-    {
-        g_Diff = new char[size];
-        
-        g_Diff_size = size;
-
-        return (int*)g_Diff;
-    }
-
-    return NULL;
+    lodepng::encode("oldtmp.png", oldImgVec, oldImgW, oldImgH, LCT_RGB,8);
+    lodepng::encode("finale.png",finalImage,newW,newH,LCT_RGB,8);
 }
 
-
-int* get_result()
-{
-    return (int*)g_Result;
-}
-
-
-int get_result_size()
-{
-    return g_Result_size;
-}
-
-
-int exec()
-{
-    if ( g_Diff && g_Old )
-    {
-        bitmap_image old;
-        if ( !old.LoadFromBuffer(g_Old, g_Old_size) )
-            return false;
-
-        bitmap_image diff;
-        if ( !diff.LoadFromBuffer(g_Diff, g_Diff_size) )
-            return false;
-
-        expand_image_to_buffer(old, diff, g_Result, g_Result_size );
-
-        return true;
-    }
-
-    return false;
+int main(int argc, char **argv) {
+    // argv[1] : smaller image, argv[2] : diff
+    expand_image(argv[1],argv[2]);
 }

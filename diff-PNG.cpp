@@ -95,5 +95,6 @@ void generateDiff (const char *lowRes, const char *highRes){
 
 
 int main(int argc, char *argv[]){
-   generateDiff("1080p.png", "1440p.png");
+   // argv[1]: smaller file
+   generateDiff(argv[1], argv[2]);
 }
