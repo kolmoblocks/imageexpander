@@ -89,7 +89,6 @@ void expand_image(const char *oldImgName, const char *diffImgName) {
         finalImage.push_back(it.g);
         finalImage.push_back(it.b);
     }
-    lodepng::encode("oldtmp.png", oldImgVec, oldImgW, oldImgH, LCT_RGB,8);
     lodepng::encode("finale.png",finalImage,newW,newH,LCT_RGB,8);
 }
 

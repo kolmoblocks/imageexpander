@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++14 -Wall -MMD -g
 EXEC = expImg
-OBJECTS = expand_image_tmo.o lodepng.o
+OBJECTS = expand_image.o lodepng.o
 DEPENDS = ${OBJECTS:.o=.d}
 
 ${EXEC}: ${OBJECTS}
