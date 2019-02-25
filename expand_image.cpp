@@ -82,14 +82,13 @@ void expand_image(const char *oldImgName, const char *diffImgName) {
          }
       }
    }
-    std::cout << newW << ' ' << newH;
     std::vector<unsigned char> finalImage;
     for (auto it : newImgVec) {
         finalImage.push_back(it.r);
         finalImage.push_back(it.g);
         finalImage.push_back(it.b);
     }
-    lodepng::encode("finale.png",finalImage,newW,newH,LCT_RGB,8);
+    lodepng::encode("final.png",finalImage,newW,newH,LCT_RGB,8);
 }
 
 int main(int argc, char **argv) {

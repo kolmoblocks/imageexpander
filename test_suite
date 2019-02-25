@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+make -f makefile.expand
+make -f makefile.diff
+
+TEST_DIR=$1
+RESIZE_FACTOR=$2
+CT=1
+
+for i in "$(ls $TEST_DIR)"; do
+	CUR_DIR=$TEST_DIR/$i
+	IMG_NAME=$(ls $CUR_DIR)
+	echo "$CUR_DIR/$IMG_NAME"
+	convert -resize $RESIZE_FACTOR $CUR_DIR/$IMG_NAME $CUR_DIR/s-$IMG_NAME
+	./diff $CUR_DIR/s-$IMG_NAME $CUR_DIR/$IMG_NAME
+	mv ./diff.png $CUR_DIR/
+	./expand $CUR_DIR/s-$IMG_NAME $CUR_DIR/diff.png
+	mv ./final.png $CUR_DIR/
+	echo "File: $IMG_NAME"
+	echo "Old Image Size: $(stat --printf=%s $CUR_DIR/$IMG_NAME)"
+	echo "New Image Size: $(stat --printf=%s $CUR_DIR/s-$IMG_NAME)"
+	echo "Diff Size     : $(stat --printf=%s $CUR_DIR/diff.png)"
+	echo "Space Saved   : $((100-$(stat --printf=%s $CUR_DIR/diff.png)*100/$(stat --printf=%s $CUR_DIR/$IMG_NAME) ))%" 
+done
