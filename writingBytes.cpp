@@ -18,23 +18,29 @@ void WriteBit (int bit) {
   }
 }
 
+
+
 void Flush_Bits(){
-    while (current_bit) {
-        WriteBit (0);
+    while (current_bit < 8) {
+        bit_buffer = (bit_buffer<<1);
+          current_bit++;
     }
+    fwrite (&bit_buffer, 1, 1, f);
     fclose (f); 
 
 }
 
 int main (){
-    WriteBit(1);
     WriteBit(0);
     WriteBit(0);
     WriteBit(0);
     WriteBit(0);
     WriteBit(1);
 
+
+    //need to fill the 0bits from the right and not left
     
     Flush_Bits();
 }
    
+   //xxd -b random.dat
