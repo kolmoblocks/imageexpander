@@ -116,14 +116,12 @@ void generateDiff (const char *lowRes, const char *highRes){
                   // set pixel of the diff at diffX , diffY with the color at the highResImage at innerX , innerY
                   diffVec.push_back(highResImage.at((innerX+innerY*highResWidth)*3));
                 fwrite(&highResImage.at((innerX+innerY*highResWidth)*3), 1, 1, f);
-                unsigned char r,g,b;
-                r = (unsigned int)highResImage.at((innerX+innerY*highResWidth)*3);
+                 int r,g,b;
+                r = (int)highResImage.at((innerX+innerY*highResWidth)*3);
                 // g = highResImage.at((innerX+innerY*highResWidth)*3+1);
                 // b = highResImage.at((innerX+innerY*highResWidth)*3+2);
                 cout<<r<<endl;
-                 
-
-
+                
 
 
                 //   diffVec.push_back(highResImage.at((innerX+innerY*highResWidth)*3+1));
