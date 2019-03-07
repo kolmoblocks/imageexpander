@@ -3,7 +3,8 @@
 #include <fstream>
 #include <cmath>
 #include <unordered_set> 
-
+#include <numeric> 
+#include <string>
 
 using namespace std;
 
@@ -54,42 +55,10 @@ void Flush_Bits(){
 }
 
 
-unsigned int gcd(unsigned int u, unsigned int v)
-{
-    // simple cases (termination)
-    if (u == v)
-        return u;
-
-    if (u == 0)
-        return v;
-
-    if (v == 0)
-        return u;
-
-    // look for factors of 2
-    if (~u & 1) // u is even
-    {
-        if (v & 1) // v is odd
-            return gcd(u >> 1, v);
-        else // both u and v are even
-            return gcd(u >> 1, v >> 1) << 1;
-    }
-
-    if (~v & 1) // u is odd, v is even
-        return gcd(u, v >> 1);
-
-    // reduce larger argument
-    if (u > v)
-        return gcd((u - v) >> 1, v);
-
-    return gcd((v - u) >> 1, u);
-}
-
 // generateDiff(string, string) 
 // generates the diff, which is used by expand_image to expand the lower
 // resolution image.
 void generateDiff (const char *lowRes, const char *highRes){
-    f = fopen ("diff.dat", "w");
     
     std::vector<unsigned char> lowResImage;
     std::vector<unsigned char> highResImage;
@@ -97,7 +66,7 @@ void generateDiff (const char *lowRes, const char *highRes){
 
     diff.reserve( 100000 );
 
-    unsigned lowResWidth, lowResHeight, highResWidth, highResHeight;
+    unsigned int lowResWidth, lowResHeight, highResWidth, highResHeight;
 
     unsigned error = lodepng::decode(lowResImage, lowResWidth, lowResHeight, lowRes, LCT_RGB, 8);
     if (error) {
@@ -128,6 +97,7 @@ void generateDiff (const char *lowRes, const char *highRes){
     const unsigned int height = highResHeight;
     const unsigned int width  = highResWidth;
 
+    vector<unsigned char> deltas;
     vector<int> block;
     unordered_set<int> deltaSet;
 
@@ -154,11 +124,11 @@ void generateDiff (const char *lowRes, const char *highRes){
                         deltaSet.insert(g);
                         deltaSet.insert(b);
 
-                        block.push_back(r);
-                        block.push_back(g);
-                        block.push_back(b);
+                        deltas.push_back(r);
+                        deltas.push_back(g);
+                        deltas.push_back(b);
                         
-                        maxDelta = max(maxDelta,max(abs(r),abs(g),abs(b)));
+                        // maxDelta = max(maxDelta,max(abs(r),abs(g),abs(b)));
                         
 
 
@@ -166,17 +136,16 @@ void generateDiff (const char *lowRes, const char *highRes){
                 }
             }
 
-            float power = log(c)/log(2); // get the number of bits needed then + 1 for sign
-	        int range = (int)floor(power) + 1;
+            // float power = log(c)/log(2); // get the number of bits needed then + 1 for sign
+	        // int range = (int)floor(power) + 1;
 
-            generateBlock(block, range,...some range start val);
-
-            diff.insert( diff.end(), r.begin(), r.end() );
-            diff.insert( diff.end(), g.begin(), g.end() );
-            diff.insert( diff.end(), b.begin(), b.end() );
+            // block = generateBlock(deltas, range,...some range start val);
 
 
-            block.clear();
+            diff.insert( diff.end(), block.begin(), block.end() );
+
+
+            deltas.clear();
             deltaSet.clear();
         }
     }
@@ -185,23 +154,90 @@ void generateDiff (const char *lowRes, const char *highRes){
     fclose (f); 
 }
 
-void generateBlock(vector<unsigned char> &block, int range (+ 1 bit for unsigned), int refR, int refG, int refB){
-    generate header
-    - range size, range start
 
-    calculate delta offset = max(0, lowest delta) - get the range start
 
-    for (auto it: block){
-         vector <char> r =  LTrim_Zeroes(){
-             LTRIM then add 1 bit for sign
-         }
-    }
 
+void writeDiffHeader(unsigned int targetWidth, unsigned int targetHeight, string colormode){
+        f = fopen ("diff.dat", "w");
+        char ID[] = "DIFF";
+        fwrite (ID, 1, 4, f);
+
+        // auto w = to_string(targetWidth);
+        // auto h = to_string(targetHeight);
+
+
+        // fwrite(&w, w.length(), 1, f);
+        // fwrite(&h, h.length(), 1, f);
+        fwrite(&targetWidth, sizeof(unsigned int), 1, f);
+        fwrite(&targetHeight, sizeof(unsigned int), 1, f);
+        fwrite(&colormode, 4,1,f);
+        fclose(f);
 }
+
+
+void readBlock(){
+    FILE * pFile;
+  long lSize;
+  char * buffer;
+  size_t result;
+
+  pFile = fopen ( "diff.dat" , "rb" );
+  if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+  // obtain file size:
+  fseek (pFile , 0 , SEEK_END);
+  lSize = ftell (pFile);
+  rewind (pFile);
+
+  // allocate memory to contain the whole file:
+  buffer = (char*) malloc (sizeof(char)*lSize);
+  if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
+
+  // copy the file into the buffer:
+  result = fread (buffer,4,1,pFile);
+    cout<<buffer<<endl;
+
+  result += fread (buffer,1,4,pFile);
+    cout<<buffer<<endl;
+
+
+  result += fread (buffer,1,4,pFile);
+    cout<<buffer<<endl;
+
+
+  result += fread (buffer,4,1,pFile);
+    cout<<buffer<<endl;
+
+
+    result = 16;
+  if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+  /* the whole file is now loaded in the memory buffer. */
+
+
+  // terminate
+  fclose (pFile);
+  free (buffer);
+}
+// vector<int> generateBlock(vector<unsigned char> &deltas, int range (+ 1 bit for unsigned), int refR, int refG, int refB){
+//     vector<int> block;
+//     // generate header
+//     // - range size, range start
+
+//     // calculate delta offset = max(0, lowest delta) - get the range start
+//     // for (auto it: block){
+//     //      vector <char> r =  LTrim_Zeroes(){
+//     //          LTRIM then add 1 bit for sign
+//     //      }
+//     // }
+//     return block;
+// }
 
 
 
 int main(int argc, char *argv[]){
    // argv[1]: smaller file
-   generateDiff(argv[1], argv[2]);
+//    generateDiff(argv[1], argv[2]);
+    writeDiffHeader(1920,1080,"RGB");
+    readBlock();
 }
