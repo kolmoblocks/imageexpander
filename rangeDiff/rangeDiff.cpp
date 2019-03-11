@@ -64,7 +64,7 @@ void Flush_Bits(){
 
 
 
-void generateDiff (const char *lowRes, const char *highRes){
+vector<unsigned char> generateDiff (const char *lowRes, const char *highRes, int height, int width, int x, int y){
     f = fopen ("random.dat", "w");
     std::vector<unsigned char> lowResImage;
     std::vector<unsigned char> highResImage;
@@ -77,13 +77,13 @@ void generateDiff (const char *lowRes, const char *highRes){
     unsigned error = lodepng::decode(lowResImage, lowResWidth, lowResHeight, lowRes, LCT_RGB, 8);
     if (error) {
         std::cout << error;
-        return;
+        return diff;
     }
 
     error = lodepng::decode(highResImage, highResWidth, highResHeight, highRes, LCT_RGB, 8);
     if (error) {
         std::cout << error;
-        return;
+        return diff;
     }
     
     
@@ -113,8 +113,8 @@ void generateDiff (const char *lowRes, const char *highRes){
             // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
            
             block.reserve(10);
-            int maxDelta = 0;
-            int minDelta = 0;
+            int maxDeltaG = 0 ,maxDeltaR= 0,maxDeltaB;
+            int minDeltaG = 0 ,minDeltaR= 0,minDeltaB;
             int r, g, b;
 
             for (int innerX = x; innerX < x+highFactor; ++innerX) {
@@ -127,6 +127,11 @@ void generateDiff (const char *lowRes, const char *highRes){
                         r = (int)highResImage.at((innerX+innerY*highResWidth)*3);
                         g = (int)highResImage.at((innerX+innerY*highResWidth)*3+1);
                         b = (int)highResImage.at((innerX+innerY*highResWidth)*3+2);
+
+                        //get deltas
+                        //get reference pixel with formula
+
+
                         deltaSet.insert(r);
                         deltaSet.insert(g);
                         deltaSet.insert(b);
@@ -135,26 +140,39 @@ void generateDiff (const char *lowRes, const char *highRes){
                         deltas.push_back(g);
                         deltas.push_back(b);
                         
-                        maxDelta = max(maxDelta,max(abs(r),abs(g),abs(b)));
-                        minDelta = min(maxDelta,min(abs(r),abs(g),abs(b)));
+                        maxDeltaR = max(maxDeltaR,r);
+                        maxDeltaG = max(maxDeltaG,g);
+                        maxDeltaB = max(maxDeltaB,b);
+                       
+                        minDeltaR = max(minDeltaR,r);
+                        minDeltaG = max(minDeltaG,g);
+                        minDeltaB = max(minDeltaB,b);
+                       
 
 
                     }
                 }
             }
 
+            
+            //move to helper function to abstract for all streams
             float power = log(maxDelta)/log(2); // get the number of bits needed then + 1 for sign
 	        int rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
+            int offset;
+            if (minDelta >= 0 || minDelta <= 0 && maxDelta <= 0) {
+                offset = minDelta;
+            } else {
+                offset = (minDelta + maxDelta) / 2;
+            }
             
-            
-            minDelta = max(minDelta)
-
-            block = generateBlock(deltas, rangeSize,...some range start val);
 
 
-            diff.insert( diff.end(), block.begin(), block.end() );
+            //depending on config block - use either r orm
+
+            insertRangeBlock(diff, deltas, rangeSize,...some range start val);
 
 
+            // diff.insert( diff.end(), block.begin(), block.end() );
             deltas.clear();
             deltaSet.clear();
         }
@@ -222,12 +240,11 @@ void readBlock(){
     free (buffer);
 }
 
-vector<int
 
-vector<int> generateBlock(vector<unsigned char> &deltas, int rangeSize, int refR, int refG, int refB){
+void insertRangeBlock(vector<unsigned char> &diff, vector<unsigned char> &deltas, int rangeSize, int){
     vector<int> block;
-    generate header
-    - range size, range start
+    // generate header
+    // - range size, range start
 
     calculate delta offset = max(0, lowest delta) - get the range start
     for (auto it: block){
