@@ -30,9 +30,6 @@ vector<char> LTrim_Zeroes(int c, int range) {
 }
 
 
-
-
-
 void WriteBit (int bit) {
   if (bit)
     bit_buffer |= (1<<current_bit);
@@ -120,7 +117,6 @@ void generateDiff (const char *lowRes, const char *highRes){
             int minDelta = 0;
             int r, g, b;
 
-            
             for (int innerX = x; innerX < x+highFactor; ++innerX) {
                 for (int innerY = y; innerY < y+highFactor; ++innerY) {
                 // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
@@ -179,8 +175,6 @@ void writeDiffHeader(unsigned int targetWidth, unsigned int targetHeight, string
 
         // auto w = to_string(targetWidth);
         // auto h = to_string(targetHeight);
-
-
         // fwrite(&w, w.length(), 1, f);
         // fwrite(&h, h.length(), 1, f);
         fwrite(&targetWidth, sizeof(unsigned int), 1, f);
