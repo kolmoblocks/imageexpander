@@ -1,5 +1,5 @@
 #include "lodepng.h"
-#include "rangeDiff.h"
+#include "rangeDiff/rangeDiff.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -13,15 +13,15 @@ FILE *f;
 int current_bit = 0;
 unsigned char bit_buffer;
 
-vector<char> LTrim_Zeroes(int c, int range) {
-	vector<char> v;
-    bool leadingZero = false;
+vector<unsigned char> lTrimZeroes(int c, int range) {
+	vector<unsigned char> v;
+    bool leadingZero = true;
 
     for (int i = range; i >= 0; i--){
         if (leadingZero){
             if ((c & (1 << i)) != 0) {
                 v.push_back(1);
-                leadingZero = true;
+                leadingZero = false;
 		    }  
         } else{
             v.push_back((c & (1 << i)) != 0);
@@ -31,7 +31,7 @@ vector<char> LTrim_Zeroes(int c, int range) {
 }
 
 
-void WriteBit (int bit) {
+void writeBit (int bit) {
   if (bit)
     bit_buffer |= (1<<current_bit);
 
@@ -44,16 +44,16 @@ void WriteBit (int bit) {
   }
 }
 
-void PadZeroes(){
+void padZeroes(vector <unsigned char> c){
     while (current_bit) {
-        WriteBit (0);
+        writeBit (0);
     }
     fclose (f); 
 
 }
 
 
-void Flush_Bits(){
+void flushBits(){
     while (current_bit < 8) {
         bit_buffer = (bit_buffer<<1);
           current_bit++;
@@ -246,20 +246,6 @@ void readBlock(){
     fclose (pFile);
     free (buffer);
 }
-
-
-void insertRangeBlock(vector<unsigned char> &diff, vector<short int> &deltas, int rangeSize, int){
-    // generate header
-    // - range size, range start
-
-    for (auto it: deltas){
-         vector <char> r =  LTrim_Zeroes(it, rangeSize){
-             LTRIM then add 1 bit for sign
-         }
-    }
-    //insert delta into diff
-}
-
 
 
 int main(int argc, char *argv[]){
