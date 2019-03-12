@@ -23,14 +23,14 @@ typedef struct {
     unsigned char r, g, b;
 } color;
 
-class delUnit {
+class deltaUnit {
     int len;
     color *colors;
 public:
-    delUnit(int len): len{len} {
+    deltaUnit(int len): len{len} {
         colors = (color*)malloc(len*sizeof(color));
     }
-    ~delUnit() {
+    ~deltaUnit() {
         free(colors);
     }
 
@@ -90,7 +90,7 @@ void flushBits(){
 
 }
 
-void populateBlocks(std::vector<blockParams> &blocks, std::vector<delUnit> &units) {
+void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &units) {
     // logic here to statisticallly determine "good" configuration of blocks
 
     blocks.push_back(blockParams{posn{0,0},posn{20,20},'R'});
@@ -98,11 +98,11 @@ void populateBlocks(std::vector<blockParams> &blocks, std::vector<delUnit> &unit
 }
 
 
-vector<short int> generateDiff (const char *lowRes, const char *highRes,  int height, int width, int x, int y){
+vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  int height, int width, int x, int y){
     f = fopen ("random.dat", "w");
     std::vector<unsigned char> lowResImage;
     std::vector<unsigned char> highResImage;
-    std::vector<short int> diff;
+    std::vector<unsigned char> diff;
 
     diff.reserve( 100000 );
 
@@ -143,7 +143,7 @@ vector<short int> generateDiff (const char *lowRes, const char *highRes,  int he
     int deltaR, deltaG,deltaB;
     // iterating through blocks, x and y indicate the top left positions of each block.
     // get units from pixels somehow
-    std::vector<delUnit> units;
+    std::vector<deltaUnit> units;
     std::vector<blockParams> blocks;
     populateBlocks(blocks, units);
 

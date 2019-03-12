@@ -19,6 +19,6 @@ void padZeroes(vector <unsigned char> c);
 
 void flushBits();
 
-vector<short int> generateDiff (const char *lowRes, const char *highRes, int height, int width, int x, int y);
+vector<unsigned char> generateDiff (const char *lowRes, const char *highRes, int height, int width, int x, int y);
 
 #endif
