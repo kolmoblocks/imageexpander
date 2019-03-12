@@ -6,8 +6,35 @@
 #include <unordered_set> 
 #include <numeric> 
 #include <string>
+const int TYPE_MAP = 0, TYPE_RANGE = 1;
 
 using namespace std;
+
+typedef struct {
+    int x, y;
+} posn;
+
+typedef struct {
+    posn tl, br;
+    int type;
+} blockParams;
+
+typedef struct {
+    unsigned char r, g, b;
+} color;
+
+class delUnit {
+    int len;
+    color *colors;
+public:
+    delUnit(int len): len{len} {
+        colors = malloc(len*sizeof(color));
+    }
+    ~delUnit() {
+        free(colors);
+    }
+
+};
 
 FILE *f;
 int current_bit = 0;
@@ -63,9 +90,15 @@ void flushBits(){
 
 }
 
+void populateBlocks(std::vector<blockParams> &blocks, std::vector<delUnit> &units) {
+    // logic here to statisticallly determine "good" configuration of blocks
+
+    blocks.push_back(blockParams{posn{0,0},posn{20,20},'R'};
+    blocks.push_back(blockParams{posn{21,21},posn{25,25},'M');
+}
 
 
-vector<short int> generateDiff (const char *lowRes, const char *highRes, int height, int width, int x, int y){
+vector<short int> generateDiff (const char *lowRes, const char *highRes,  int height, int width, int x, int y){
     f = fopen ("random.dat", "w");
     std::vector<unsigned char> lowResImage;
     std::vector<unsigned char> highResImage;
@@ -109,6 +142,11 @@ vector<short int> generateDiff (const char *lowRes, const char *highRes, int hei
     unordered_set<int> deltaSet;
     int deltaR, deltaG,deltaB;
     // iterating through blocks, x and y indicate the top left positions of each block.
+    // get units from pixels somehow
+    std::vector<delUnit> units;
+    std::vector<blockParams> blocks;
+    populateBlocks(blocks, units);
+
     for (std::size_t y=0; y<height; y+= highFactor) {
         for (std::size_t x=0; x<width; x+= highFactor) {
             // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
@@ -131,7 +169,7 @@ vector<short int> generateDiff (const char *lowRes, const char *highRes, int hei
                         //get deltas
                         //get reference pixel with formula
 
-                        
+
                         if (innerX == innerY){
                             deltaR = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3)   - r;
                             deltaG = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3+1) - b;
