@@ -93,8 +93,8 @@ void flushBits(){
 void populateBlocks(std::vector<blockParams> &blocks, std::vector<delUnit> &units) {
     // logic here to statisticallly determine "good" configuration of blocks
 
-    blocks.push_back(blockParams{posn{0,0},posn{20,20},'R'};
-    blocks.push_back(blockParams{posn{21,21},posn{25,25},'M');
+    blocks.push_back(blockParams{posn{0,0},posn{20,20},'R'});
+    blocks.push_back(blockParams{posn{21,21},posn{25,25},'M'});
 }
 
 
