@@ -28,7 +28,7 @@ class delUnit {
     color *colors;
 public:
     delUnit(int len): len{len} {
-        colors = malloc(len*sizeof(color));
+        colors = (color*)malloc(len*sizeof(color));
     }
     ~delUnit() {
         free(colors);
