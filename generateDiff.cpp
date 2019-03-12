@@ -27,7 +27,7 @@ class delUnit {
     int len;
     color *colors;
 public:
-    delUnit(int len): len{len} {
+    delUnit(int len): len(len) {
         colors = (color*)malloc(len*sizeof(color));
     }
     ~delUnit() {

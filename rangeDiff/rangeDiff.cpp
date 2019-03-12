@@ -12,7 +12,7 @@ using namespace std;
 
 void insertRangeHeader(vector<unsigned char> &diff, int rangeSize, int offset){
     vector <unsigned char> offsetByte= lTrimZeroes(offset,8);
-    vector <unsigned char> rangeSizeByte = lTrimZeroes(rangeSize);
+    vector <unsigned char> rangeSizeByte = lTrimZeroes(rangeSize, 8);
     diff.insert(diff.end(), offsetByte.begin(), offsetByte.end());
     diff.insert(diff.end(), rangeSizeByte.begin(), rangeSizeByte.end());
 
@@ -21,7 +21,7 @@ void insertRangeHeader(vector<unsigned char> &diff, int rangeSize, int offset){
 void insertRangeBlock(vector<unsigned char> &diff, vector<short int> &deltas, int rangeSize, int offset){
     // generate headers
     // - range size, range start
-    insertRangeHeader;
+    insertRangeHeader(diff, rangeSize, offset);
     for (auto it: deltas){
          vector <unsigned char> b  =  lTrimZeroes(it, rangeSize);
          //LTRIM then add 1 bit for sign
@@ -30,11 +30,9 @@ void insertRangeBlock(vector<unsigned char> &diff, vector<short int> &deltas, in
          }
          padZeroes(b);
          
-         for (auto bit: b){
-             diff.push_back(bit);
-         }
-    }
     //insert delta into diff
+    diff.insert(diff.end(), b.begin(), b.end());
+
 }
 
 
