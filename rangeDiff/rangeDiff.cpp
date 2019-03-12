@@ -64,11 +64,11 @@ void Flush_Bits(){
 
 
 
-vector<unsigned char> generateDiff (const char *lowRes, const char *highRes, int height, int width, int x, int y){
+vector<> generateDiff (const char *lowRes, const char *highRes, int height, int width, int x, int y){
     f = fopen ("random.dat", "w");
     std::vector<unsigned char> lowResImage;
     std::vector<unsigned char> highResImage;
-    std::vector<unsigned char> diff;
+    std::vector<char> diff;
 
     diff.reserve( 100000 );
 
@@ -103,10 +103,10 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes, int
     const unsigned int height = highResHeight;
     const unsigned int width  = highResWidth;
 
-    vector<unsigned char> deltas;
+    vector<> deltas;
     vector<int> block;
     unordered_set<int> deltaSet;
-
+    int deltaR, deltaG,deltaB;
     // iterating through blocks, x and y indicate the top left positions of each block.
     for (std::size_t y=0; y<height; y+= highFactor) {
         for (std::size_t x=0; x<width; x+= highFactor) {
@@ -131,22 +131,37 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes, int
                         //get deltas
                         //get reference pixel with formula
 
-
-                        deltaSet.insert(r);
-                        deltaSet.insert(g);
-                        deltaSet.insert(b);
-
-                        deltas.push_back(r);
-                        deltas.push_back(g);
-                        deltas.push_back(b);
                         
-                        maxDeltaR = max(maxDeltaR,r);
-                        maxDeltaG = max(maxDeltaG,g);
-                        maxDeltaB = max(maxDeltaB,b);
+                        if (innerX == innerY){
+                            deltaR = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3)   - r;
+                            deltaG = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3+1) - b;
+                            deltaB = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3+2) - g;
+                        } else if (innerX > innerY){
+                            deltaR = (int)highResImage.at(((innerX-1)+innerY*highResWidth)*3)   - r;
+                            deltaG = (int)highResImage.at(((innerX-1)+innerY*highResWidth)*3+1) - g;
+                            deltaB = (int)highResImage.at(((innerX-1)+innerY*highResWidth)*3+2) - b;
+                        } else {
+                            deltaR = (int)highResImage.at((innerX+(innerY-1)*highResWidth)*3)   - r;
+                            deltaG = (int)highResImage.at((innerX+(innerY-1)*highResWidth)*3+1) - b;
+                            deltaB = (int)highResImage.at((innerX+(innerY-1)*highResWidth)*3+2) - g;
+                        }
+                        
+                        
+                        deltaSet.insert(deltaR);
+                        deltaSet.insert(deltaG);
+                        deltaSet.insert(deltaB);
+
+                        deltas.push_back(deltaR);
+                        deltas.push_back(deltaG);
+                        deltas.push_back(deltaB);
+                        
+                        maxDeltaR = max(maxDeltaR,deltaR);
+                        maxDeltaG = max(maxDeltaG,deltaG);
+                        maxDeltaB = max(maxDeltaB,deltaB);
                        
-                        minDeltaR = max(minDeltaR,r);
-                        minDeltaG = max(minDeltaG,g);
-                        minDeltaB = max(minDeltaB,b);
+                        minDeltaR = max(minDeltaR,deltaR);
+                        minDeltaG = max(minDeltaG,deltaG);
+                        minDeltaB = max(minDeltaB,deltaB);
                        
 
 
