@@ -75,6 +75,37 @@ public:
     }
 };
 
+class blockIterator {
+    std::vector<deltaUnit> &units;
+public:
+    posn pos, tl, br;
+    int unitLength;
+    
+    blockIterator(std::vector<deltaUnit> &units, posn tl, posn br, int width): units{units}, pos{tl}, tl{tl}, br{br}, width{width} {
+    }
+
+    blockIterator &operator++() {
+        if (pos.x == br.x) {
+            pos.x = tl.x;
+            ++pos.y;
+        }
+        else if (pos.y == br.y) {
+            return NULL;
+        }
+        else {
+            ++pos.x;
+        }
+    }
+
+    blockIterator &operator!=(blockIterator other) {
+        return pos != other.pos;
+    }
+
+    blockIterator &operator*() {
+        return units[pos.y*width + pos.x];
+    }
+}
+
 FILE *f;
 int current_bit = 0;
 unsigned char bit_buffer;
@@ -240,66 +271,19 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
     // iterating through blocks, x and y indicate the top left positions of each block.
     // get units from pixels somehow
     std::vector<deltaUnit> units;
-    std::vector<blockParams> blocks;
-    populateBlocks(blocks, units);
+    std::vector<blockParams> blocksConfig;
+    populateBlocks(blocksConfig, units);
 
 
 
-    for (std::size_t y=0; y<height; ++y) {
-        for (std::size_t x=0; x<width; x+= highFactor) {
+    for (auto block : blocksConfig) {
             // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
            
-            block.reserve(10);
             int maxDelta=-255, minDelta=255; 
             int r, g, b;
 
-            for (int innerX = x; innerX < x+highFactor; ++innerX) {
-                for (int innerY = y; innerY < y+highFactor; ++innerY) {
-                // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
-                    if (!(innerX < x+lowFactor) || !(innerY < y+lowFactor)) {
-                        // set pixel of the diff at diffX , diffY with the color at the highResImage at innerX , innerY
+            blockIterator begin{units, block.tl, block.br, highResWidth/highfactor};
 
-
-                        r = (int)highResImage.at((innerX+innerY*highResWidth)*3);
-                        g = (int)highResImage.at((innerX+innerY*highResWidth)*3+1);
-                        b = (int)highResImage.at((innerX+innerY*highResWidth)*3+2);
-
-                        //get deltas
-                        //get reference pixel with formula
-
-
-                        if (innerX == innerY){
-                            deltaR = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3)   - r;
-                            deltaG = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3+1) - b;
-                            deltaB = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3+2) - g;
-                        } else if (innerX > innerY){
-                            deltaR = (int)highResImage.at(((innerX-1)+innerY*highResWidth)*3)   - r;
-                            deltaG = (int)highResImage.at(((innerX-1)+innerY*highResWidth)*3+1) - g;
-                            deltaB = (int)highResImage.at(((innerX-1)+innerY*highResWidth)*3+2) - b;
-                        } else {
-                            deltaR = (int)highResImage.at((innerX+(innerY-1)*highResWidth)*3)   - r;
-                            deltaG = (int)highResImage.at((innerX+(innerY-1)*highResWidth)*3+1) - b;
-                            deltaB = (int)highResImage.at((innerX+(innerY-1)*highResWidth)*3+2) - g;
-                        }
-                        
-                        
-                        deltaSet.insert(deltaR);
-                        deltaSet.insert(deltaG);
-                        deltaSet.insert(deltaB);
-
-                        deltas.push_back(deltaR);
-                        deltas.push_back(deltaG);
-                        deltas.push_back(deltaB);
-                        
-                        maxDelta = max(maxDelta,max(deltaR,deltaG,deltaB));
-                        minDelta = min(minDelta,min(deltaR,deltaG,deltaB));
-                       
-
-                    }
-                }
-            }
-
-            
             //move to helper function to abstract for all streams
             float power = log(maxDelta)/log(2); // get the number of bits needed then + 1 for sign
 	        int rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
@@ -310,14 +294,13 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
                 offset = (minDelta + maxDelta) / 2;
             }
             
-            //depending on config block - use either r orm
+            //depending on config block - use either r or m
 
-            insertRangeBlock(diff, deltas, rangeSize, offset);
+            //insertRangeBlock(diff, begin, rangeSize, offset);
 
 
             // diff.insert( diff.end(), block.begin(), block.end() );
             deltas.clear();
-            deltaSet.clear();
         }
     }
 
