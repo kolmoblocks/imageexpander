@@ -31,12 +31,12 @@ color &operator-(color col1, color col2) {
 
 color &max(color col1, color col2) {
     // sanity check for maximum delta
-    return color{min(max(col1.r, col2.r),255), min(max(col1.g, col2.g),255), min(255,max(col1.b, col2.b))};
+    return color{max(col1.r, col2.r), max(col1.g, col2.g), max(col1.b, col2.b)};
 }
 
 color &min(color col1, color col2) {
     // sanity check for minimum delta
-    return color{max(min(col1.r, col2.r),-255), max(min(col1.g, col2.g),-255), max(-255,min(col1.b, col2.b))};
+    return color{min(col1.r, col2.r), min(col1.g, col2.g), min(col1.b, col2.b)};
 }
 
 class deltaUnit {
@@ -73,36 +73,56 @@ public:
     color getMin() {
         return minDeltas;
     }
+    int size() {
+        return len;
+    }
+    color &at(int pos) {
+        if (pos < len && pos >= 0) {
+            return colors[pos];
+        }
+        throw std::logic_error("requested delta Unit color position is out of range.")
+    }
 };
 
 class blockIterator {
     std::vector<deltaUnit> &units;
 public:
     posn pos, tl, br;
-    int unitLength;
+    int unitLength, innerUnitPos=0;
     
-    blockIterator(std::vector<deltaUnit> &units, posn tl, posn br, int width): units{units}, pos{tl}, tl{tl}, br{br}, width{width} {
-    }
+    blockIterator(std::vector<deltaUnit> &units, posn tl, posn br, int width): 
+        units{units}, pos{tl}, tl{tl}, br{br}, width{width}, unitLength{units[0].size()} {}
 
     blockIterator &operator++() {
-        if (pos.x == br.x) {
-            pos.x = tl.x;
-            ++pos.y;
-        }
-        else if (pos.y == br.y) {
-            return NULL;
+        if (innerUnitPos < deltaUnitLength) {
+            ++innerUnitPos;
         }
         else {
-            ++pos.x;
+            innerUnitPos = 0;
+            if (pos.x == br.x) {
+                pos.x = tl.x;
+                ++pos.y;
+            }
+            else if (pos.y == br.y) {
+                return NULL;
+            }
+            else {
+                ++pos.x;
+            }
         }
+        return this;
     }
 
-    blockIterator &operator!=(blockIterator other) {
+    bool operator!=(blockIterator other) {
         return pos != other.pos;
     }
 
-    blockIterator &operator*() {
-        return units[pos.y*width + pos.x];
+    color &operator*() {
+        return units[pos.y*width + pos.x].at(innerUnitPos);
+    }
+
+    void reset() {
+        pos = tl;
     }
 }
 
@@ -177,7 +197,9 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
     for (std::size_t y=0; y<height; y += highFactor) {
         for (std::size_t x=0; x<width; x+= highFactor) {
             int r, g, b;
-            deltaUnit curUnit{deltaUnitLength};
+            deltaUnit curDeltaUnit{deltaUnitLength};
+            curDeltaUnit.setMax(color{-255,-255,-255});
+            curDeltaUnit.setMin(color{255,255,255});
 
             // loop into each block
             for (int innerX = x; innerX < x+highFactor; ++innerX) {
@@ -211,15 +233,15 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                         deltaColor = donor - curColor;
                         
                         // push delta Color to the unit
-                        curUnit.push_back(deltaUnit);
+                        curDeltaUnit.push_back(deltaUnit);
 
-                        curUnit.setMax(max(deltaColor, curUnit.getMax()));
-                        curUnit.setMin(min(deltaColor, curUnit.getMin()));
+                        curDeltaUnit.setMax(max(deltaColor, curDeltaUnit.getMax()));
+                        curDeltaUnit.setMin(min(deltaColor, curDeltaUnit.getMin()));
                     }
                 }
             }
 
-            units.push_back(curUnit);
+            units.push_back(curDeltaUnit);
         }
     }
 }
@@ -246,8 +268,6 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
         std::cout << error;
         return diff;
     }
-    
-    
 
     unsigned denom = gcd(lowResWidth, highResWidth);
     // finding numerator and denominator of ratio (lowFactor, highFactor respectively)
@@ -265,7 +285,6 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
     const unsigned int width  = highResWidth;
 
     vector<short int> deltas;
-    vector<int> block;
     unordered_set<int> deltaSet;
     int deltaR, deltaG,deltaB;
     // iterating through blocks, x and y indicate the top left positions of each block.
@@ -273,14 +292,9 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
     std::vector<deltaUnit> units;
     std::vector<blockParams> blocksConfig;
     populateBlocks(blocksConfig, units);
-
-
-
+    
     for (auto block : blocksConfig) {
             // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
-           
-            int maxDelta=-255, minDelta=255; 
-            int r, g, b;
 
             blockIterator begin{units, block.tl, block.br, highResWidth/highfactor};
 
