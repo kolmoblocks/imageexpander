@@ -30,10 +30,12 @@ color &operator-(color col1, color col2) {
 }
 
 color &max(color col1, color col2) {
+    // sanity check for maximum delta
     return color{min(max(col1.r, col2.r),255), min(max(col1.g, col2.g),255), min(255,max(col1.b, col2.b))};
 }
 
 color &min(color col1, color col2) {
+    // sanity check for minimum delta
     return color{max(min(col1.r, col2.r),-255), max(min(col1.g, col2.g),-255), max(-255,min(col1.b, col2.b))};
 }
 
@@ -132,22 +134,25 @@ void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &un
 }
 
 void populateDeltas(std::vector<unsigned char> &image, int width, int height, int highFactor, int lowFactor, std::vector<deltaUnit> &units) {
+    // calculate the delta unit length from default block configuration
     int deltaUnitLength = highFactor*highfactor - lowFactor*lowfactor;
     
     if (deltaUnitLength < 0) {
         throw std::logic_error("delta unit length less than 0");
     }
 
+
+    // loop across each block
     for (std::size_t y=0; y<height; y += highFactor) {
         for (std::size_t x=0; x<width; x+= highFactor) {
             int r, g, b;
             deltaUnit curUnit{deltaUnitLength};
-            color upperLeft = {image.at((y*width+x)*3),image.at((y*width+x)*3+1),image.at((y*width+x)*3+2)};
 
+            // loop into each block
             for (int innerX = x; innerX < x+highFactor; ++innerX) {
                 for (int innerY = y; innerY < y+highFactor; ++innerY) {
                 
-                // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
+                    // only get and set pixel delta if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                     if (!(innerX < x+lowFactor) || !(innerY < y+lowFactor)) {
                         // deltaColor is the delta to be pushed to the delta unit, deltaDonor is the color that the delta is set relative to
                         color deltaColor, deltaDonor;
