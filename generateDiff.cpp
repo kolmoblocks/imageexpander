@@ -6,6 +6,8 @@
 #include <unordered_set> 
 #include <numeric> 
 #include <string>
+#include <memory>
+#include <error>
 const int TYPE_MAP = 0, TYPE_RANGE = 1;
 
 using namespace std;
@@ -25,10 +27,16 @@ typedef struct {
 
 class deltaUnit {
     int len;
+    int ct=0;
     color *colors;
 public:
     deltaUnit(int len): len(len) {
         colors = (color*)malloc(len*sizeof(color));
+    }
+    void push(color col) {
+        if (ct >= len) throw std::logic_error("pushing past specified deltaUnit length");
+        colors[ct] = col;
+        ++ct;
     }
     ~deltaUnit() {
         free(colors);
@@ -75,8 +83,6 @@ void padZeroes(vector <unsigned char> c){
     while (current_bit) {
         writeBit (0);
     }
-    fclose (f); 
-
 }
 
 
@@ -86,7 +92,6 @@ void flushBits(){
           current_bit++;
     }
     fwrite (&bit_buffer, 1, 1, f);
-    fclose (f); 
 
 }
 
@@ -95,6 +100,64 @@ void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &un
 
     blocks.push_back(blockParams{posn{0,0},posn{20,20},'R'});
     blocks.push_back(blockParams{posn{21,21},posn{25,25},'M'});
+}
+
+void populateDeltas(std::vector<unsigned char> &image, int width, int height, int highFactor, int lowFactor, std::vector<deltaUnit> &units) {
+    for (std::size_t y=0; y<height; y += highFactor) {
+        for (std::size_t x=0; x<width; x+= highFactor) {
+            // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
+            int maxDelta=-255, minDelta=255; 
+            int r, g, b;
+            color upperLeft = {image.at((y*width+x)*3),image.at((y*width+x)*3+1),image.at((y*width+x)*3+2)};
+
+            for (int innerX = x; innerX < x+highFactor; ++innerX) {
+                for (int innerY = y; innerY < y+highFactor; ++innerY) {
+                
+                // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
+                    if (!(innerX < x+lowFactor) || !(innerY < y+lowFactor)) {
+                        // set pixel of the diff at diffX , diffY with the color at the highResImage at innerX , innerY
+
+                        
+                        // r = (int)image.at((innerX+innerY*width)*3);
+                        // g = (int)image.at((innerX+innerY*width)*3+1);
+                        // b = (int)image.at((innerX+innerY*width)*3+2);
+
+                        //get deltas
+                        //get reference pixel with formula
+
+
+                        // if (innerX == innerY){
+                        //     deltaR = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3)   - r;
+                        //     deltaG = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3+1) - b;
+                        //     deltaB = (int)highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3+2) - g;
+                        // } else if (innerX > innerY){
+                        //     deltaR = (int)highResImage.at(((innerX-1)+innerY*highResWidth)*3)   - r;
+                        //     deltaG = (int)highResImage.at(((innerX-1)+innerY*highResWidth)*3+1) - g;
+                        //     deltaB = (int)highResImage.at(((innerX-1)+innerY*highResWidth)*3+2) - b;
+                        // } else {
+                        //     deltaR = (int)highResImage.at((innerX+(innerY-1)*highResWidth)*3)   - r;
+                        //     deltaG = (int)highResImage.at((innerX+(innerY-1)*highResWidth)*3+1) - b;
+                        //     deltaB = (int)highResImage.at((innerX+(innerY-1)*highResWidth)*3+2) - g;
+                        // }
+                        
+                        
+                        deltaSet.insert(deltaR);
+                        deltaSet.insert(deltaG);
+                        deltaSet.insert(deltaB);
+
+                        deltas.push_back(deltaR);
+                        deltas.push_back(deltaG);
+                        deltas.push_back(deltaB);
+                        
+                        maxDelta = max(maxDelta,max(deltaR,deltaG,deltaB));
+                        minDelta = min(minDelta,min(deltaR,deltaG,deltaB));
+                       
+
+                    }
+                }
+            }
+        }
+    }
 }
 
 
@@ -147,7 +210,9 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
     std::vector<blockParams> blocks;
     populateBlocks(blocks, units);
 
-    for (std::size_t y=0; y<height; y+= highFactor) {
+
+
+    for (std::size_t y=0; y<height; ++y) {
         for (std::size_t x=0; x<width; x+= highFactor) {
             // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
            
@@ -224,7 +289,6 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
     }
 
    std::cout << lodepng_error_text(error) << std::endl;
-    fclose (f); 
 }
 
 
@@ -243,7 +307,6 @@ void writeDiffHeader(unsigned int targetWidth, unsigned int targetHeight, string
         fwrite(&targetWidth, sizeof(unsigned int), 1, f);
         fwrite(&targetHeight, sizeof(unsigned int), 1, f);
         fwrite(&colormode, 4,1,f);
-        fclose(f);
 }
 
 

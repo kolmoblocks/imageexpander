@@ -6,8 +6,8 @@
 #include <numeric> 
 #include <string>
 
-void writeMBlock(char *buf, std::vector<unsigned char>::iterator start, std::vector<unsigned char>::iterator end) {
-    std::vector<unsigned char>::pos = start;
+void writeMBlock(std::vector<MB) {
+    
     char id = 'M';
     fwrite()
     while (pos != end) {
