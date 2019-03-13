@@ -22,19 +22,33 @@ typedef struct {
 } blockParams;
 
 typedef struct {
-    unsigned char r, g, b;
+    short int r, g, b;
 } color;
 
 color &operator-(color col1, color col2) {
     return color{col1.r-col2.r, col1.g-col2.g, col1.b-col2.b};
 }
 
+color &max(color col1, color col2) {
+    return color{min(max(col1.r, col2.r),255), min(max(col1.g, col2.g),255), min(255,max(col1.b, col2.b))};
+}
+
+color &min(color col1, color col2) {
+    return color{max(min(col1.r, col2.r),-255), max(min(col1.g, col2.g),-255), max(-255,min(col1.b, col2.b))};
+}
+
 class deltaUnit {
     int len;
     int ct=0;
     color *colorDeltas;
+    color maxDeltas;
+    color minDeltas;
 public:
     deltaUnit(int len): len(len) {
+        colors = (color*)malloc(len*sizeof(color));
+    }
+
+    deltaUnit(int len, color max, color min): len{len}, maxDeltas{max}, minDeltas{min} {
         colors = (color*)malloc(len*sizeof(color));
     }
     void push_back(color col) {
@@ -44,6 +58,18 @@ public:
     }
     ~deltaUnit() {
         free(colorDeltas);
+    }
+    void setMax(color col) {
+        maxDeltas = col;
+    }
+    void setMin(color col) {
+        minDeltas = col;
+    }
+    color getMax() {
+        return maxDeltas;
+    }
+    color getMin() {
+        return minDeltas;
     }
 };
 
@@ -114,8 +140,6 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
 
     for (std::size_t y=0; y<height; y += highFactor) {
         for (std::size_t x=0; x<width; x+= highFactor) {
-            // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
-            int maxDelta=-255, minDelta=255;
             int r, g, b;
             deltaUnit curUnit{deltaUnitLength};
             color upperLeft = {image.at((y*width+x)*3),image.at((y*width+x)*3+1),image.at((y*width+x)*3+2)};
@@ -125,14 +149,15 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                 
                 // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                     if (!(innerX < x+lowFactor) || !(innerY < y+lowFactor)) {
-
+                        // deltaColor is the delta to be pushed to the delta unit, deltaDonor is the color that the delta is set relative to
                         color deltaColor, deltaDonor;
+
+                        // current loop-specified color
                         color curColor{image.at((innerX+innerY*width)*3),
                                         image.at((innerX+innerY*width)*3+1)
                                         image.at((innerX+innerY*width)*3+2)};
 
-
-
+                        // setting donor pixel logically as top, left, or top-left pixel relative to current pixel.
                         if (innerX == innerY){
                             donor = {highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3),
                                         highResImage.at(((innerX-1)+(innerY-1)*highResWidth)*3+1),
@@ -149,7 +174,11 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                         
                         deltaColor = donor - curColor;
                         
-                        curUnit.push_back(deltaColor);
+                        // push delta Color to the unit
+                        curUnit.push_back(deltaUnit);
+
+                        curUnit.setMax(max(deltaColor, curUnit.getMax()));
+                        curUnit.setMin(min(deltaColor, curUnit.getMin()));
                     }
                 }
             }
