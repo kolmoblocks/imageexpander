@@ -114,12 +114,16 @@ vector<unsigned char> lTrimZeroes(int c, int range) {
 	vector<unsigned char> v;
     bool leadingZero = true;
 
-    for (int i = range; i >= 0; i--){
-        if (leadingZero){
+	if (c < 0) {
+            v.push_back(1);
+			c *= -1;
+         } else {
+            v.push_back(0);
+         }
+    for (int i = range-1; i >= 0; i--){
             if ((c & (1 << i)) != 0) {
                 v.push_back(1);
-                leadingZero = false;
-		    }  
+                leadingZero = false; 
         } else{
             v.push_back((c & (1 << i)) != 0);
         }
@@ -291,15 +295,13 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
             if (minDelta >= 0 || minDelta <= 0 && maxDelta <= 0) {
                 offset = minDelta;
             } else {
-                offset = (minDelta + maxDelta) / 2;
+                offset = (minDelta + maxDeltax) / 2;
             }
             
             //depending on config block - use either r or m
 
             //insertRangeBlock(diff, begin, rangeSize, offset);
 
-
-            // diff.insert( diff.end(), block.begin(), block.end() );
             deltas.clear();
         }
     }

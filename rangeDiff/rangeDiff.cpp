@@ -22,18 +22,26 @@ void insertRangeBlock(vector<unsigned char> &diff, vector<short int> &deltas, in
     // generate headers
     // - range size, range start
     insertRangeHeader(diff, rangeSize, offset);
+     vector <unsigned char> b;
+     
     for (auto it: deltas){
-         vector <unsigned char> b  =  lTrimZeroes(it, rangeSize);
-         //LTRIM then add 1 bit for sign
-         if (it < 0) {
-            writeBit(1);
+        if (it < 0) {
+            b.push_back(1);
+         } else {
+            b.push_back(0);
          }
-         padZeroes(b);
-         
-    //insert delta into diff
-    diff.insert(diff.end(), b.begin(), b.end());
-
+         b =  lTrimZeroes(it, rangeSize - 1);
+         //LTRIM then add 1 bit for sign
+        
+        diff.insert(diff.end(), b.begin(), b.end());
+        b.clear();
+    }
+    while (diff.size() % 8 != 0){
+        writeBit(0);
+    }         
 }
+
+
 
 
 

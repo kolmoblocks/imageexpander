@@ -34,31 +34,36 @@ void Flush_Bits(){
 }
 
 
-vector<char> LTrim_Zeroes(int c) {
-	vector<char> v;
-	float lenF = log(c)/log(2);
-	int i = (int)floor(lenF) + 1;
-	cout<<i;
-	while(i >  0){
-		if ((c & (1 << i)) != 0) {
-			v.push_back(1);
-			i--;
-			break;
-		}
-		i--;
-	}
-	for ( ; i >= 0 ; i--) {
-		v.push_back((c & (1 << i)) != 0);
-	}
+vector<unsigned char> lTrimZeroes(int c, int range) {
+	vector<unsigned char> v;
+    bool leadingZero = true;
+
+	if (c < 0) {
+            v.push_back(1);
+			c *= -1;
+         } else {
+            v.push_back(0);
+         }
+    for (int i = range-1; i >= 0; i--){
+            if ((c & (1 << i)) != 0) {
+                v.push_back(1);
+                leadingZero = false; 
+        } else{
+            v.push_back((c & (1 << i)) != 0);
+        }
+    }
 	return v;
 }
 
 int main (){
-	vector<char> v = LTrim_Zeroes(250);
+	vector<unsigned char> v = lTrimZeroes(13, 4);
 	for (auto it : v){
-		cout<<it;
+		cout<<(int)it;
 	}
+	cout<<v[0];
 	cout<<endl;
+
+
 		
 }
 	 
