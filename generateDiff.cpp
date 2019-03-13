@@ -312,7 +312,7 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
 
 
 
-void writeDiffHeader(unsigned int targetWidth, unsigned int targetHeight, string colormode){
+void insertDiffHeader(vector<unsigned char> &diff, unsigned int targetWidth, unsigned int targetHeight, string colormode){
         f = fopen ("diff.dat", "w");
         char ID[] = "DIFF";
         fwrite (ID, 1, 4, f);
@@ -322,11 +322,22 @@ void writeDiffHeader(unsigned int targetWidth, unsigned int targetHeight, string
         // auto h = to_string(targetHeight);
         // fwrite(&w, w.length(), 1, f);
         // fwrite(&h, h.length(), 1, f);
-        fwrite(&targetWidth, sizeof(unsigned int), 1, f);
-        fwrite(&targetHeight, sizeof(unsigned int), 1, f);
-        fwrite(&colormode, 4,1,f);
+        diff.push_back();
+        // fwrite(&targetWidth, sizeof(unsigned int), 1, f);
+        // fwrite(&targetHeight, sizeof(unsigned int), 1, f);
+        // fwrite(&colormode, 4,1,f);
 }
 
+void insertBlockHeader(vector<unsigned char> &diff, int type){
+    if type == TYPE_MAP {
+        diff.push_back(0);
+
+    } else if type == TYPE_RANGE {
+        diff.push_back(1);
+
+    }
+
+}
 
 void readBlock(){
     FILE * pFile;

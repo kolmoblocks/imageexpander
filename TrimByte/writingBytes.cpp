@@ -29,8 +29,6 @@ void Flush_Bits(){
 			current_bit++;
 		}
 		fwrite (&bit_buffer, 1, 1, f);
-		fclose (f); 
-
 }
 
 
