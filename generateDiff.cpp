@@ -65,6 +65,9 @@ public:
         colorDeltas[ct] = col;
         ++ct;
     }
+    bool full() {
+        return ct == len;
+    }
     ~deltaUnit() {
         free(colorDeltas);
     }
@@ -118,6 +121,10 @@ public:
             }
         }
         return *this;
+    }
+
+    bool end() {
+        return innerUnitPos == unitLength-1 && pos.x == br.x && pos.y == br.y;
     }
 
     bool operator!=(blockIterator other) {
@@ -307,22 +314,30 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
     for (auto block : blocksConfig) {
         // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
 
-        blockIterator begin{units, block.tl, block.br, highResWidth/highFactor};
-        int maxDelta, minDelta;
+        blockIterator it{units, block.tl, block.br, highResWidth/highFactor};
+        color maxDelta{-255,-255,-255}, minDelta{255,255,255};
+        while (!it.end()) {
+            maxDelta = max(*it, maxDelta);
+        }
+        it.reset();
+        while (!it.end()) {
+            minDelta = min(*it, minDelta);
+        }
+        it.reset();
 
         //move to helper function to abstract for all streams
-        float power = log(maxDelta)/log(2); // get the number of bits needed then + 1 for sign
+        float power = log(maxDelta.r)/log(2); // get the number of bits needed then + 1 for sign
         int rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
         int offset;
-        if (minDelta >= 0 || minDelta <= 0 && maxDelta <= 0) {
-            offset = minDelta;
+        if (minDelta.r >= 0 || minDelta.r <= 0 && maxDelta.r <= 0) {
+            offset = minDelta.r;
         } else {
-            offset = (minDelta + maxDelta) / 2;
+            offset = (minDelta.r + maxDelta.r) / 2;
         }
         
         //depending on config block - use either r or m
 
-        //insertRangeBlock(diff, begin, rangeSize, offset);
+        insertRangeBlock(diff, it, rangeSize, offset);
 
         deltas.clear();
     }

@@ -18,19 +18,19 @@ void insertRangeHeader(vector<unsigned char> &diff, int rangeSize, int offset){
 
 }
 
-void insertRangeBlock(vector<unsigned char> &diff, vector<short int> &deltas, int rangeSize, int offset){
+void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeSize, int offset){
     // generate headers
     // - range size, range start
     insertRangeHeader(diff, rangeSize, offset);
      vector <unsigned char> b;
      
-    for (auto it: deltas){
-        if (it < 0) {
+    while (!it.end()){
+        if (*it < 0) {
             b.push_back(1);
          } else {
             b.push_back(0);
          }
-         b =  lTrimZeroes(it, rangeSize - 1);
+         b =  lTrimZeroes(*it, rangeSize - 1);
          //LTRIM then add 1 bit for sign
         
         diff.insert(diff.end(), b.begin(), b.end());
@@ -40,8 +40,3 @@ void insertRangeBlock(vector<unsigned char> &diff, vector<short int> &deltas, in
         writeBit(0);
     }         
 }
-
-
-
-
-
