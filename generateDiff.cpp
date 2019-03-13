@@ -27,7 +27,7 @@ class deltaUnit {
     int len;
     color *colors;
 public:
-    deltaUnit(int len): len{len} {
+    deltaUnit(int len): len(len) {
         colors = (color*)malloc(len*sizeof(color));
     }
     ~deltaUnit() {
