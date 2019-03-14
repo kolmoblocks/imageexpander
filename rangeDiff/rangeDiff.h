@@ -9,6 +9,7 @@
 #include <numeric> 
 #include <string>
 
+using namespace std;
 
 void insertRangeHeader(vector<unsigned char> &diff, int rangeSize, int offset);
 
