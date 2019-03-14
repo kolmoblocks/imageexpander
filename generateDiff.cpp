@@ -196,21 +196,21 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
         it.reset();
 
         //move to helper function to abstract for all streams
-        float power = log(maxDelta.r)/log(2); // get the number of bits needed then + 1 for sign
-        int rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
-        int offset;
-        if (minDelta.r >= 0 || minDelta.r <= 0 && maxDelta.r <= 0) {
-            offset = minDelta.r;
-        } else {
-            offset = (minDelta.r + maxDelta.r) / 2;
-        }
         
         //depending on config block - use either r or m
         if (block.type == 'R') {
+            float power = log(maxDelta.r)/log(2); // get the number of bits needed then + 1 for sign
+            int rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
+            int offset;
+            if (minDelta.r >= 0 || minDelta.r <= 0 && maxDelta.r <= 0) {
+                offset = minDelta.r;
+            } else {
+                offset = (minDelta.r + maxDelta.r) / 2;
+            }
             insertRangeBlock(diff, it, rangeSize, offset);
         }
         else if (block.type == 'M') {
-            //do map
+            insertMapBlock(diff, it, minDelta.r, maxDelta.r);
         }
 
         deltas.clear();

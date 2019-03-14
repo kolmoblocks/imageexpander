@@ -5,13 +5,6 @@
 #include <unordered_set> 
 #include <numeric> 
 #include <string>
+#include "blockIterator.h"
 
-void writeMBlock(std::vector<MB) {
-    
-    char id = 'M';
-    fwrite()
-    while (pos != end) {
-        
-        ++pos;
-    }
-}
+void insertMapBlock(vector<unsigned char> &diff, blockIterator &it, int minDelta, int maxDelta);
