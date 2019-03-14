@@ -26,17 +26,17 @@ Color max(Color col1, Color col2);
 Color min(Color col1, Color col2);
 
 class deltaUnit {
-    int len;
+    unsigned int len;
     int ct=0;
     Color *colorDeltas;
     Color maxDeltas;
     Color minDeltas;
 public:
-    deltaUnit(int len): len(len) {
+    deltaUnit(unsigned int len): len(len) {
         colorDeltas = (Color*)malloc(len*sizeof(Color));
     }
 
-    deltaUnit(int len, Color max, Color min): len{len}, maxDeltas{max}, minDeltas{min} {
+    deltaUnit(unsigned int len, Color max, Color min): len{len}, maxDeltas{max}, minDeltas{min} {
         colorDeltas = (Color*)malloc(len*sizeof(Color));
     }
     void push_back(Color col) {
@@ -62,7 +62,7 @@ public:
     Color getMin() {
         return minDeltas;
     }
-    int size() {
+    unsigned int size() {
         return len;
     }
     Color &at(int pos) {

@@ -192,8 +192,8 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
 
     unsigned denom = gcd(lowResWidth, highResWidth);
     // finding numerator and denominator of ratio (lowFactor, highFactor respectively)
-    int lowFactor = lowResWidth / denom;
-    int highFactor = highResWidth / denom;
+    unsigned int lowFactor = lowResWidth / denom;
+    unsigned int highFactor = highResWidth / denom;
     // finding diffWidth from the difference between smaller vs newer chunk sizes
     int diffWidth = highFactor * highFactor - lowFactor * lowFactor;
     int highResArea = highResWidth * highResHeight;

@@ -7,9 +7,7 @@ using namespace std;
 bool isInt(float num) {
     return floor(num) == ceil(num);
 }
-struct Color {
-    unsigned char r,g,b;
-};
+
 // expand_image(bitmap_image, bitmap_image):
 // recieves the old image and image diff as parameters to 
 // construct the image of higher resolution.
