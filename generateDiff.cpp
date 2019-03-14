@@ -1,5 +1,6 @@
 #include "generateDiff.h"
 
+
 const int TYPE_MAP = 0, TYPE_RANGE = 1;
 
 using namespace std;
@@ -167,7 +168,7 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
 }
 
 
-vector<unsigned char> generateDiff (const char *lowRes, const char *highRes){
+std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes){
     f = fopen ("random.dat", "w");
     std::vector<unsigned char> lowResImage;
     std::vector<unsigned char> highResImage;
@@ -175,7 +176,7 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes){
 
     diff.reserve( 100000 );
 
-    unsigned int lowResWidth, lowResHeight, highResWidth, highResHeight;
+    unsigned lowResWidth, lowResHeight, highResWidth, highResHeight;
 
     unsigned error = lodepng::decode(lowResImage, lowResWidth, lowResHeight, lowRes, LCT_RGB, 8);
     if (error) {

@@ -1,7 +1,7 @@
 #include "blockIterator.h"
 
 
-blockIterator::blockIterator(std::vector<deltaUnit> &units, posn tl, posn br, int width): 
+blockIterator::blockIterator(std::vector<deltaUnit> &units, posn tl, posn br, unsigned int width):
     units{units}, pos{tl}, tl{tl}, br{br}, width{width}, unitLength{units[0].size()} {}
 
 blockIterator &blockIterator::operator++() {

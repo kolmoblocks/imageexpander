@@ -212,7 +212,7 @@ Same as the other decode functions, but instead takes a filename as input.
 */
 unsigned decode(std::vector<unsigned char>& out, unsigned& w, unsigned& h,
                 const std::string& filename,
-                LodePNGColorType colortype = LCT_RGBA, unsigned bitdepth = 8);
+                LodePNGColorType colortype, unsigned bitdepth);
 #endif /* LODEPNG_COMPILE_DISK */
 #endif /* LODEPNG_COMPILE_DECODER */
 

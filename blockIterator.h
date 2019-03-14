@@ -1,12 +1,12 @@
 #ifndef BLOCKITERATOR_H
 #define BLOCKITERATOR_H
-#include "rangeDiff/rangeDiff.h"
-#include "generateDiff.h"
 #include "deltaUnit.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <numeric> 
+#include <vector>
+#include <numeric>
+using namespace std;
 
 class blockIterator {
     std::vector<deltaUnit> &units;

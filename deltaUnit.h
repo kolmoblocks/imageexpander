@@ -1,41 +1,29 @@
 #ifndef DELTAUNIT_H
 #define DELTAUNIT_H
-#include "rangeDiff/rangeDiff.h"
-#include "generateDiff.h"
-#include "deltaUnit.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <numeric> 
+#include <algorithm>
+#include <numeric>
 
 typedef struct {
     int x, y;
 } posn;
 
-bool operator!=(posn p1, posn p2) {
-    return p1.x != p1.x || p1.y != p2.y;
-}
-
+bool operator!=(posn p1, posn p2);
 typedef struct {
      int r, g, b;
 } Color;
 
-Color operator-(Color col1, Color col2) {
-    Color col{col1.r-col2.r, col1.g-col2.g, col1.b-col2.b};
-    return col;
-}
+Color operator-(Color col1, Color col2);
 
-Color max(Color col1, Color col2) {
-    // sanity check for maximum delta
-    Color col{max(col1.r, col2.r), max(col1.g, col2.g), max(col1.b, col2.b)};
-    return col;
-}
+int max(int a, int b);
 
-Color min(Color col1, Color col2) {
-    // sanity check for minimum delta
-    Color col{min(col1.r, col2.r), min(col1.g, col2.g), min(col1.b, col2.b)};
-    return col;
-}
+int min(int a, int b);
+
+Color max(Color col1, Color col2);
+
+Color min(Color col1, Color col2);
 
 class deltaUnit {
     int len;
