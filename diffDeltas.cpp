@@ -112,7 +112,7 @@ void generateDiff (const char *lowRes, const char *highRes){
                 for (int innerY = y; innerY < y+highFactor; ++innerY) {
                 // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                     if (!(innerX < x+lowFactor) || !(innerY < y+lowFactor)) {
-                        // set pixel of the diff at diffX , diffY with the color at the highResImage at innerX , innerY
+                        // set pixel of the diff at diffX , diffY with the Color at the highResImage at innerX , innerY
 
 
                         r = (int)highResImage.at((innerX+innerY*highResWidth)*3);

@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++14 -Wall -MMD -g
+CXXFLAGS = -std=c++14  -MMD -g
 EXEC = diff
 OBJECTS = generateDiff.o deltaUnit.o blockIterator.o rangeDiff.o
 DEPENDS = ${OBJECTS:.o=.d}
