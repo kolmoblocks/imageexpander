@@ -25,12 +25,12 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
      vector <unsigned char> b;
      
     while (!it.end()){
-        if (*it < 0) {
+        if ((*it).r < 0) {
             b.push_back(1);
          } else {
             b.push_back(0);
          }
-         b =  lTrimZeroes(*it, rangeSize - 1);
+         b =  lTrimZeroes((*it).r, rangeSize - 1);
          //LTRIM then add 1 bit for sign
         
         diff.insert(diff.end(), b.begin(), b.end());

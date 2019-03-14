@@ -2,6 +2,7 @@
 #define GENERATEDIFF_H
 #include "lodepng.h"
 #include "rangeDiff/rangeDiff.h"
+#include "blockIterator.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>

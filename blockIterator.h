@@ -1,14 +1,13 @@
 #ifndef BLOCKITERATOR_H
 #define BLOCKITERATOR_H
-#include "lodepng.h"
 #include "rangeDiff/rangeDiff.h"
 #include "generateDiff.h"
+#include "deltaUnit.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include <unordered_set> 
 #include <numeric> 
-#include <string>
+
 class blockIterator {
     std::vector<deltaUnit> &units;
 public:
@@ -26,3 +25,5 @@ public:
 
     void reset();
 };
+
+#endif
