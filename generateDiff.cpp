@@ -14,6 +14,38 @@ FILE *f;
 int current_bit = 0;
 unsigned char bit_buffer;
 
+unsigned int gcd(unsigned int u, unsigned int v)
+{
+    // simple cases (termination)
+    if (u == v)
+        return u;
+
+    if (u == 0)
+        return v;
+
+    if (v == 0)
+        return u;
+
+    // look for factors of 2
+    if (~u & 1) // u is even
+    {
+        if (v & 1) // v is odd
+            return gcd(u >> 1, v);
+        else // both u and v are even
+            return gcd(u >> 1, v >> 1) << 1;
+    }
+
+    if (~v & 1) // u is odd, v is even
+        return gcd(u, v >> 1);
+
+    // reduce larger argument
+    if (u > v)
+        return gcd((u - v) >> 1, v);
+
+    return gcd((v - u) >> 1, u);
+}
+
+
 vector<unsigned char> lTrimZeroes(int c, int range) {
 	vector<unsigned char> v;
     bool leadingZero = true;
@@ -86,8 +118,8 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
         for (std::size_t x=0; x<width; x+= highFactor) {
             int r, g, b;
             deltaUnit curDeltaUnit(deltaUnitLength);
-            curDeltaUnit.setMax(color{-255,-255,-255});
-            curDeltaUnit.setMin(color{255,255,255});
+            curDeltaUnit.setMax(Color{-255,-255,-255});
+            curDeltaUnit.setMin(Color{255,255,255});
 
             // loop into each block
             for (int innerX = x; innerX < x+highFactor; ++innerX) {
@@ -95,11 +127,11 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                 
                     // only get and set pixel delta if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                     if (!(innerX < x+lowFactor) || !(innerY < y+lowFactor)) {
-                        // deltaColor is the delta to be pushed to the delta unit, deltaDonor is the color that the delta is set relative to
-                        color deltaColor, donor;
+                        // deltaColor is the delta to be pushed to the delta unit, deltaDonor is the Color that the delta is set relative to
+                        Color deltaColor, donor;
 
-                        // current loop-specified color
-                        color curColor{image.at((innerX+innerY*width)*3),
+                        // current loop-specified Color
+                        Color curColor{image.at((innerX+innerY*width)*3),
                                         image.at((innerX+innerY*width)*3+1),
                                         image.at((innerX+innerY*width)*3+2)};
 
@@ -185,7 +217,7 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes){
         // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
 
         blockIterator it{units, block.tl, block.br, highResWidth/highFactor};
-        color maxDelta{-255,-255,-255}, minDelta{255,255,255};
+        Color maxDelta{-255,-255,-255}, minDelta{255,255,255};
         while (!it.end()) {
             maxDelta = max(*it, maxDelta);
         }

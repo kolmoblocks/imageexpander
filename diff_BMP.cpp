@@ -69,7 +69,7 @@ void generateDiff (string lowRes, string highRes){
             for (int innerY = y; innerY < y+highFactor; ++innerY) {
                // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                if (!(innerX < x+lowFactor) || !(innerY < y+lowFactor)) {
-                  // set pixel of the diff at diffX , diffY with the color at the highResImage at innerX , innerY
+                  // set pixel of the diff at diffX , diffY with the Color at the highResImage at innerX , innerY
                   diff.set_pixel(diffX, diffY, highResImage.get_pixel(innerX, innerY));
                   //cout << diffX << " " << diffY << " " << highResImage.get_pixel(innerX, innerY).blue << endl;
                   // increment diffX every time we increment through the inner block.

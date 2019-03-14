@@ -1,27 +1,34 @@
 #include <iostream>
 #include <cmath>
 #include "lodepng.h"
+#include <vector>
+using namespace std;
 
 bool isInt(float num) {
     return floor(num) == ceil(num);
 }
-struct color {
+struct Color {
     unsigned char r,g,b;
 };
 // expand_image(bitmap_image, bitmap_image):
 // recieves the old image and image diff as parameters to 
 // construct the image of higher resolution.
-void expand_image(const char *oldImgName, const char *diffImgName) {
+
+vector<int> decodedDiff(const char *diffFile){
+        fopen(diffFile, "rb");
+            fread (buffer,4,1,pFile);
+
+
+}
+
+
+void expand_image(const char *oldImgName, ) {
     std::vector<unsigned char> oldImgVec, diffVec;
     unsigned diffW, diffH, oldImgH, oldImgW;
 
-    unsigned error = lodepng::decode(diffVec, diffW, diffH, diffImgName, LCT_RGB, 8);
-    if (error) {
-          std::cout << lodepng_error_text(error) << std::endl;
 
-       return;
-   }
-    
+    vector<int> diff = decodedDiff();
+
     unsigned cur = diffW+1;
     float curSqrt = sqrt(cur);
 
@@ -49,7 +56,7 @@ void expand_image(const char *oldImgName, const char *diffImgName) {
     unsigned newW = oldImgW * hiFactor / loFactor;
     unsigned newH = oldImgH * hiFactor / loFactor;
 
-    std::vector<struct color> newImgVec(newW * newH * 3);
+    std::vector<struct Color> newImgVec(newW * newH * 3);
 
     int diffX = 0;
     int diffY = 0;

@@ -32,7 +32,7 @@ bool blockIterator::operator!=(blockIterator other) {
     return pos != other.pos;
 }
 
-color &blockIterator::operator*() {
+Color &blockIterator::operator*() {
     return units[pos.y*width + pos.x].at(innerUnitPos);
 }
 
