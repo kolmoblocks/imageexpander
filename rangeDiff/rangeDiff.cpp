@@ -1,5 +1,6 @@
 #include "../lodepng.h"
 #include "../generateDiff.h"
+#include "../blockIterator.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>

@@ -85,7 +85,7 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
     for (std::size_t y=0; y<height; y += highFactor) {
         for (std::size_t x=0; x<width; x+= highFactor) {
             int r, g, b;
-            deltaUnit curDeltaUnit{deltaUnitLength};
+            deltaUnit curDeltaUnit(deltaUnitLength);
             curDeltaUnit.setMax(color{-255,-255,-255});
             curDeltaUnit.setMin(color{255,255,255});
 
@@ -135,7 +135,7 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
 }
 
 
-vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  int height, int width, int x, int y){
+vector<unsigned char> generateDiff (const char *lowRes, const char *highRes){
     f = fopen ("random.dat", "w");
     std::vector<unsigned char> lowResImage;
     std::vector<unsigned char> highResImage;
@@ -172,7 +172,7 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
     const unsigned int height = highResHeight;
     const unsigned int width  = highResWidth;
 
-    vector<short int> deltas;
+    vector< int> deltas;
     unordered_set<int> deltaSet;
     int deltaR, deltaG,deltaB;
     // iterating through blocks, x and y indicate the top left positions of each block.
@@ -210,10 +210,13 @@ vector<unsigned char> generateDiff (const char *lowRes, const char *highRes,  in
             insertRangeBlock(diff, it, rangeSize, offset);
         }
         else if (block.type == 'M') {
-            insertMapBlock(diff, it, minDelta.r, maxDelta.r);
+            // insertMapBlock(diff, it, minDelta.r, maxDelta.r);
         }
 
         deltas.clear();
+    }
+    for (auto it: diff){
+        cout<<it;
     }
    std::cout << lodepng_error_text(error) << std::endl;
 }
@@ -289,7 +292,7 @@ void readBlock(){
 
 int main(int argc, char *argv[]){
    // argv[1]: smaller file
-//    generateDiff(argv[1], argv[2]);
+    generateDiff(argv[1], argv[2]);
     //writeDiffHeader(1920,1080,"RGB");
     readBlock();
 }
