@@ -32,45 +32,17 @@ class deltaUnit {
     Color maxDeltas;
     Color minDeltas;
 public:
-    deltaUnit(unsigned int len): len(len) {
-        colorDeltas = (Color*)malloc(len*sizeof(Color));
-    }
-
-    deltaUnit(unsigned int len, Color max, Color min): len{len}, maxDeltas{max}, minDeltas{min} {
-        colorDeltas = (Color*)malloc(len*sizeof(Color));
-    }
-    void push_back(Color col) {
-        if (ct >= len) throw std::logic_error("pushing past specified deltaUnit length");
-        colorDeltas[ct] = col;
-        ++ct;
-    }
-    bool full() {
-        return ct == len;
-    }
-    ~deltaUnit() {
-        free(colorDeltas);
-    }
-    void setMax(Color col) {
-        maxDeltas = col;
-    }
-    void setMin(Color col) {
-        minDeltas = col;
-    }
-    Color getMax() {
-        return maxDeltas;
-    }
-    Color getMin() {
-        return minDeltas;
-    }
-    unsigned int size() {
-        return len;
-    }
-    Color &at(int pos) {
-        if (pos < len && pos >= 0) {
-            return colorDeltas[pos];
-        }
-        throw std::logic_error("requested delta Unit Color position is out of range.");
-    }
+    deltaUnit(unsigned int len);
+    deltaUnit(unsigned int len, Color max, Color min);
+    void push_back(Color col);
+    bool full();
+    ~deltaUnit();
+    void setMax(Color col);
+    void setMin(Color col);
+    Color getMax();
+    Color getMin();
+    unsigned int size();
+    Color &at(int pos);
 };
 
 #endif

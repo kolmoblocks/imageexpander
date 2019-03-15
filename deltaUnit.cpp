@@ -29,3 +29,52 @@ Color operator-(Color col1, Color col2) {
 bool operator!=(posn p1, posn p2) {
     return p1.x != p1.x || p1.y != p2.y;
 }
+
+deltaUnit::deltaUnit(unsigned int len): len(len) {
+    colorDeltas = (Color*)malloc(len*sizeof(Color));
+}
+
+deltaUnit::deltaUnit(unsigned int len, Color max, Color min): len{len}, maxDeltas{max}, minDeltas{min} {
+    colorDeltas = (Color*)malloc(len*sizeof(Color));
+}
+
+void deltaUnit::push_back(Color col) {
+    if (ct >= len) throw std::logic_error("pushing past specified deltaUnit length");
+    colorDeltas[ct] = col;
+    ++ct;
+}
+
+bool deltaUnit::full() {
+    return ct == len;
+}
+
+deltaUnit::~deltaUnit() {
+    free(colorDeltas);
+}
+
+void deltaUnit::setMax(Color col) {
+    maxDeltas = col;
+}
+
+void deltaUnit::setMin(Color col) {
+    minDeltas = col;
+}
+
+Color deltaUnit::getMax() {
+    return maxDeltas;
+}
+
+Color deltaUnit::getMin() {
+    return minDeltas;
+}
+
+unsigned int deltaUnit::size() {
+    return len;
+}
+
+Color &deltaUnit::at(int pos) {
+    if (pos < len && pos >= 0) {
+        return colorDeltas[pos];
+    }
+    throw std::logic_error("requested delta Unit Color position is out of range.");
+}
