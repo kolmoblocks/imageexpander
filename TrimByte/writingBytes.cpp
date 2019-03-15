@@ -32,7 +32,7 @@ void Flush_Bits(){
 }
 
 
-vector<unsigned char> lTrimZeroes(int c, int range) {
+vector<unsigned char> intToBin(int c, int range) {
 	vector<unsigned char> v;
     bool leadingZero = true;
 
@@ -54,7 +54,7 @@ vector<unsigned char> lTrimZeroes(int c, int range) {
 }
 
 int main (){
-	vector<unsigned char> v = lTrimZeroes(13, 4);
+	vector<unsigned char> v = intToBin(13, 4);
 	for (auto it : v){
 		cout<<(int)it;
 	}

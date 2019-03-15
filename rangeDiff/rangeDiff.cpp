@@ -12,8 +12,8 @@ using namespace std;
 
 
 void insertRangeHeader(vector<unsigned char> &diff, int rangeSize, int offset){
-    vector <unsigned char> offsetByte= lTrimZeroes(offset,8);
-    vector <unsigned char> rangeSizeByte = lTrimZeroes(rangeSize, 8);
+    vector <unsigned char> offsetByte= intToBin(offset,8);
+    vector <unsigned char> rangeSizeByte = intToBin(rangeSize, 8);
     diff.insert(diff.end(), offsetByte.begin(), offsetByte.end());
     diff.insert(diff.end(), rangeSizeByte.begin(), rangeSizeByte.end());
 
@@ -31,7 +31,7 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
          } else {
             b.push_back(0);
          }
-         b =  lTrimZeroes((*it).r, rangeSize - 1);
+         b =  intToBin((*it).r, rangeSize - 1);
          //LTRIM then add 1 bit for sign
         
         diff.insert(diff.end(), b.begin(), b.end());

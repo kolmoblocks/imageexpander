@@ -46,49 +46,6 @@ unsigned int gcd(unsigned int u, unsigned int v)
     return gcd((v - u) >> 1, u);
 }
 
-
-vector<unsigned char> lTrimZeroes(int c, int range) {
-	vector<unsigned char> v;
-    bool leadingZero = true;
-
-	if (c < 0) {
-            v.push_back(1);
-			c *= -1;
-         } else {
-            v.push_back(0);
-         }
-    for (int i = range-1; i >= 0; i--){
-            if ((c & (1 << i)) != 0) {
-                v.push_back(1);
-                leadingZero = false; 
-        } else{
-            v.push_back((c & (1 << i)) != 0);
-        }
-    }
-	return v;
-}
-
-
-void writeBit (int bit) {
-  if (bit)
-    bit_buffer |= (1<<current_bit);
-
-  current_bit++;
-  if (current_bit == 8)
-  {
-    fwrite (&bit_buffer, 1, 1, f);
-    current_bit = 0;
-    bit_buffer = 0;
-  }
-}
-
-void padZeroes(vector <unsigned char> c){
-    while (current_bit) {
-        writeBit (0);
-    }
-}
-
-
 void flushBits(){
     while (current_bit < 8) {
         bit_buffer = (bit_buffer<<1);
@@ -253,8 +210,8 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
         char ID[] = "DIFF";
         fwrite (ID, 1, 4, f);
 
-        // auto w = to_string(targetWidth);
-        // auto h = to_string(targetHeight);
+        auto w = to_string(targetWidth);
+        auto h = to_string(targetHeight);
         // fwrite(&w, w.length(), 1, f);
         // fwrite(&h, h.length(), 1, f);
         // diff.push_back();

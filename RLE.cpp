@@ -21,7 +21,7 @@ vector <unsigned char> encodeRLE (vector<unsigned char> &bits){
         for (int l = 1; l <= floor(log(k)/log(2)); l++){
             encoded.push_back(0);
         }
-        binary = lTrimZeroes(k, floor(log(k)/log(2)+1));
+        binary = intToBin(k, floor(log(k)/log(2)+1));
             encoded.insert(encoded.end(), binary.begin(), binary.end());
         // compressed.push_back();
         i+=k;

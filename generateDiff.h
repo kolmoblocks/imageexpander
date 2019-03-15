@@ -18,7 +18,7 @@ extern unsigned lodepng::decode(std::vector<unsigned char>& out, unsigned& w, un
 const std::string& filename,
         LodePNGColorType colortype = LCT_RGBA, unsigned bitdepth = 8);
 
-vector<unsigned char> lTrimZeroes(int c, int range) ;
+vector<unsigned char> intToBin(int c, int range) ;
 
 void writeBit (int bit);
 
