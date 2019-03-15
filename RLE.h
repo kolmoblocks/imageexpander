@@ -5,5 +5,7 @@
 using namespace std;
 
 vector <unsigned char> RLE (vector<unsigned char> &bits);
+vector <unsigned char> RLE (vector<unsigned char> &bits);
+int binToInt(vector<unsigned char> &bin);
 
 #endif

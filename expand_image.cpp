@@ -15,8 +15,8 @@ bool isInt(float num) {
 vector<int> decodedDiff(const char *diffFile){
         fopen(diffFile, "rb");
             fread (buffer,4,1,pFile);
-
-
+        RLE DECODE
+        read in blocks and convert to int
 }
 
 
