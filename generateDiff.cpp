@@ -198,16 +198,9 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     int diffWidth = highFactor * highFactor - lowFactor * lowFactor;
     int highResArea = highResWidth * highResHeight;
 
-    // finding diffHeight from the number of chunks in a whole highRes image by finding the number of whole chunks (rounded up) for along the height and the width.
-    int diffHeight = (highResWidth % highFactor == 0 ? highResWidth / highFactor : highResWidth / highFactor + 1 )
-                    * (highResHeight % highFactor == 0 ? highResHeight / highFactor : highResHeight / highFactor + 1 );
-
     const unsigned int height = highResHeight;
     const unsigned int width  = highResWidth;
 
-    vector< int> deltas;
-    unordered_set<int> deltaSet;
-    int deltaR, deltaG,deltaB;
     // iterating through blocks, x and y indicate the top left positions of each block.
     // get units from pixels somehow
     std::vector<deltaUnit> units;
@@ -245,8 +238,6 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         else if (block.type == 'M') {
             // insertMapBlock(diff, it, minDelta.r, maxDelta.r);
         }
-
-        deltas.clear();
     }
     for (auto it: diff){
         cout<<it;
@@ -261,7 +252,6 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
         f = fopen ("diff.dat", "w");
         char ID[] = "DIFF";
         fwrite (ID, 1, 4, f);
-
 
         // auto w = to_string(targetWidth);
         // auto h = to_string(targetHeight);
