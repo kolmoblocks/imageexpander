@@ -1,6 +1,5 @@
 #include "generateDiff.h"
 
-
 const int TYPE_MAP = 0, TYPE_RANGE = 1;
 
 using namespace std;
@@ -12,8 +11,6 @@ typedef struct {
 
 
 FILE *f;
-int current_bit = 0;
-unsigned char bit_buffer;
 
 unsigned int gcd(unsigned int u, unsigned int v)
 {
@@ -46,14 +43,6 @@ unsigned int gcd(unsigned int u, unsigned int v)
     return gcd((v - u) >> 1, u);
 }
 
-void flushBits(){
-    while (current_bit < 8) {
-        bit_buffer = (bit_buffer<<1);
-          current_bit++;
-    }
-    fwrite (&bit_buffer, 1, 1, f);
-
-}
 
 void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &units) {
     // logic here to statisticallly determine "good" configuration of blocks
@@ -163,7 +152,8 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     std::vector<deltaUnit> units;
     std::vector<blockParams> blocksConfig;
     populateBlocks(blocksConfig, units);
-    
+    insertDiffheader();
+    int offset, rangeSize;
     for (auto block : blocksConfig) {
         // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
 
@@ -183,8 +173,8 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         //depending on config block - use either r or m
         if (block.type == 'R') {
             float power = log(maxDelta.r)/log(2); // get the number of bits needed then + 1 for sign
-            int rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
-            int offset;
+            rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
+         
             if (minDelta.r >= 0 || minDelta.r <= 0 && maxDelta.r <= 0) {
                 offset = minDelta.r;
             } else {
@@ -196,6 +186,8 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
             // insertMapBlock(diff, it, minDelta.r, maxDelta.r);
         }
     }
+    insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset);
+
     for (auto it: diff){
         cout<<it;
     }
@@ -220,13 +212,16 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
         // fwrite(&colormode, 4,1,f);
 }
 
-void insertBlockHeader(vector<unsigned char> &diff, int type){
+void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int offset){
     if (type == TYPE_MAP) {
         diff.push_back(0);
-
     } else if (type == TYPE_RANGE) {
         diff.push_back(1);
-
+        vector<unsigned char> rangeSizeV = intToBin(rangeSize,8);
+        vector<unsigned char> offsetV = intToBin(offset,8);
+        diff.insert(diff.end(),rangeSizeV.begin(), rangeSizeV.end());
+        diff.insert(diff.end(), offsetV.begin(), offsetV.end());
+        //RGB header
     }
 
 }

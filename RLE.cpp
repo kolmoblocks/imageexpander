@@ -1,6 +1,7 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
+#include "RLE.h"
 using namespace std;
 
 
@@ -30,15 +31,6 @@ vector <unsigned char> encodeRLE (vector<unsigned char> &bits){
     return encoded;
 }
 
-int binToInt(vector<unsigned char> &bin){
-    int exponent = bin.size() - 1;
-    int x = 0;
-    for (auto it: bin){
-        x += (int)it * pow(2, exponent);
-        exponent-=1;
-    }
-    return x;
-}
 
 vector <unsigned char> decodeRLE (vector<unsigned char> &bits){
     unsigned char b = bits[0];

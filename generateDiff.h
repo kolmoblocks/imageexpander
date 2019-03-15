@@ -10,6 +10,7 @@
 #include <cmath>
 #include <numeric>
 #include <string>
+#include "bitUtil.h"
 
 using namespace std;
 
