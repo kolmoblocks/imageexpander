@@ -1,7 +1,3 @@
-#ifndef BITUTIL_H
-#define BITUTIL_H
-
-
 #include "bitUtil.h"
 using namespace std;
 
@@ -58,5 +54,3 @@ int binToInt(vector<unsigned char> &bin){
     }
     return x;
 }
-
-#endif
