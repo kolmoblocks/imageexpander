@@ -49,7 +49,6 @@ bool deltaUnit::full() {
 }
 
 deltaUnit::~deltaUnit() {
-    free(colorDeltas);
 }
 
 void deltaUnit::setMax(Color col) {

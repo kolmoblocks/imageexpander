@@ -21,18 +21,23 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
     // generate headers
     // - range size, range start
     insertRangeHeader(diff, rangeSize, offset);
-     vector <unsigned char> b;
+     vector <unsigned char> r,g,b;
      
     while (!it.end()){
         if ((*it).r < 0) {
             b.push_back(1);
-         } else {
+        } else {
             b.push_back(0);
-         }
-         b =  intToBin((*it).r, rangeSize - 1);
+        }
+        r =  intToBin((*it).r, rangeSize - 1);
+        g =  intToBin((*it).g, rangeSize - 1);
+        b =  intToBin((*it).b, rangeSize - 1);
          //LTRIM then add 1 bit for sign
-        
+        diff.insert(diff.end(), r.begin(), r.end());
+        diff.insert(diff.end(), g.begin(), g.end());
         diff.insert(diff.end(), b.begin(), b.end());
+        r.clear();
+        g.clear();
         b.clear();
     }      
 }

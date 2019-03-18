@@ -120,7 +120,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     std::vector<unsigned char> highResImage;
     std::vector<unsigned char> diff;
 
-    diff.reserve( 100000 );
+    // diff.reserve( 100000 );
 
     unsigned lowResWidth, lowResHeight, highResWidth, highResHeight;
 
@@ -151,8 +151,11 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     // get units from pixels somehow
     std::vector<deltaUnit> units;
     std::vector<blockParams> blocksConfig;
+    populateDeltas(highResImage, highResWidth, highResHeight, highFactor, lowFactor, units);
     populateBlocks(blocksConfig, units);
+    cerr<<"populated blocks"<<endl;;
     insertDiffHeader(diff, highResWidth, highResHeight, "RGB");
+    cerr<<"diff header inserted"<<endl;
     int offset, rangeSize;
     for (auto block : blocksConfig) {
         // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
@@ -180,12 +183,15 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
             } else {
                 offset = (minDelta.r + maxDelta.r) / 2;
             }
+
             insertRangeBlock(diff, it, rangeSize, offset);
         }
         else if (block.type == 'M') {
             // insertMapBlock(diff, it, minDelta.r, maxDelta.r);
         }
     }
+
+    
     insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset);
 
 
@@ -292,5 +298,5 @@ int main(int argc, char *argv[]){
    // argv[1]: smaller file
     generateDiff(argv[1], argv[2]);
     //writeDiffHeader(1920,1080,"RGB");
-    readBlock();
+    // readBlock();
 }
