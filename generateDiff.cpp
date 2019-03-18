@@ -46,11 +46,15 @@ unsigned int gcd(unsigned int u, unsigned int v)
 
 void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &units, int width, int height, int highFactor) {
     // logic here to statisticallly determine "good" configuration of blocks
-    int xincr = width/highFactor, yincr=height/highFactor;
+    int xincr = width/16, yincr=height/9;
+    
     for (int i=0; i<width; i+=xincr) {
         for (int j=0; j<height; j+=yincr) {
-            blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor, (j+yincr)/highFactor}, 'R'});
+            blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
         }
+    }
+    for (auto it : blocks) {
+        std::cout << it.tl.x << " " << it.tl.y << " " << it.br.x << " " << it.br.y << std::endl;
     }
 }
 
@@ -161,11 +165,9 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     cerr<<"diff header inserted"<<endl;
     int offset, rangeSize;
     for (auto block : blocksConfig) {
-        cerr << "1" << endl;
         // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
 
         blockIterator it{units, block.tl, block.br, highResWidth/highFactor};
-        std::cerr << "1" << std::endl;
         Color maxDelta{-255,-255,-255}, minDelta{255,255,255};
         while (!it.end()) {
             maxDelta = max(*it, maxDelta);
@@ -178,7 +180,6 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         }
         it.reset();
         //move to helper function to abstract for all streams
-        std::cerr << "1" << std::endl;
 
         //depending on config block - use either r or m
         if (block.type == 'R') {
@@ -196,7 +197,6 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         else if (block.type == 'M') {
             // insertMapBlock(diff, it, minDelta.r, maxDelta.r);
         }
-        std::cerr << "1" << std::endl;
 
     }
 
