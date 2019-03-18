@@ -2,10 +2,12 @@
 
 
 blockIterator::blockIterator(std::vector<deltaUnit> &units, posn tl, posn br, unsigned int width):
-    units{units}, pos{tl}, tl{tl}, br{br}, width{width}, unitLength{units[0].size()} {}
+    units{units}, pos{tl}, tl{tl}, br{br}, width{width}, unitLength{units[0].size()} {
+        innerUnitPos = 0;
+    }
 
 blockIterator &blockIterator::operator++() {
-    if (innerUnitPos < unitLength) {
+    if (innerUnitPos < unitLength-1) {
         ++innerUnitPos;
     }
     else {

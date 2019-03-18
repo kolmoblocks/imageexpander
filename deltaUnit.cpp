@@ -75,5 +75,8 @@ Color &deltaUnit::at(int pos) {
     if (pos < len && pos >= 0) {
         return colorDeltas[pos];
     }
-    throw std::logic_error("requested delta Unit Color position is out of range.");
+    std::string position = std::to_string(pos);
+    std::string length = std::to_string(len);
+    std::string msg = "delta is out of range: "+position+" of "+length;
+    throw std::logic_error(msg);
 }

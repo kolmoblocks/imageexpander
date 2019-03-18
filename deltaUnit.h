@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cmath>
 #include <algorithm>
+#include <string>
 #include <numeric>
 
 typedef struct {

@@ -158,21 +158,25 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     cerr<<"diff header inserted"<<endl;
     int offset, rangeSize;
     for (auto block : blocksConfig) {
+        cerr << "1" << endl;
         // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
 
         blockIterator it{units, block.tl, block.br, highResWidth/highFactor};
+        std::cerr << "1" << std::endl;
         Color maxDelta{-255,-255,-255}, minDelta{255,255,255};
         while (!it.end()) {
             maxDelta = max(*it, maxDelta);
+            ++it;
         }
         it.reset();
         while (!it.end()) {
             minDelta = min(*it, minDelta);
+            ++it;
         }
         it.reset();
-
         //move to helper function to abstract for all streams
-        
+        std::cerr << "1" << std::endl;
+
         //depending on config block - use either r or m
         if (block.type == 'R') {
             float power = log(maxDelta.r)/log(2); // get the number of bits needed then + 1 for sign
@@ -189,6 +193,8 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         else if (block.type == 'M') {
             // insertMapBlock(diff, it, minDelta.r, maxDelta.r);
         }
+        std::cerr << "1" << std::endl;
+
     }
 
     
