@@ -35,7 +35,14 @@ bool blockIterator::operator!=(blockIterator other) {
 }
 
 Color &blockIterator::operator*() {
-    return units[pos.y*width + pos.x].at(innerUnitPos);
+    try {
+        return units[pos.y*width + pos.x].at(innerUnitPos);
+    }
+    catch (std::logic_error e) {
+        std::cout << e.what() << std::endl;
+        std::cout << pos.y << " " << pos.x << " " << units.size() << std::endl;
+        throw std::logic_error("iterator out of range");
+    }
 }
 
 void blockIterator::reset() {
