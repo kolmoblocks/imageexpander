@@ -10,6 +10,7 @@ using namespace std;
 
 class blockIterator {
     std::vector<deltaUnit> &units;
+    static vector<unsigned char> &NONE;
 public:
     posn pos, tl, br;
     unsigned int width, unitLength, innerUnitPos=0;
