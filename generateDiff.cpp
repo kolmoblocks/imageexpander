@@ -46,11 +46,6 @@ unsigned int gcd(unsigned int u, unsigned int v)
 
 void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &units, int width, int height, int highFactor) {
     // logic here to statisticallly determine "good" configuration of blocks
-<<<<<<< HEAD
-
-    blocks.push_back(blockParams{posn{0,0},posn{20,20},'R'});
-    blocks.push_back(blockParams{posn{21,21},posn{25,25},'R'});
-=======
     int xincr = width/16, yincr=height/9;
     
     for (int i=0; i<width; i+=xincr) {
@@ -61,7 +56,6 @@ void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &un
     for (auto it : blocks) {
         std::cout << it.tl.x << " " << it.tl.y << " " << it.br.x << " " << it.br.y << std::endl;
     }
->>>>>>> ae889639f7a8d27046dc278d770a5ec7af037e54
 }
 
 void populateDeltas(std::vector<unsigned char> &image, int width, int height, int highFactor, int lowFactor, std::vector<deltaUnit> &units) {
