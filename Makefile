@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++14  -MMD -g
 EXEC = diff
-OBJECTS = generateDiff.o deltaUnit.o blockIterator.o rangeDiff/rangeDiff.o mapDiff.o lodepng.o
+OBJECTS = generateDiff.o deltaUnit.o blockIterator.o rangeDiff/rangeDiff.o mapDiff.o lodepng.o bitUtil.o
 DEPENDS = ${OBJECTS:.o=.d}
 
 ${EXEC}: ${OBJECTS}

@@ -1,6 +1,8 @@
 #ifndef RANGEDIFF_H
 #define RANGEDIFF_H
 #include "../blockIterator.h"
+#include "../lodepng.h"
+#include "../generateDiff.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>

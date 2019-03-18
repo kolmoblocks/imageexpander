@@ -1,12 +1,10 @@
-#include "../lodepng.h"
-#include "../generateDiff.h"
-#include "../blockIterator.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>
 #include <unordered_set> 
 #include <numeric> 
 #include <string>
+#include "rangeDiff.h"
 
 using namespace std;
 
@@ -36,8 +34,5 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
         
         diff.insert(diff.end(), b.begin(), b.end());
         b.clear();
-    }
-    while (diff.size() % 8 != 0){
-        writeBit(0);
-    }         
+    }      
 }
