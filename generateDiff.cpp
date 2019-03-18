@@ -180,16 +180,18 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         }
         it.reset();
         //move to helper function to abstract for all streams
+        int minLim = min(min(minDelta.r, minDelta.g), minDelta.b);
+        int maxLim = max(max(maxDelta.r, maxDelta.g), maxDelta.b);
 
         //depending on config block - use either r or m
         if (block.type == 'R') {
-            float power = log(maxDelta.r)/log(2); // get the number of bits needed then + 1 for sign
+            float power = log(maxLim)/log(2); // get the number of bits needed then + 1 for sign
             rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
          
-            if (minDelta.r >= 0 || (minDelta.r <= 0 && maxDelta.r <= 0)) {
-                offset = minDelta.r;
+            if (maxLim >= 0 || (minLim <= 0 && maxLim <= 0)) {
+                offset = minLim;
             } else {
-                offset = (minDelta.r + maxDelta.r) / 2;
+                offset = (minLim + maxLim) / 2;
             }
 
             insertRangeBlock(diff, it, rangeSize, offset);
@@ -274,7 +276,7 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
 
 void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int offset){
     if (type == TYPE_MAP) {
-        diff.push_back(0);
+//
     } else if (type == TYPE_RANGE) {
         diff.push_back(1);
         vector<unsigned char> rangeSizeV = intToBin(rangeSize,8);

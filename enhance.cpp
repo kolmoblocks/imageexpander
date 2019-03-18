@@ -4,16 +4,34 @@ void extractInfo(FILE *pFile, unsigned &deltaUnitSize, unsigned &lowFactor, unsi
 
 }
 
-
+void populateDiffPixelVec(FILE *pFile, std::vector<unsigned char> &diffPixelVec, std::vector<unsigned char> &diffEncodedVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
+    // assuming is RANGE
+    // assuming default config for a 16:9 image
+    unsigned blockdataSize = highResHeight*highResWidth* / (16*9);
+    unsigned numBlocks = 16*9;
+}
 
 void enhance(char *lowResFileName, char *diffFileName) {
     FILE *pDiff;
     pFile = fopen(diffFileName);
-    unsigned deltaUnitSize, lowFactor, highFactor;
+    // rle decode diff, then put into diffFileVector
 
-    extractInfo(pDiff, deltaUnitSize, lowFactor, highFactor);
-    
+    unsigned lowFactor, highFactor;
     unsigned lowResWidth, lowResHeight, highResWidth, highResHeight;
+
+    extractInfo(pDiff, deltaUnitSize, lowFactor, highFactor, highResWidth, highResHeight);
+
+    unsigned unitSize = highFactor*highFactor;
+    unsigned deltaUnitSize = unitSize - lowFactor*lowFactor;
+
+    unsigned totalDeltaUnits = highResHeight*highResWidth / unitSize;
+    
+    std::vector<unsigned char> diffPixelVec;
+    diffVec.reserve(3*totalDeltaUnits*deltaUnitSize);
+
+
+    
+    
     std::vector<unsigned char> lowResImage;
 
     unsigned error = lodepng::decode(lowResImage, lowResWidth, lowResHeight, lowResFileName, LCT_RB, 8);
