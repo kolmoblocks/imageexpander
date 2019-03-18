@@ -44,11 +44,14 @@ unsigned int gcd(unsigned int u, unsigned int v)
 }
 
 
-void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &units) {
+void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &units, int width, int height, int highFactor) {
     // logic here to statisticallly determine "good" configuration of blocks
-
-    blocks.push_back(blockParams{posn{0,0},posn{20,20},'R'});
-    blocks.push_back(blockParams{posn{21,21},posn{25,25},'M'});
+    int xincr = width/highFactor, yincr=height/highFactor;
+    for (int i=0; i<width; i+=xincr) {
+        for (int j=0; j<height; j+=yincr) {
+            blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor, (j+yincr)/highFactor}, 'R'});
+        }
+    }
 }
 
 void populateDeltas(std::vector<unsigned char> &image, int width, int height, int highFactor, int lowFactor, std::vector<deltaUnit> &units) {
@@ -152,7 +155,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     std::vector<deltaUnit> units;
     std::vector<blockParams> blocksConfig;
     populateDeltas(highResImage, highResWidth, highResHeight, highFactor, lowFactor, units);
-    populateBlocks(blocksConfig, units);
+    populateBlocks(blocksConfig, units, highResWidth, highResHeight, highFactor);
     cerr<<"populated blocks"<<endl;;
     insertDiffHeader(diff, highResWidth, highResHeight, "RGB");
     cerr<<"diff header inserted"<<endl;
