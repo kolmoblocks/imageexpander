@@ -1,9 +1,5 @@
 #ifndef GENERATEDIFF_H
 #define GENERATEDIFF_H
-#include "lodepng.h"
-#include "rangeDiff/rangeDiff.h"
-#include "mapDiff.h"
-#include "blockIterator.h"
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -11,6 +7,11 @@
 #include <numeric>
 #include <string>
 #include "bitUtil.h"
+#include "lodepng.h"
+#include "rangeDiff/rangeDiff.h"
+#include "mapDiff.h"
+#include "blockIterator.h"
+
 
 using namespace std;
 
@@ -26,6 +27,10 @@ void writeBit (int bit);
 void padZeroes(vector <unsigned char> c);
 
 void flushBits();
+
+void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int offset);
+
+void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth, unsigned int targetHeight, string colormode);
 
 vector<unsigned char> generateDiff (const char *lowRes, const char *highRes, int height, int width, int x, int y);
 

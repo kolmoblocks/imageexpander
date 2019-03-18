@@ -152,7 +152,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     std::vector<deltaUnit> units;
     std::vector<blockParams> blocksConfig;
     populateBlocks(blocksConfig, units);
-    insertDiffheader();
+    insertDiffHeader(diff, highResWidth, highResHeight, "RGB");
     int offset, rangeSize;
     for (auto block : blocksConfig) {
         // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
@@ -188,6 +188,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     }
     insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset);
 
+
     for (auto it: diff){
         cout<<it;
     }
@@ -204,6 +205,28 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
 
         auto w = to_string(targetWidth);
         auto h = to_string(targetHeight);
+        vector<unsigned char> v;
+        v = intToBin('D', 8);
+        diff.insert(diff.end(),v.begin(), v.end());
+        v = intToBin('I', 8);
+        diff.insert(diff.end(),v.begin(), v.end());
+        v = intToBin('F', 8);
+        diff.insert(diff.end(),v.begin(), v.end());
+        v = intToBin('F', 8);
+        diff.insert(diff.end(),v.begin(), v.end());
+        v = intToBin(targetWidth, 32);
+        diff.insert(diff.end(),v.begin(), v.end());
+        v = intToBin(targetHeight, 32);
+        diff.insert(diff.end(),v.begin(), v.end());
+        v = intToBin('R', 8);
+        diff.insert(diff.end(),v.begin(), v.end());
+        v = intToBin('G', 8);
+        diff.insert(diff.end(),v.begin(), v.end());
+        v = intToBin('B', 8);
+        diff.insert(diff.end(),v.begin(), v.end());
+        v = intToBin(' ', 8);
+        diff.insert(diff.end(),v.begin(), v.end());
+
         // fwrite(&w, w.length(), 1, f);
         // fwrite(&h, h.length(), 1, f);
         // diff.push_back();
