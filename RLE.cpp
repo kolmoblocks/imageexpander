@@ -16,16 +16,24 @@ vector <unsigned char> encodeRLE (vector<unsigned char> &bits){
     encoded.push_back(bits[0]);
     while (i <len) {
         k = 1;
-        while (i + k < len && bits[i + k] == bits[i]){
+        while ((i + k < len) && bits[i + k] == bits[i]){
             k++;
         }
+
         for (int l = 1; l <= floor(log(k)/log(2)); l++){
             encoded.push_back(0);
+            cout<<"0";
         }
-        binary = intToBin(k, floor(log(k)/log(2)+1));
-            encoded.insert(encoded.end(), binary.begin(), binary.end());
+        cout<<endl;
+        binary = intToUnsignedBin(k, floor(log(k)/log(2))+1);
+        for (auto it: binary){
+            cout<<(int)it;
+        }
+        cout<<endl;
+        encoded.insert(encoded.end(), binary.begin(), binary.end());
         // compressed.push_back();
         i+=k;
+        binary.clear();
             
     }
     return encoded;
@@ -47,7 +55,7 @@ vector <unsigned char> decodeRLE (vector<unsigned char> &bits){
             cout<<"invalid encoding";
             return decoded;
         }
-        for(int j = i+l; j< i + 2*l + 1; j++){
+        for(int j = i + l; j<i + 2*l + 1; j++){
             bin.push_back(bits[j]);
         }
         int k = binToInt(bin);
@@ -61,26 +69,28 @@ vector <unsigned char> decodeRLE (vector<unsigned char> &bits){
     return decoded;
 }
 
-int main(){
-    vector <unsigned char> v;
-    string answer = "10011101010000101000001011";
-    string test = "11111110010000000000000000000011111111111";
-    vector<unsigned char> a {0,0,0,0,1,1,0,1,0,0,1,0,0,1,0,1,0};
-    for (int i = 0; i < test.length(); i++){
-        v.push_back(test[i]-'0');
-    }
+// int main(){
+//     vector <unsigned char> v;
+//     string answer = "10011101010000101000001011";
+//     string test = "11111110010000000000000000000011111111111";
+//     // vector<unsigned char> a {0,0,0,0,1,1,0,1,0,0,1,0,0,1,0,1,0};
+//     for (int i = 0; i < test.length(); i++){
+//         v.push_back(test[i]-'0');
+//     }
 
-    vector <unsigned char> encoded = encodeRLE(v); 
-     for (auto it: encoded){
-        cout<<(int)it;
-    }
-    
-    cout<<endl;
+//     vector <unsigned char> encoded = encodeRLE(v); 
+//      for (auto it: encoded){
+//         cout<<(int)it;
+//     }
 
-    vector <unsigned char> decoded = decodeRLE(a); 
-     for (auto it: decoded){
-        cout<<(int)it;
-    }
+//     cout<<endl;
+
+//     vector <unsigned char> decoded = decodeRLE(encoded); 
+//      for (auto it: decoded){
+//         cout<<(int)it;
+//     }
+//     cout<<endl; 
+//     cout<<test<<endl;
     
-}
+// }
 

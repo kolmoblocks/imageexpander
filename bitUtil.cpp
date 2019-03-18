@@ -45,6 +45,18 @@ std::vector<unsigned char> intToBin(int c, int range) {
 	return v;
 }
 
+
+std::vector<unsigned char> intToUnsignedBin(int c, int range) {
+	std::vector<unsigned char> v;
+
+
+    for (int i = range-1; i >= 0; i--){
+            v.push_back((c & (1 << i)) != 0);
+    }
+	return v;
+}
+
+
 int binToInt(vector<unsigned char> &bin){
     int exponent = bin.size() - 1;
     int x = 0;
