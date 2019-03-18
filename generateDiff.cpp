@@ -182,7 +182,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
             float power = log(maxDelta.r)/log(2); // get the number of bits needed then + 1 for sign
             rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
          
-            if (minDelta.r >= 0 || minDelta.r <= 0 && maxDelta.r <= 0) {
+            if (minDelta.r >= 0 || (minDelta.r <= 0 && maxDelta.r <= 0)) {
                 offset = minDelta.r;
             } else {
                 offset = (minDelta.r + maxDelta.r) / 2;
@@ -202,9 +202,31 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
 
 
     for (auto it: diff){
-        cout<<it;
+        cout<<(int)it;
     }
+    cout<<endl<<diff.size();
+
+    cout<<endl<<endl;
+
+    cout<<"encoded"<<endl;
+    vector <unsigned char> encoded = encodeRLE(diff); 
+    for (auto it: encoded){
+        cout<<(int)it;
+    }
+    cout<<endl<<endl;
+
+    cout<<"decoded"<<endl;
+    vector <unsigned char> decoded = decodeRLE(encoded); 
+    for (auto it: decoded){
+        cout<<(int)it;
+    }
+    cout<<endl<<endl;
+
+
+
+
    std::cout << lodepng_error_text(error) << std::endl;
+   return diff;
 }
 
 

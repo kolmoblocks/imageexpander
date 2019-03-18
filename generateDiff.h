@@ -11,6 +11,7 @@
 #include "rangeDiff/rangeDiff.h"
 #include "mapDiff.h"
 #include "blockIterator.h"
+#include "RLE.h"
 
 
 using namespace std;
