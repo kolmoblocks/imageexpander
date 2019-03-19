@@ -4,6 +4,33 @@ void extractInfo(FILE *pFile, unsigned &deltaUnitSize, unsigned &lowFactor, unsi
 
 }
 
+
+char* getDiffFromFile(FILE *pFile){
+    long lSize;
+    char * buffer;
+    size_t result = 0;
+
+    pFile = fopen ( "diff.dat" , "rb" );
+    if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+    // obtain file size:
+    fseek (pFile , 0 , SEEK_END);
+    lSize = ftell (pFile);
+    rewind (pFile);
+
+    // allocate memory to contain the whole file:
+    buffer = (char*) malloc (sizeof(char)*lSize);
+    if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
+
+    // copy the file into the buffer:
+    fread (buffer,1,lSize,pFile);
+    
+    fclose (pFile);
+    free (buffer);
+    return buffer;
+}
+
+
 void populateDiffPixelVec(FILE *pFile, std::vector<unsigned char> &diffPixelVec, std::vector<unsigned char> &diffEncodedVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
     // assuming is RANGE
     // assuming default config for a 16:9 image
@@ -13,8 +40,12 @@ void populateDiffPixelVec(FILE *pFile, std::vector<unsigned char> &diffPixelVec,
 
 void enhance(char *lowResFileName, char *diffFileName) {
     FILE *pDiff;
-    pFile = fopen(diffFileName);
+    pDiff = fopen(diffFileName, "rb");
     // rle decode diff, then put into diffFileVector
+
+    char* diff = getDiffFromFile(pDiff);
+
+
 
     unsigned lowFactor, highFactor;
     unsigned lowResWidth, lowResHeight, highResWidth, highResHeight;

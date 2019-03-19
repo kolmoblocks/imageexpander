@@ -53,9 +53,9 @@ void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &un
             blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
         }
     }
-    for (auto it : blocks) {
-        std::cout << it.tl.x << " " << it.tl.y << " " << it.br.x << " " << it.br.y << std::endl;
-    }
+    // for (auto it : blocks) {
+    //     std::cout << it.tl.x << " " << it.tl.y << " " << it.br.x << " " << it.br.y << std::endl;
+    // }
 }
 
 void populateDeltas(std::vector<unsigned char> &image, int width, int height, int highFactor, int lowFactor, std::vector<deltaUnit> &units) {
@@ -122,7 +122,6 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
 
 
 std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes){
-    f = fopen ("random.dat", "w");
     std::vector<unsigned char> lowResImage;
     std::vector<unsigned char> highResImage;
     std::vector<unsigned char> diff;
@@ -201,49 +200,16 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         }
 
     }
-
-    
+    diff = encodeRLE(diff);
     insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset);
-
-
-    for (auto it: diff){
-        cout<<(int)it;
-    }
-    cout<<endl<<diff.size();
-
-    cout<<endl<<endl;
-
-    cout<<"encoded"<<endl;
-    vector <unsigned char> encoded = encodeRLE(diff); 
-    for (auto it: encoded){
-        cout<<(int)it;
-    }
-    cout<<endl<<endl;
-
-    cout<<"decoded"<<endl;
-    vector <unsigned char> decoded = decodeRLE(encoded); 
-    for (auto it: decoded){
-        cout<<(int)it;
-    }
-    cout<<endl<<endl;
-
-
-
-
-   std::cout << lodepng_error_text(error) << std::endl;
-   return diff;
+    std::cout << lodepng_error_text(error) << std::endl;
+    return diff;
 }
 
 
 
 
 void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth, unsigned int targetHeight, string colormode){
-        f = fopen ("diff.dat", "w");
-        char ID[] = "DIFF";
-        fwrite (ID, 1, 4, f);
-
-        auto w = to_string(targetWidth);
-        auto h = to_string(targetHeight);
         vector<unsigned char> v;
         v = intToBin('D', 8);
         diff.insert(diff.end(),v.begin(), v.end());
@@ -278,7 +244,9 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
     if (type == TYPE_MAP) {
 //
     } else if (type == TYPE_RANGE) {
-        diff.push_back(1);
+
+        vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
+        diff.insert(diff.end(),typeV.begin(), typeV.end());
         vector<unsigned char> rangeSizeV = intToBin(rangeSize,8);
         vector<unsigned char> offsetV = intToBin(offset,8);
         diff.insert(diff.end(),rangeSizeV.begin(), rangeSizeV.end());
@@ -288,48 +256,12 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
 
 }
 
-void readBlock(){
-    FILE * pFile;
-    long lSize;
-    char * buffer;
-    int x,y;
-    size_t result = 0;
-
-    pFile = fopen ( "diff.dat" , "rb" );
-    if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
-
-    // obtain file size:
-    fseek (pFile , 0 , SEEK_END);
-    lSize = ftell (pFile);
-    rewind (pFile);
-
-    // allocate memory to contain the whole file:
-    buffer = (char*) malloc (sizeof(char)*lSize);
-    if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
-
-    // copy the file into the buffer:
-    fread (buffer,4,1,pFile);
-    cout<<buffer<<endl;
-
-    fread (&x,1,4,pFile);
-    cout<<x<<endl;
-
-    fread (&y,1,4,pFile);
-    cout<<y<<endl;
-
-    fread (buffer,4,1,pFile);
-    cout<<buffer<<endl;
-
-
- 
-    fclose (pFile);
-    free (buffer);
-}
-
-
 int main(int argc, char *argv[]){
    // argv[1]: smaller file
-    generateDiff(argv[1], argv[2]);
+    FILE *diffFile = fopen ("diff.dat", "w");
+    vector<unsigned char> diff = generateDiff(argv[1], argv[2]);
+    writeBitsToFile(diff, diffFile);
+    fclose(diffFile);
     //writeDiffHeader(1920,1080,"RGB");
     // readBlock();
 }

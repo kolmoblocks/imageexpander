@@ -22,14 +22,8 @@ vector <unsigned char> encodeRLE (vector<unsigned char> &bits){
 
         for (int l = 1; l <= floor(log(k)/log(2)); l++){
             encoded.push_back(0);
-            cout<<"0";
         }
-        cout<<endl;
         binary = intToUnsignedBin(k, floor(log(k)/log(2))+1);
-        for (auto it: binary){
-            cout<<(int)it;
-        }
-        cout<<endl;
         encoded.insert(encoded.end(), binary.begin(), binary.end());
         // compressed.push_back();
         i+=k;

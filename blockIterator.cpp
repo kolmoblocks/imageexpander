@@ -1,8 +1,8 @@
 #include "blockIterator.h"
 
 
-blockIterator::blockIterator(std::vector<deltaUnit> &units, posn tl, posn br, unsigned int width, std::vector<unsigned char> &donorImage=NONE):
-    units{units}, pos{tl}, tl{tl}, br{br}, width{width}, unitLength{units[0].size()}, {
+blockIterator::blockIterator(std::vector<deltaUnit> &units, posn tl, posn br, unsigned int width):
+    units{units}, pos{tl}, tl{tl}, br{br}, width{width}, unitLength{units[0].size()} {
         innerUnitPos = 0;
     }
 
