@@ -50,10 +50,10 @@ void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned 
 
 }
 
-vector<unsigned char> getBits(vector<unsigned char>buffer, int start, int len){
+vector<unsigned char> getBits(vector<unsigned char>&buffer, int start, int len){
     vector<unsigned char> res;    
     res.reserve(len);
-    for (int i = start; i < start + len; i++){
+    for (int i = start+len - 1; i >= start ; i--){
         res.push_back(buffer[i]); 
         cout<<(int)buffer[i];
     }
@@ -74,7 +74,7 @@ void populateDiffPixelVec(FILE *pFile, std::vector<unsigned char> &diffPixelVec,
 
 
 
-bool checkFileHeader(vector<unsigned char>diff){
+bool checkFileHeader(vector<unsigned char>&diff){
     vector<unsigned char> v;
     string res = "";
     v = getBits(diff,0,8);
@@ -127,14 +127,11 @@ void enhance(char *lowResFileName, char *diffFileName) {
     diff.reserve(200);
     for (int i = 0; i < 200; i++){
         vector<unsigned char> bin;
-        for (int j = 0; j < 8; j++){
             bin = intToUnsignedBin(buffer[i], 8);
            diff.insert(diff.end(), bin.begin(), bin.end());
-        }
-        
     }
 
-    diff = decodeRLE(diff);
+    // diff = decodeRLE(diff);
 
 
     if (!checkFileHeader(diff)){

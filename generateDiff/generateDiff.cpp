@@ -169,7 +169,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         }
 
     }
-    diff = encodeRLE(diff);
+    // diff = encodeRLE(diff);
     insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset);
     std::cout << lodepng_error_text(error) << std::endl;
     return diff;
@@ -180,13 +180,29 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
 
 void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth, unsigned int targetHeight, string colormode){
         vector<unsigned char> v;
-        v = intToBin('D', 8);
+        v = intToUnsignedBin('D', 8);
+        for(auto it : v){
+            cout<<(int)it;
+        }
+        cout<<endl;
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToBin('I', 8);
+        v = intToUnsignedBin('I', 8);
+         for(auto it : v){
+            cout<<(int)it;
+        }
+        cout<<endl;
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToBin('F', 8);
+        v = intToUnsignedBin('F', 8);
+         for(auto it : v){
+            cout<<(int)it;
+        }
+        cout<<endl;
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToBin('F', 8);
+        v = intToUnsignedBin('F', 8);
+         for(auto it : v){
+            cout<<(int)it;
+        }
+        cout<<endl;
         diff.insert(diff.end(),v.begin(), v.end());
         v = intToBin(targetWidth, 32);
         diff.insert(diff.end(),v.begin(), v.end());

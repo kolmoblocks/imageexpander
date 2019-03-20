@@ -15,8 +15,7 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
     // generate headers
     // - range size, range start
     insertRangeHeader(diff, rangeSize, offset);
-     vector <unsigned char> r,g,b;
-     cout<<rangeSize<<":"<<offset<<endl;
+    vector <unsigned char> r,g,b;
     while (!it.end()){
         //use first bit to represent sign
         if ((*it).r < 0) {
