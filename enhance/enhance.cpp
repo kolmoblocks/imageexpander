@@ -28,6 +28,7 @@ char* getDiffFromFile(FILE *pFile){
     //  }
     fclose (pFile);
     free (buffer);
+    cout<<"end getdiff"<<endl;
     return buffer;
 }
 void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned &highResHeight) {
@@ -116,24 +117,52 @@ bool checkFileHeader(vector<unsigned char>&diff){
 void enhance(char *lowResFileName, char *diffFileName) {
     FILE *pDiff;
     pDiff = fopen(diffFileName, "rb");
-    vector<unsigned char> deltas, diffPixelVec, lowResImage, diff;
+    vector<unsigned char> deltas, diffPixelVec, lowResImage,diff;
     unsigned lowResWidth, lowResHeight, highResWidth, highResHeight,lowFactor, highFactor, 
     unitSize, deltaUnitSize, totalDeltaUnits, error;
 
     // rle decode diff, then put into diffFileVector
-
-    char* buffer = getDiffFromFile(pDiff);
-    
-    diff.reserve(200);
-    for (int i = 0; i < 200; i++){
         vector<unsigned char> bin;
-            bin = intToUnsignedBin(buffer[i], 8);
-           diff.insert(diff.end(), bin.begin(), bin.end());
+
+    // char* buffer = getDiffFromFile(pDiff);
+    // unsigned lSize = ftell(pDiff);
+    // unsigned lSize = 239206;
+    // diff.reserve(lSize * 8);
+    // cout<<lSize;
+    // for (int i = 0; i < lSize; i++){
+    //     bin = intToUnsignedBin(buffer[i], 8);
+    //     cout<<(uint8_t)buffer[i]<<endl;
+    //     diff.insert(diff.end(), bin.begin(), bin.end());
+    // }
+
+
+//  std::vector<unsigned char> decodedDiff;
+//     std::ifstream input( "diff.dat", std::ios::binary );
+//      std::vector<unsigned char> diff(std::istreambuf_iterator<char>(input), {});
+
+
+    ifstream f("diff.dat", ios::binary | ios::in);
+    char c;
+    while (f.get(c))
+    {
+        for (int i = 7; i >= 0; i--) // or (int i = 0; i < 8; i++)  if you want reverse bit order in bytes
+           diff.push_back((c >> i) & 1);
+    }
+    for (auto it: diff){
+        cout<<(int)it;
     }
 
-    // diff = decodeRLE(diff);
+//  for (int i = 0; i < diff.size(); i++){
+//         bin = intToUnsignedBin(diff[i], 8);
+//         decodedDiff.insert(decodedDiff.end(), diff.begin(), diff.end());
+//     }
 
+    cout<<"after loop"<<endl;
 
+    cout<<diff.size()<<endl;
+    diff = decodeRLE(diff);
+
+    cout<<"successfully decoded"<<endl;
     if (!checkFileHeader(diff)){
         cerr<<"File is not in DIFF format"<<endl;
         return;

@@ -45,7 +45,7 @@ vector <unsigned char> decodeRLE (vector<unsigned char> &bits){
         while (bits[i + l] == 0){
             l++;
         }
-        if (size < i + 1) {
+        if (size < i + l) {
             cout<<"invalid encoding";
             return decoded;
         }
@@ -63,28 +63,4 @@ vector <unsigned char> decodeRLE (vector<unsigned char> &bits){
     return decoded;
 }
 
-// int main(){
-//     vector <unsigned char> v;
-//     string answer = "10011101010000101000001011";
-//     string test = "11111110010000000000000000000011111111111";
-//     // vector<unsigned char> a {0,0,0,0,1,1,0,1,0,0,1,0,0,1,0,1,0};
-//     for (int i = 0; i < test.length(); i++){
-//         v.push_back(test[i]-'0');
-//     }
-
-//     vector <unsigned char> encoded = encodeRLE(v); 
-//      for (auto it: encoded){
-//         cout<<(int)it;
-//     }
-
-//     cout<<endl;
-
-//     vector <unsigned char> decoded = decodeRLE(encoded); 
-//      for (auto it: decoded){
-//         cout<<(int)it;
-//     }
-//     cout<<endl; 
-//     cout<<test<<endl;
-    
-// }
 

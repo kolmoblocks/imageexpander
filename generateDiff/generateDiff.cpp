@@ -161,7 +161,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
             } else {
                 offset = (minLim + maxLim) / 2;
             }
-
+            insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset);
             insertRangeBlock(diff, it, rangeSize, offset);
         }
         else if (block.type == 'M') {
@@ -169,8 +169,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         }
 
     }
-    // diff = encodeRLE(diff);
-    insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset);
+    diff = encodeRLE(diff);
     std::cout << lodepng_error_text(error) << std::endl;
     return diff;
 }

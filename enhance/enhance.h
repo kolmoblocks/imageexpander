@@ -7,6 +7,7 @@
 #include <cmath>
 #include <numeric>
 #include <string>
+#include <cstdint>
 #include "../bitUtil/bitUtil.h"
 #include "../lodepng/lodepng.h"
 #include "../rangeDiff/rangeDiff.h"
