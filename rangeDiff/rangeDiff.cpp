@@ -1,9 +1,3 @@
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <unordered_set> 
-#include <numeric> 
-#include <string>
 #include "rangeDiff.h"
 
 using namespace std;
@@ -12,8 +6,8 @@ using namespace std;
 void insertRangeHeader(vector<unsigned char> &diff, int rangeSize, int offset){
     vector <unsigned char> offsetByte= intToBin(offset,8);
     vector <unsigned char> rangeSizeByte = intToBin(rangeSize, 8);
-    diff.insert(diff.end(), offsetByte.begin(), offsetByte.end());
     diff.insert(diff.end(), rangeSizeByte.begin(), rangeSizeByte.end());
+    diff.insert(diff.end(), offsetByte.begin(), offsetByte.end());
 
 }
 
@@ -22,8 +16,9 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
     // - range size, range start
     insertRangeHeader(diff, rangeSize, offset);
      vector <unsigned char> r,g,b;
-     
+     cout<<rangeSize<<":"<<offset<<endl;
     while (!it.end()){
+        //use first bit to represent sign
         if ((*it).r < 0) {
             b.push_back(1);
         } else {
