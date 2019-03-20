@@ -2,7 +2,7 @@
 #define RLE_H
 #include <cmath>
 #include <vector>
-#include "bitUtil.h"
+#include "../bitUtil/bitUtil.h"
 using namespace std;
 
 vector <unsigned char> encodeRLE (vector<unsigned char> &bits);

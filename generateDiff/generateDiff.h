@@ -6,12 +6,12 @@
 #include <cmath>
 #include <numeric>
 #include <string>
-#include "bitUtil.h"
-#include "lodepng.h"
-#include "rangeDiff/rangeDiff.h"
-#include "mapDiff.h"
-#include "blockIterator.h"
-#include "RLE.h"
+#include "../bitUtil/bitUtil.h"
+#include "../lodepng/lodepng.h"
+#include "../rangeDiff/rangeDiff.h"
+#include "../mapDiff/mapDiff.h"
+#include "../blockIterator/blockIterator.h"
+#include "../RLE/RLE.h"
 
 
 using namespace std;
@@ -33,7 +33,7 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
 
 void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth, unsigned int targetHeight, string colormode);
 
-vector<unsigned char> generateDiff (const char *lowRes, const char *highRes, int height, int width, int x, int y);
+vector<unsigned char> generateDiff (const char *lowRes, const char *highRes);
 
 
 #endif

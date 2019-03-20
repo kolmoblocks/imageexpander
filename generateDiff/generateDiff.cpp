@@ -1,47 +1,13 @@
 #include "generateDiff.h"
-
-const int TYPE_MAP = 0, TYPE_RANGE = 1;
-
 using namespace std;
+
+FILE *f;
+const int TYPE_MAP = 0, TYPE_RANGE = 1;
 
 typedef struct {
     posn tl, br;
     int type;
 } blockParams;
-
-
-FILE *f;
-
-unsigned int gcd(unsigned int u, unsigned int v)
-{
-    // simple cases (termination)
-    if (u == v)
-        return u;
-
-    if (u == 0)
-        return v;
-
-    if (v == 0)
-        return u;
-
-    // look for factors of 2
-    if (~u & 1) // u is even
-    {
-        if (v & 1) // v is odd
-            return gcd(u >> 1, v);
-        else // both u and v are even
-            return gcd(u >> 1, v >> 1) << 1;
-    }
-
-    if (~v & 1) // u is odd, v is even
-        return gcd(u, v >> 1);
-
-    // reduce larger argument
-    if (u > v)
-        return gcd((u - v) >> 1, v);
-
-    return gcd((v - u) >> 1, u);
-}
 
 
 void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &units, int width, int height, int highFactor) {

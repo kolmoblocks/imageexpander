@@ -1,6 +1,6 @@
 #ifndef BLOCKITERATOR_H
 #define BLOCKITERATOR_H
-#include "../DeltaUnit/deltaUnit.h"
+#include "../deltaUnit/deltaUnit.h"
 #include <iostream>
 #include <fstream>
 #include <cmath>

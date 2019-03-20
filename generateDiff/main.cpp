@@ -1,4 +1,4 @@
-#include "../generateDiff/generateDiff.h"
+#include "generateDiff.h"
 
 int main(int argc, char *argv[]){
    // argv[1]: smaller file

@@ -10,9 +10,9 @@
 #include "../bitUtil/bitUtil.h"
 #include "../lodepng/lodepng.h"
 #include "../rangeDiff/rangeDiff.h"
-#include "mapDiff.h"
+#include "../mapDiff/mapDiff.h"
 #include "../blockIterator/blockIterator.h"
-#include "RLE.h"
+#include "../RLE/RLE.h"
 
 void enhance(char *lowRes, char *diff);
 
