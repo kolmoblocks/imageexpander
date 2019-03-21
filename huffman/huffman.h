@@ -18,7 +18,7 @@
 
 
 typedef struct dNode{
-    char ch;
+    int ch;
     int weight;
 
     struct dNode *left;

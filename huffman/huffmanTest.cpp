@@ -14,4 +14,8 @@ int main(int argc, char **argv) {
                                          1,1,1,1,1,1,1,1,
                                          1,1,1,1,1,1,1,1};
     encodeHuffman(binStr);
+    for (auto it : binStr) {
+        std::cout << (int)it;
+    }
+    std::cout << std::endl;
 }
