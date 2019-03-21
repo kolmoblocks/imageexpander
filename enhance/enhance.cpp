@@ -1,5 +1,25 @@
 #include "enhance.h"
 
+vector<unsigned char> getBits(vector<unsigned char>&buffer, int start, int len){
+    vector<unsigned char> res;    
+    res.reserve(len);
+    // for (int i = start+len - 1; i >= start ; i--){
+    //     res.push_back(buffer[i]); 
+    //     cout<<(int)buffer[i];
+    // }
+
+    for (int i = start; i< start +len; i++){
+        res.push_back(buffer[i]); 
+        cout<<(int)buffer[i];
+    }
+
+    
+    cout<<endl;
+    return res;
+}
+
+
+
 char* getDiffFromFile(FILE *pFile){
     long lSize;
     char * buffer;
@@ -34,36 +54,18 @@ char* getDiffFromFile(FILE *pFile){
 void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned &highResHeight) {
     vector<unsigned char> v;
     v.reserve(32);
-    for (int i = 32; i < 64; i++){
-        v.push_back(diff[i]);
-    }
+    v = getBits(diff,32,32);
     highResWidth = (unsigned)binToInt(v);
-    v.clear();
-    for (int i = 64; i < 86; i++){
-        v.push_back(diff[i]);       
-    }
+    v = getBits(diff,64,32);
     highResHeight = (unsigned)binToInt(v);
-    v.clear();
-    for (int i = 86; i < 118; i++){
-        v.push_back(diff[i]);
-    }
+
+
+    // for (int i = 86; i < 118; i++){
+    //     v.push_back(diff[i]);
+    // }
     //colormode = assume RGB for now
 
 }
-
-vector<unsigned char> getBits(vector<unsigned char>&buffer, int start, int len){
-    vector<unsigned char> res;    
-    res.reserve(len);
-    for (int i = start+len - 1; i >= start ; i--){
-        res.push_back(buffer[i]); 
-        cout<<(int)buffer[i];
-    }
-
-    
-    cout<<endl;
-    return res;
-}
-
 
 
 void populateDiffPixelVec(FILE *pFile, std::vector<unsigned char> &diffPixelVec, std::vector<unsigned char> &diffEncodedVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
@@ -145,11 +147,9 @@ void enhance(char *lowResFileName, char *diffFileName) {
     char c;
     while (f.get(c))
     {
-        for (int i = 7; i >= 0; i--) // or (int i = 0; i < 8; i++)  if you want reverse bit order in bytes
+        // for (int i = 7; i >= 0; 
+        for (int i = 0; i < 8; i++)  //if you want reverse bit order in bytes
            diff.push_back((c >> i) & 1);
-    }
-    for (auto it: diff){
-        cout<<(int)it;
     }
 
 //  for (int i = 0; i < diff.size(); i++){
@@ -189,16 +189,7 @@ void enhance(char *lowResFileName, char *diffFileName) {
     int numberOfDeltaPixelsPerBlock = unitSize - highResWidth*highResHeight*lowFactor*lowFactor/(16*9*highFactor*highFactor);
     // THIS SHOULD BE 3 SINCE WE ARE RESIZING 2:1
     
-
-
-    
-    
-    
-   
-    
-    
 }
-
 
 
 // void expand_image(const char *oldImgName, std::vector<unsigned char> diffVec, unsigned loFactor, unsigned hiFactor) {
@@ -256,6 +247,7 @@ void enhance(char *lowResFileName, char *diffFileName) {
 //         finalImage.push_back(it.b);
 //     }
 //     lodepng::encode("final.png",finalImage,newW,newH,LCT_RGB,8);
+// }
 // }
 
 

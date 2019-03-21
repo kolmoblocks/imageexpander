@@ -56,6 +56,7 @@ void writeBitsToFile (std::vector<unsigned char> &bitBuff, FILE *f) {
 
     if (bitBuff.size() % 8 != 0) std::cout << "bitBuffLen not 8 after padding!" << std::endl;
 
+    bitBuff = encodeRLE(bitBuff);
     for (auto it : bitBuff) {
         writeBit(it, current_bit, bit_buffer, f);
     }

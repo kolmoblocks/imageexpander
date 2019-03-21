@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cmath>
 #include <vector>
+#include "../RLE/RLE.h"
 
 
 void writeBit (int bit, int &current_bit, FILE *f);

@@ -136,10 +136,6 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         Color maxDelta{-255,-255,-255}, minDelta{255,255,255};
         while (!it.end()) {
             maxDelta = max(*it, maxDelta);
-            ++it;
-        }
-        it.reset();
-        while (!it.end()) {
             minDelta = min(*it, minDelta);
             ++it;
         }
@@ -169,7 +165,6 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         }
 
     }
-    diff = encodeRLE(diff);
     std::cout << lodepng_error_text(error) << std::endl;
     return diff;
 }
@@ -197,23 +192,30 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
         }
         cout<<endl;
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin('F', 8);
          for(auto it : v){
             cout<<(int)it;
         }
         cout<<endl;
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToBin(targetWidth, 32);
+        v = intToUnsignedBin(targetWidth, 32);
+         for(auto it : v){
+            cout<<(int)it;
+        }
+                cout<<endl;
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToBin(targetHeight, 32);
+        v = intToUnsignedBin(targetHeight, 32);
+         for(auto it : v){
+            cout<<(int)it;
+        }
+                cout<<endl;
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToBin('R', 8);
+        v = intToUnsignedBin('R', 8);
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToBin('G', 8);
+        v = intToUnsignedBin('G', 8);
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToBin('B', 8);
+        v = intToUnsignedBin('B', 8);
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToBin(' ', 8);
+        v = intToUnsignedBin(' ', 8);
         diff.insert(diff.end(),v.begin(), v.end());
 
         // fwrite(&w, w.length(), 1, f);
