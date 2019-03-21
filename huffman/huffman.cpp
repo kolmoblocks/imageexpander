@@ -3,7 +3,7 @@
 //
 
 #include "huffman.h"
-#define TOKENSIZE 1024
+#define TOKENSIZE 256
 
 
 struct compare{
@@ -23,7 +23,7 @@ void inOrder(dNode *curNode, std::vector<unsigned char> bitstring, std::vector<u
         int c = curNode->ch;
         //std::cout << "1";
         encTable[c].insert(encTable[c].end(), bitstring.begin(), bitstring.end());
-        if (bitstring.size() < 7) std ::cout << bitstring.size() << std::endl;
+        //if (bitstring.size() < 7) std ::cout << bitstring.size() << std::endl;
 
         //std::cout << "2" << std::endl;
         return;
@@ -102,7 +102,7 @@ dNode *encodeHuffman(std::vector<unsigned char> &rawData) {
     int i=0;
 
     while ( i<rawDataSize ) {
-        int lim = i+10;
+        int lim = i+8;
         for (; i<lim; ++i) {
             curCharVec.push_back(*leadingIt);
             ++leadingIt;
@@ -127,5 +127,24 @@ dNode *encodeHuffman(std::vector<unsigned char> &rawData) {
 
 void decodeHuffman(std::vector<unsigned char> &encoded, std::vector<unsigned char> &decoded, dNode *encodeDict) {
     auto encodedIt = encoded.begin();
+    std::vector<unsigned char> curBinaryVec;
+    dNode *dictPtr = encodeDict;
 
+    while (encodedIt != encoded.end()) {
+        if (!(dictPtr->left) && !(dictPtr->right)) {
+            decoded.insert(decoded.end(), curBinaryVec.begin(), curBinaryVec.end());
+            dictPtr = encodeDict;
+            curBinaryVec.clear();
+        }
+        else{
+            if (*encodedIt == 0) {
+                dictPtr = dictPtr->left;
+            }
+            else {
+                dictPtr = dictPtr->right;
+            }
+            curBinaryVec.push_back(*encodedIt);
+        }
+        ++encodedIt;
+    }
 }
