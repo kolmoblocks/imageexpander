@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
                                          1,1,1,1,0,1,1,1,
                                          1,1,1,1,1,1,1,1,
                                          1,1,1,1,1,1,1,1};
-    encodeHuffman(binStr);
+    dNode *codex = encodeHuffman(binStr);
     for (auto it : binStr) {
         std::cout << (int)it;
     }
