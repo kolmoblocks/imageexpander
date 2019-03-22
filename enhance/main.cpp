@@ -2,5 +2,5 @@
 
 int main(int argc, char* argv[]){
     //low res and diff
-    enhance(argv[0],argv[1]);
+    enhance(argv[1],argv[2]);
 }

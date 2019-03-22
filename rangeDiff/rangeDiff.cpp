@@ -13,9 +13,14 @@ void insertRangeHeader(vector<unsigned char> &diff, int rangeSize, int offset){
 
 void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeSize, int offset){
     // generate headers
-    // - range size, range start
+    // - range size, range start/
+        ofstream f;
+
+       f.open("range.data", std::ios_base::app);
+
     insertRangeHeader(diff, rangeSize, offset);
     vector <unsigned char> r,g,b;
+    f << rangeSize<<":"<<offset<<endl;
     while (!it.end()){
         //use first bit to represent sign
         if ((*it).r < 0) {
@@ -35,4 +40,5 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
         b.clear();
         ++it;
     }      
+    f.close();
 }

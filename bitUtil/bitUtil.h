@@ -20,4 +20,7 @@ std::vector<unsigned char> intToUnsignedBin(int c, int range);
 
 int binToInt(std::vector<unsigned char> &bin);
 
+int binToSignedInt(std::vector<unsigned char> &bin);
+
+
 #endif

@@ -15,7 +15,8 @@
 #include "../blockIterator/blockIterator.h"
 #include "../RLE/RLE.h"
 
-void enhance(char *lowRes, char *diff);
+void expandImage(const char *oldImgName, std::vector<unsigned char> &diff, unsigned lowFactor, unsigned highFactor);
+void enhance(char *lowResFileName, char *diffFileName);
 
 
 #endif

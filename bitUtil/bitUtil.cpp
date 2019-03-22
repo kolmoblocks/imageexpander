@@ -98,3 +98,19 @@ int binToInt(vector<unsigned char> &bin){
     }
     return x;
 }
+
+int binToSignedInt(vector<unsigned char> &bin){
+    int exponent = bin.size() - 2;
+    int x = 0;
+    int sign = 1;
+    if (bin[0] == 1) {
+        sign = -1;
+    } 
+    for (auto it = bin.begin() + 1; it < bin.end(); ++it ){
+        x += (int)*it * pow(2, exponent);
+        exponent-=1;
+    }
+    return sign * x;
+}
+
+
