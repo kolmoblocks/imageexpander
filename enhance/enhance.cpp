@@ -17,6 +17,24 @@ vector<unsigned char> getBits(vector<unsigned char>&buffer, int start, int len){
 }
 
 
+vector<int> getPixels(vector<unsigned char> &diff, int deltaUnitSize){
+    vector<int> pixels;
+
+    int i = 124, rangeSize;
+
+    while (i < diff.size()){
+        rangeSize = 
+        for (int j = 0; j < deltaUnitSize; j++){
+            pixels.push_back();
+        }
+
+    }
+
+
+    return pixels;
+
+}
+
 
 char* getDiffFromFile(FILE *pFile){
     long lSize;
@@ -64,11 +82,14 @@ void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned 
 }
 
 
-void populateDiffPixelVec(FILE *pFile, std::vector<unsigned char> &diffPixelVec, std::vector<unsigned char> &diffEncodedVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
-    // assuming is RANGE
+void populateDiffPixelVec(std::vector<unsigned char> &diffPixelVec, std::vector<unsigned char> &diffEncodedVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
+    // assuming is RANGE 
     // assuming default config for a 16:9 image
     unsigned blockdataSize = highResHeight*highResWidth / (16*9);
     unsigned numBlocks = 16*9;
+    
+
+
 }
 
 
