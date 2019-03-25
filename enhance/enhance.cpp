@@ -80,6 +80,20 @@ void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned 
 
 }
 
+void populateBlocks(std::vector<blockParams> &blocks, int width, int height, int highFactor) {
+    // logic here to statisticallly determine "good" configuration of blocks
+    int xincr = width/16, yincr=height/9;
+
+    for (int i=0; i<width; i+=xincr) {
+        for (int j=0; j<height; j+=yincr) {
+            blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
+        }
+    }
+    // for (auto it : blocks) {
+    //     std::cout << it.tl.x << " " << it.tl.y << " " << it.br.x << " " << it.br.y << std::endl;
+    // }
+}
+
 
 void populateDiffPixelVec(std::vector<unsigned char> &diffPixelVec, std::vector<unsigned char> &blocksPixelVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
     // assuming is RANGE 
@@ -92,12 +106,35 @@ void populateDiffPixelVec(std::vector<unsigned char> &diffPixelVec, std::vector<
         blockPosVec.push_back(i * blockDataSize * 3);
     }
 
+    std::vector<blockParams> bPs;
+    populateBlocks(bPs, 1960, 1080, 2);
+
+    auto bt = bPs.begin();
+
     for (auto it=blockPosVec.begin(); it<blockPosVec.end(); ++it) {
+
         unsigned blockBegin = *it;
         unsigned blockEnd = *(std::next(it,1));
+        // tl, br are in UNITS not PIXELS
+        int diffPixPos = (bt->tl.x + bt->tl.y * highResWidth/2)*deltaUnitSize*3;
+        int blockW = bt->br.x - bt->tl.x;
 
-        for (int i=blockBegin; i<blockEnd; ++i) {
+        if (bt->br.x < bt->tl.x) {
+            throw std::logic_error("error: br.x < tl.x");
         }
+
+        int ct = diffPixPos;
+        for (int i=blockBegin; i<blockEnd; ++i) {
+            // in delta unit, but we don't care since it's iterating through each pixel anyways..
+            // it is reading from blocksPixelVec, ct is where you are putting the pixels in diffPixelVec
+            diffPixelVec[ct] = blocksPixelVec[i];
+
+            ++ct;
+            if ((ct-diffPixPos) == blockW ) {
+                ct += (highResWidth/2 - blockW)*deltaUnitSize*3;
+            }
+        }
+        ++bt;
     }
 }
 

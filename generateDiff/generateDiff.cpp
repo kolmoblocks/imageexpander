@@ -4,11 +4,6 @@ using namespace std;
 FILE *f;
 const int TYPE_MAP = 0, TYPE_RANGE = 1;
 
-typedef struct {
-    posn tl, br;
-    int type;
-} blockParams;
-
 
 void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &units, int width, int height, int highFactor) {
     // logic here to statisticallly determine "good" configuration of blocks
