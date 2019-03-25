@@ -22,10 +22,9 @@ vector<int> getPixels(vector<unsigned char> &diff, int deltaUnitSize){
 
     int i = 124, rangeSize;
 
-    while (i < diff.size()){
-        rangeSize = 
+    while (i < diff.size()) {
         for (int j = 0; j < deltaUnitSize; j++){
-            pixels.push_back();
+            //pixels.push_back();
         }
 
     }
@@ -82,14 +81,24 @@ void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned 
 }
 
 
-void populateDiffPixelVec(std::vector<unsigned char> &diffPixelVec, std::vector<unsigned char> &diffEncodedVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
+void populateDiffPixelVec(std::vector<unsigned char> &diffPixelVec, std::vector<unsigned char> &blocksPixelVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
     // assuming is RANGE 
     // assuming default config for a 16:9 image
-    unsigned blockdataSize = highResHeight*highResWidth / (16*9);
+    unsigned blockDataSize = highResHeight*highResWidth / (16*9);
     unsigned numBlocks = 16*9;
-    
 
+    std::vector<unsigned int> blockPosVec;
+    for (int i=0; i<numBlocks; ++i) {
+        blockPosVec.push_back(i * blockDataSize * 3);
+    }
 
+    for (auto it=blockPosVec.begin(); it<blockPosVec.end(); ++it) {
+        unsigned blockBegin = *it;
+        unsigned blockEnd = *(std::next(it,1));
+
+        for (int i=blockBegin; i<blockEnd; ++i) {
+        }
+    }
 }
 
 
