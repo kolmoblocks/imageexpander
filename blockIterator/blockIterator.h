@@ -8,6 +8,11 @@
 #include <numeric>
 using namespace std;
 
+typedef struct {
+    posn tl, br;
+    int type;
+} blockParams;
+
 class blockIterator {
     std::vector<deltaUnit> &units;
 public:

@@ -100,7 +100,7 @@ dNode *encodeHuffman(std::vector<unsigned char> &rawData) {
     auto leadingIt = rawData.begin();
     auto trailingIt = rawData.begin();
     int i=0;
-    int incr = floor(log(TOKENSIZE)/log(2))
+    int incr = floor(log(TOKENSIZE)/log(2));
     while ( i<rawDataSize ) {
         int lim = i+8;
         for (; i<lim; ++i) {

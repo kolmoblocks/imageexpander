@@ -11,7 +11,9 @@
 #include "../bitUtil/bitUtil.h"
 #include "../lodepng/lodepng.h"
 #include "../rangeDiff/rangeDiff.h"
+#include "../deltaUnit/deltaUnit.h"
 #include "../mapDiff/mapDiff.h"
+#include "../huffman/huffman.h"
 #include "../blockIterator/blockIterator.h"
 #include "../RLE/RLE.h"
 
