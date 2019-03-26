@@ -45,7 +45,7 @@ vector <unsigned char> decodeRLE (vector<unsigned char> &bits){
         while (bits[i + l] == 0){
             l++;
         }
-        if (size < i + l) {
+        if (size < i + l + 1) {
             cout<<"invalid encoding";
             return decoded;
         }
