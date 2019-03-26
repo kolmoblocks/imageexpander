@@ -21,11 +21,10 @@ void setBlockInfo(int &w, int &h, int highResImgW, int highResImgH){
     h = highResImgH / 9;
 }
 
-vector<unsigned int> getPixels(vector<unsigned char> &diff, vector<unsigned char> &lowRes, 
+void getPixels(vector<unsigned char> &pixels, vector<unsigned char> &diff, vector<unsigned char> &lowRes,
     int highResImgW, int highResImgH, int deltaUnitSize, int numDeltaPixelsPerBlock, int highFactor){
     
-    vector<unsigned int> pixels;
-    int diffPos = 124, rangeSize, offset, r, g, b, ref, blockW, blockH; 
+    int diffPos = 124, rangeSize, offset, r, g, b, ref, blockW, blockH;
     setBlockInfo(blockW, blockH, highResImgW, highResImgH);
     int numBlocks = highResImgW * highResImgH / numDeltaPixelsPerBlock;
 
@@ -75,8 +74,6 @@ vector<unsigned int> getPixels(vector<unsigned char> &diff, vector<unsigned char
 
         }
     }
-
-    return pixels;
 
 }
 
@@ -203,12 +200,61 @@ bool checkFileHeader(vector<unsigned char>&diff){
 }
 
 
+void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsigned oldImgH, std::vector<unsigned char> diffVec, unsigned loFactor, unsigned hiFactor, int diffW) {
+
+
+    unsigned newW = oldImgW * hiFactor / loFactor;
+    unsigned newH = oldImgH * hiFactor / loFactor;
+
+    std::vector<Color> newImgVec(newW * newH * 3);
+
+    int diffX = 0;
+    int diffY = 0;
+
+    for (std::size_t y=0; y<newH; y+= hiFactor) {
+        for (std::size_t x=0; x<newW; x+= hiFactor) {
+            // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
+            // increment diffY, reset diffX to 0 each time we go to a new block
+            ++diffY;
+            diffX = 0;
+            for (int innerX = x; innerX < x+hiFactor; ++innerX) {
+                for (int innerY = y; innerY < y+hiFactor; ++innerY) {
+                    // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
+                    if (!(innerX < x+loFactor) || !(innerY < y+loFactor)) {
+                        // grab pixel from the diff
+                        newImgVec[innerX + innerY*newW + 4].r = diffVec[3*(diffX + diffY*diffW)];
+                        newImgVec[innerX + innerY*newW + 4].g = diffVec[3*(diffX + diffY*diffW)+1];
+                        newImgVec[innerX + innerY*newW + 4].b = diffVec[3*(diffX + diffY*diffW)+2];
+                        // increment diffX every time we increment through the inner block.
+                        ++diffX;
+                    }
+                    else {
+                        // grab pixel from the old image
+                        newImgVec[innerX + innerY*newW].r = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y)))];
+                        newImgVec[innerX + innerY*newW].g = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y))) + 1];
+                        newImgVec[innerX + innerY*newW].b = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y))) + 2];
+                    }
+
+                }
+            }
+        }
+    }
+    std::vector<unsigned char> finalImage;
+    for (auto it : newImgVec) {
+        finalImage.push_back(it.r);
+        finalImage.push_back(it.g);
+        finalImage.push_back(it.b);
+    }
+    lodepng::encode("final.png",finalImage,newW,newH,LCT_RGB,8);
+}
+
+
 
 
 void enhance(char *lowResFileName, char *diffFileName) {
     FILE *pDiff;
     pDiff = fopen(diffFileName, "rb");
-    vector<unsigned char> deltas, diffPixelVec, lowResImage,diff;
+    vector<unsigned char> deltas, diffPixelVec, lowResImage,diff, blocksPixelVec;
     unsigned lowResWidth, lowResHeight, highResWidth, highResHeight,lowFactor, highFactor, 
     unitSize, deltaUnitSize, totalDeltaUnits, error;
     ofstream f2;
@@ -252,7 +298,9 @@ void enhance(char *lowResFileName, char *diffFileName) {
     unitSize = highFactor*highFactor;
     deltaUnitSize = unitSize - lowFactor*lowFactor;
     totalDeltaUnits = highResHeight*highResWidth / unitSize;
+
     diffPixelVec.reserve(3*totalDeltaUnits*deltaUnitSize);
+    blocksPixelVec.reserve(3*totalDeltaUnits*deltaUnitSize);
 
     //iterate blocks
     // assuming aspect ratio is 16:9
@@ -260,67 +308,15 @@ void enhance(char *lowResFileName, char *diffFileName) {
     int numDeltaPixelsPerBlock = unitSize - highResWidth*highResHeight*lowFactor*lowFactor/(16*9*highFactor*highFactor);
     // THIS SHOULD BE 3 SINCE WE ARE RESIZING 2:1
 
+    getPixels(blocksPixelVec, diff, lowResImage, highResWidth, highResHeight, deltaUnitSize, numDeltaPixelsPerBlock, highFactor);
 
+    populateDiffPixelVec(diffPixelVec, blocksPixelVec, deltaUnitSize, highResWidth, highResHeight);
+
+    expand_image(lowResImage, lowResWidth, lowResHeight, diffPixelVec, lowFactor, highFactor, deltaUnitSize);
 
 }
 
 
- void expand_image(const char *oldImgName, std::vector<unsigned char> diffVec, unsigned loFactor, unsigned hiFactor) {
-     std::vector<unsigned char> oldImgVec;
-     unsigned oldImgH, oldImgW;
-
-     unsigned error = lodepng::decode(oldImgVec, oldImgW, oldImgH, oldImgName, LCT_RGB, 8);
-     if (error) {
-           std::cout << lodepng_error_text(error) << std::endl;
-
-        return;
-    }
-
-
-     unsigned newW = oldImgW * hiFactor / loFactor;
-     unsigned newH = oldImgH * hiFactor / loFactor;
-
-     std::vector<Color> newImgVec(newW * newH * 3);
-
-     int diffX = 0;
-     int diffY = 0;
-
-     for (std::size_t y=0; y<newH; y+= hiFactor) {
-       for (std::size_t x=0; x<newW; x+= hiFactor) {
-          // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
-          // increment diffY, reset diffX to 0 each time we go to a new block
-          ++diffY;
-          diffX = 0;
-          for (int innerX = x; innerX < x+hiFactor; ++innerX) {
-             for (int innerY = y; innerY < y+hiFactor; ++innerY) {
-                // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
-                if (!(innerX < x+loFactor) || !(innerY < y+loFactor)) {
-                   // grab pixel from the diff
-                    newImgVec[innerX + innerY*newW + 4].r = diffVec[3*(diffX + diffY*diffW)];
-                     newImgVec[innerX + innerY*newW + 4].g = diffVec[3*(diffX + diffY*diffW)+1];
-                     newImgVec[innerX + innerY*newW + 4].b = diffVec[3*(diffX + diffY*diffW)+2];
-                   // increment diffX every time we increment through the inner block.
-                   ++diffX;
-                }
-                else {
-                    // grab pixel from the old image
-                     newImgVec[innerX + innerY*newW].r = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y)))];
-                     newImgVec[innerX + innerY*newW].g = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y))) + 1];
-                     newImgVec[innerX + innerY*newW].b = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y))) + 2];
-                }
-
-             }
-          }
-       }
-    }
-     std::vector<unsigned char> finalImage;
-     for (auto it : newImgVec) {
-         finalImage.push_back(it.r);
-         finalImage.push_back(it.g);
-         finalImage.push_back(it.b);
-     }
-     lodepng::encode("final.png",finalImage,newW,newH,LCT_RGB,8);
- }
 
 
 
