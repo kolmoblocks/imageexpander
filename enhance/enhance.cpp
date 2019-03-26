@@ -22,7 +22,7 @@ void setBlockInfo(int &w, int &h, int highResImgW, int highResImgH){
 }
 
 void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector<unsigned char> &lowRes,
-    int highResImgW, int highResImgH, int deltaUnitSize, int numDeltaPixelsPerBlock, int highFactor){
+    int highResImgW, int highResImgH, int deltaUnitSize, int numDeltaPixelsPerBlock, int highFactor, int lowFactor, int lowResImgW){
     
     int diffPos = 124, rangeSize, offset, r, g, b, refR, refG, refB, blockW, blockH;
     setBlockInfo(blockW, blockH, highResImgW, highResImgH);
@@ -30,14 +30,15 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 
     //x,y = start of each block
 
-    for (int blockY = 0; blockY < highResImgH; blockY+= blockH){
-        for (int blockX = 0; blockX < highResImgW; blockX+= blockW){
+
+
+    for (int blockY = 0; blockY < highResImgH - blockH; blockY+= blockH){
+        for (int blockX = 0; blockX < highResImgW - blockW; blockX+= blockW){
             diffPos +=8;
             rangeSize = binToInt(getBits(diff, diffPos, 8));
             diffPos += 8;
             offset = binToInt(getBits(diff, diffPos, 8));
             diffPos += 8;    
-        cout<<highFactor<<endl;
             for (int deltaY = blockY; deltaY < blockY + blockH; deltaY += highFactor){
                 int deltaYCpy = deltaY;
                 for (int deltaX = blockX; deltaX < blockX + blockW; deltaX += highFactor) {
@@ -51,32 +52,70 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         // cout<<highResImgW<<endl;
                         // cout<<deltaYCpy<<":"<<deltaXCpy<<endl;
                     cout<<deltaYCpy<<":"<<deltaXCpy<<endl;
-
+                    //     cout<<"unit"<<unit<<endl;
                         if (unit == deltaUnitSize - 1){
-                                                        cout<<"if 1"<<endl;
-                                                        cout<<"size"<<lowRes.size()<<endl;
-                            cout <<3*(highResImgW * (deltaYCpy-1)-1 + (deltaXCpy-1))<<endl;
-                            refR = lowRes[3*((highResImgW * (deltaYCpy-1)-1) + (deltaXCpy-1))];
-                            refG = lowRes[3*((highResImgW * (deltaYCpy-1)-1) + (deltaXCpy-1)) + 1];
-                            refB = lowRes[3*((highResImgW * (deltaYCpy-1)-1) + (deltaXCpy-1)) + 2];
+                                                        //cout<<"if 1"<<endl;
+                        //                                 cout<<"size"<<lowRes.size()<<endl;
+                            // cout <<3*(1920 * (deltaYCpy-1)-1 + (deltaXCpy-1))<<endl;
+                            // refR = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy-1))];
+
+
+
+
+                            refR = lowRes[ 3*((deltaXCpy - 1) * lowFactor/highFactor 
+                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor)];
+
+                            refG = lowRes[ 3*((deltaXCpy - 1) * lowFactor/highFactor 
+                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor ) + 1];
+
+                            refB = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
+                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor) + 2];
+
+                            // refG = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy-1)) + 1];
+                            // refB = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy-1)) + 2];
 
     
 
     
                         } else if (unit < (deltaUnitSize - 1)/2){
-                            refR = lowRes[3*((highResImgW * (deltaYCpy)-1) + (deltaXCpy-1))];
-                            refG = lowRes[3*((highResImgW * (deltaYCpy)-1) + (deltaXCpy-1)) + 1];
-                            refB = lowRes[3*((highResImgW * (deltaYCpy)-1) + (deltaXCpy-1)) + 2];
+                                                                                    // cout<<"if 2"<<endl;
+                            // cout<<3*((1920 * (deltaYCpy)-1) + (deltaXCpy-1))<<endl;
+                            // refR = lowRes[3*((1920 * (deltaYCpy)-1) + (deltaXCpy-1))];
+                            // refG = lowRes[3*((1920 * (deltaYCpy)-1) + (deltaXCpy-1)) + 1];
+                            // refB = lowRes[3*((1920 * (deltaYCpy)-1) + (deltaXCpy-1)) + 2];
+
+
+
+                            refR = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
+                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor)];
+
+                            refG = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
+                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor ) + 1];
+
+                            refB = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
+                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor) + 2];
+
+
                             deltaYCpy +=1;
-                                                        // cout<<"if 2"<<endl;
 
                         } else {
-                            if (unit == (deltaUnitSize - 1)/2) deltaXCpy = deltaX;
-                            refR = lowRes[3*((highResImgW * (deltaYCpy-1)-1) + (deltaXCpy))];
-                            refG = lowRes[3*(highResImgW * (deltaYCpy-1)-1 + (deltaXCpy)) + 1];
-                            refB = lowRes[3*(highResImgW * (deltaYCpy-1)-1 + (deltaXCpy)) + 2];
-                            deltaXCpy +=1;
                             // cout<<"if 3"<<endl;
+
+                            if (unit == (deltaUnitSize - 1)/2) deltaXCpy = deltaX;
+                            // refR = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy))];
+                            // refG = lowRes[3*(1920 * (deltaYCpy-1)-1 + (deltaXCpy)) + 1];
+                            // refB = lowRes[3*(1920 * (deltaYCpy-1)-1 + (deltaXCpy)) + 2];
+
+                            refR = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
+                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor)];
+
+                            refG = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
+                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor ) + 1];
+
+                            refB = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
+                            + lowResImgW * (deltaYCpy -1) * lowFactor/highFactor) + 2];
+
+                            deltaXCpy +=1;
                         }
 
                         // cout<<"diffpos"<<diffPos<<endl;
@@ -336,7 +375,7 @@ void enhance(char *lowResFileName, char *diffFileName) {
     int numDeltaPixelsPerBlock = unitSize - highResWidth*highResHeight*lowFactor*lowFactor/(16*9*highFactor*highFactor);
     // THIS SHOULD BE 3 SINCE WE ARE RESIZING 2:1
 
-    getPixels(blocksPixelVec, diff, lowResImage, highResWidth, highResHeight, deltaUnitSize, numDeltaPixelsPerBlock, highFactor);
+    getPixels(blocksPixelVec, diff, lowResImage, highResWidth, highResHeight, deltaUnitSize, numDeltaPixelsPerBlock, highFactor, lowFactor, lowResWidth);
 cout<<"Gotpixels"<<endl;
     populateDiffPixelVec(diffPixelVec, blocksPixelVec, deltaUnitSize, highResWidth, highResHeight);
 cout<<"populated diff pix vec"<<endl;
