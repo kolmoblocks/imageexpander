@@ -100,7 +100,7 @@ dNode *encodeHuffman(std::vector<unsigned char> &rawData) {
     auto leadingIt = rawData.begin();
     auto trailingIt = rawData.begin();
     int i=0;
-
+    int incr = floor(log(TOKENSIZE)/log(2))
     while ( i<rawDataSize ) {
         int lim = i+8;
         for (; i<lim; ++i) {
@@ -129,6 +129,7 @@ void decodeHuffman(std::vector<unsigned char> &encoded, std::vector<unsigned cha
     auto encodedIt = encoded.begin();
     std::vector<unsigned char> curBinaryVec;
     dNode *dictPtr = encodeDict;
+
 
     while (encodedIt != encoded.end()) {
         if (!(dictPtr->left) && !(dictPtr->right)) {

@@ -7,6 +7,10 @@
 #include <vector>
 #include "../RLE/RLE.h"
 
+typedef struct {
+    posn tl, br;
+    int type;
+} blockParams;
 
 void writeBit (int bit, int &current_bit, FILE *f);
 
