@@ -16,18 +16,75 @@ vector<unsigned char> getBits(vector<unsigned char>&buffer, int start, int len){
     return res;
 }
 
+void setBlockInfo(int &w, int &h, int highResImgW, int highResImgH){
+    w = highResImgW / 16;
+    h = highResImgH / 9;
+}
 
-vector<int> getPixels(vector<unsigned char> &diff, int deltaUnitSize){
-    vector<int> pixels;
+vector<unsigned int> getPixels(vector<unsigned char> &diff, vector<unsigned char> &lowRes, 
+    int highResImgW, int highResImgH, int deltaUnitSize, int numDeltaPixelsPerBlock, int highFactor){
+    
+    vector<unsigned int> pixels;
+    int diffPos = 124, rangeSize, offset, r, g, b, ref, blockW, blockH; 
+    setBlockInfo(blockW, blockH, highResImgW, highResImgH);
+    int numBlocks = highResImgW * highResImgH / numDeltaPixelsPerBlock;
 
-    int i = 124, rangeSize;
+    //x,y = start of each block
 
-    while (i < diff.size()){
-        rangeSize = 
-        for (int j = 0; j < deltaUnitSize; j++){
-            pixels.push_back();
+    for (int blockY = 0; blockY < highResImgH; blockY+= blockH){
+        for (int blockX = 0; blockX < highResImgW; blockX+= blockW){
+            
+            rangeSize = binToInt(getBits(diff, diffPos, 8));
+            diffPos += 8;
+            offset = binToInt(getBits(diff, diffPos, 8));
+            diffPos += 8;    
+
+            for (int deltaY = blockY; deltaY < blockY + blockH; deltaY += highFactor){
+                int deltaYCpy = deltaY;
+                for (int deltaX = blockX; deltaX < blockX + blockW; deltaX += highFactor) {
+                    int deltaXCpy = deltaX;
+                    for (int unit = 0; unit < deltaUnitSize; unit++){
+                        if (deltaYCpy == deltaUnitSize - 1  && deltaXCpy == deltaUnitSize - 1){
+                            ref = binToInt(getBits(lowRes, highResImgW * (deltaYCpy-1) + (deltaXCpy-1), 8) );
+                            deltaYCpy = deltaYCpy - (highFactor - 1);
+                            deltaXCpy = deltaXCpy - (highFactor - 1);
+                        } else if (unit < (deltaUnitSize - 1)/2){
+                            ref = binToInt(getBits(lowRes, highResImgW * deltaYCpy + (deltaXCpy-1), 8) );
+                            deltaYCpy +=1;
+                        } else {
+                            ref = binToInt(getBits(lowRes, highResImgW * (deltaYCpy-1) + deltaXCpy, 8) );
+                            deltaXCpy +=1;
+                        }
+
+                        r = ref + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        pixels.push_back(r);
+                        diffPos += rangeSize;
+
+                        g = ref + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        pixels.push_back(g);
+                        diffPos += rangeSize;
+
+                        b = ref + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        pixels.push_back(b);
+                        diffPos += rangeSize;
+                    }
+
+
+                }
+            }    
+
         }
+    }
+    
+    for (int j = 0; j < numDeltaPixelsPerBlock; j++){
+        
+        
 
+
+        for (int k = 0; k < deltaUnitSize; k++){
+            //reference pixel =  
+           
+        }
     }
 
 

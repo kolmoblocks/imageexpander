@@ -18,9 +18,9 @@ std::vector<unsigned char> intToBin(int c, int range);
 
 std::vector<unsigned char> intToUnsignedBin(int c, int range);
 
-int binToInt(std::vector<unsigned char> &bin);
+int binToInt(std::vector<unsigned char> bin);
 
-int binToSignedInt(std::vector<unsigned char> &bin);
+int binToSignedInt(std::vector<unsigned char> bin);
 
 
 #endif
