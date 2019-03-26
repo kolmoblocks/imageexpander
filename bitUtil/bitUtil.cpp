@@ -89,7 +89,7 @@ std::vector<unsigned char> intToUnsignedBin(int c, int range) {
 }
 
 
-int binToInt(vector<unsigned char> &bin){
+int binToInt(vector<unsigned char> bin){
     int exponent = bin.size() - 1;
     int x = 0;
     for (auto it: bin){
@@ -99,7 +99,7 @@ int binToInt(vector<unsigned char> &bin){
     return x;
 }
 
-int binToSignedInt(vector<unsigned char> &bin){
+int binToSignedInt(vector<unsigned char> bin){
     int exponent = bin.size() - 2;
     int x = 0;
     int sign = 1;

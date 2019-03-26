@@ -28,9 +28,9 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
         } else {
             b.push_back(0);
         }
-        r =  intToBin((*it).r, rangeSize - 1);
-        g =  intToBin((*it).g, rangeSize - 1);
-        b =  intToBin((*it).b, rangeSize - 1);
+        r =  intToBin((*it).r - offset, rangeSize - 1);
+        g =  intToBin((*it).g - offset, rangeSize - 1);
+        b =  intToBin((*it).b - offset, rangeSize - 1);
          //LTRIM then add 1 bit for sign
         diff.insert(diff.end(), r.begin(), r.end());
         diff.insert(diff.end(), g.begin(), g.end());
