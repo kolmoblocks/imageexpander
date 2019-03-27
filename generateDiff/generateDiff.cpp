@@ -144,8 +144,10 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
             if (maxLim == 0){
                 maxLim = 1;
             }
+            if (maxLim < 0 ) cout<<maxLim<<endl;
             float power = log(maxLim)/log(2); // get the number of bits needed then + 1 for sign
             rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
+             cout<<rangeSize<<endl;
          
             if (maxLim >= 0 || (minLim <= 0 && maxLim <= 0)) {
                 offset = minLim;
@@ -204,14 +206,14 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
         }
                 cout<<endl;
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin('R', 8);
-        diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin('G', 8);
-        diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin('B', 8);
-        diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin(' ', 8);
-        diff.insert(diff.end(),v.begin(), v.end());
+        // v = intToUnsignedBin('R', 8);
+        // diff.insert(diff.end(),v.begin(), v.end());
+        // v = intToUnsignedBin('G', 8);
+        // diff.insert(diff.end(),v.begin(), v.end());
+        // v = intToUnsignedBin('B', 8);
+        // diff.insert(diff.end(),v.begin(), v.end());
+        // v = intToUnsignedBin(' ', 8);
+        // diff.insert(diff.end(),v.begin(), v.end());
 
         // fwrite(&w, w.length(), 1, f);
         // fwrite(&h, h.length(), 1, f);
@@ -226,11 +228,23 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
 //
     } else if (type == TYPE_RANGE) {
 
-        vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
-        diff.insert(diff.end(),typeV.begin(), typeV.end());
+        // vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
+        // diff.insert(diff.end(),typeV.begin(), typeV.end());
         vector<unsigned char> rangeSizeV = intToBin(rangeSize,8);
+        for(auto it: rangeSizeV){
+            cout<<(int)it;
+        }
+
+        cout<<endl;
         vector<unsigned char> offsetV = intToBin(offset,8);
+        cout<<diff.size();
+
         diff.insert(diff.end(),rangeSizeV.begin(), rangeSizeV.end());
+        cout<<diff.size();
+
+
+        cout<<endl;
+
         diff.insert(diff.end(), offsetV.begin(), offsetV.end());
         //RGB header
     }

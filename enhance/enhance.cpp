@@ -28,7 +28,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
     setBlockInfo(blockW, blockH, highResImgW, highResImgH);
 
     //x,y = start of each block
-    
+
     for (int blockY = 0; blockY < highResImgH - blockH; blockY+= blockH){
         for (int blockX = 0; blockX < highResImgW - blockW; blockX+= blockW){
             rangeSize = binToInt(getBits(diff, diffPos, 8));
