@@ -51,7 +51,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         // cout<<3*(highResImgW * (deltaYCpy) + (deltaXCpy-1)) + 2<<endl;
                         // cout<<highResImgW<<endl;
                         // cout<<deltaYCpy<<":"<<deltaXCpy<<endl;
-                    cout<<deltaYCpy<<":"<<deltaXCpy<<endl;
+                    // cout<<deltaYCpy<<":"<<deltaXCpy<<endl;
                     //     cout<<"unit"<<unit<<endl;
                         if (unit == deltaUnitSize - 1){
                                                         //cout<<"if 1"<<endl;
@@ -118,20 +118,21 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                             deltaXCpy +=1;
                         }
 
-                        // cout<<"diffpos"<<diffPos<<endl;
-                        // cout<<"rangesize"<<rangeSize<<endl;
-                        // r = refR + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
-                        // pixels.push_back(r);
-                        // diffPos += rangeSize;
+                        r = refR + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        pixels.push_back(r);
+                        diffPos += rangeSize;
+                        cout<<"diffpos"<<diffPos<<endl;
 
-                        // g = refG + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
-                        // pixels.push_back(g);
-                        // diffPos += rangeSize;
+                        g = refG + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        pixels.push_back(g);
+                        diffPos += rangeSize;
+                        cout<<"diffpos"<<diffPos<<endl;
 
-                        // b = refB + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
-                        // pixels.push_back(b);
-                        // diffPos += rangeSize;
-                        // cout<<diffPos<<endl;
+                        b = refB + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        pixels.push_back(b);
+                        diffPos += rangeSize;
+                                                cout<<"diffpos"<<diffPos<<endl;
+
                     }
 
 
