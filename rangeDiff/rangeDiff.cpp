@@ -17,28 +17,28 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
         ofstream f;
 
 
-    insertRangeHeader(diff, rangeSize, offset);
     vector <unsigned char> r,g,b;
     int ct = 0;
+
     while (!it.end()){
         ++ct;
         //use first bit to represent sign
-        if ((*it).r < 0) {
-            b.push_back(1);
-        } else {
-            b.push_back(0);
-        }
-        r =  intToBin((*it).r - offset, rangeSize - 1);
-        g =  intToBin((*it).g - offset, rangeSize - 1);
-        b =  intToBin((*it).b - offset, rangeSize - 1);
-         //LTRIM then add 1 bit for sign
+
+        r =  intToBin((*it).r - offset, rangeSize);
         diff.insert(diff.end(), r.begin(), r.end());
+
+        g =  intToBin((*it).g - offset, rangeSize);
         diff.insert(diff.end(), g.begin(), g.end());
+
+        b =  intToBin((*it).b - offset, rangeSize);
+         //LTRIM then add 1 bit for sign
+
         diff.insert(diff.end(), b.begin(), b.end());
         r.clear();
         g.clear();
         b.clear();
         ++it;
     }
+
     it.reset();
 }

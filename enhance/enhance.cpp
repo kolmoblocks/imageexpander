@@ -35,11 +35,12 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
             cout<<"rangeSize:"<<rangeSize<<endl;
             cout<<"diffpos:"<<diffPos<<endl;
             diffPos += 8;
-            offset = binToInt(getBits(diff, diffPos, 8));
+            offset = binToSignedInt(getBits(diff, diffPos, 8));
+            cout<<"offset"<<offset<<endl;
             diffPos += 8;
-            unsigned int nPix = binToInt(getBits(diff, diffPos, 8));
-            int lim = nPix*rangeSize*3 + diffPos + 32;
-            diffPos += 32;
+//            unsigned int nPix = binToInt(getBits(diff, diffPos, 32));
+//            int lim = nPix*rangeSize*3 + diffPos + 32;
+//            diffPos += 32;
 
             for (int deltaY = blockY; deltaY < blockY + blockH; deltaY += highFactor){
                 int deltaYCpy = deltaY;
@@ -121,9 +122,9 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         pixels.push_back(b);
                         diffPos += rangeSize;
 
-                        if (diffPos > lim) {
-                            std::cout << "here" << std::endl;
-                        }
+//                        if (diffPos > lim) {
+//                            std::cout << "here" << std::endl;
+//                        }
                         if (r>255){
                             std::cout << "r: " << r << std::endl;
                         }
