@@ -213,7 +213,7 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
 //        diff.insert(diff.end(),typeV.begin(), typeV.end());
         vector<unsigned char> rangeSizeV = intToBin(rangeSize,8);
         vector<unsigned char> offsetV = intToBin(offset,8);
-        vector<unsigned char> numPixVec = intToBin(numPixels, 8);
+        vector<unsigned char> numPixVec = intToBin(numPixels, 32);
 
         diff.insert(diff.end(),rangeSizeV.begin(), rangeSizeV.end());
         diff.insert(diff.end(), offsetV.begin(), offsetV.end());
