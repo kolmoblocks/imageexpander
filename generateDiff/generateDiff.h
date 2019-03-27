@@ -29,7 +29,7 @@ void padZeroes(vector <unsigned char> c);
 
 void flushBits();
 
-void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int offset);
+void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int offset, int numPixels);
 
 void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth, unsigned int targetHeight, string colormode);
 
