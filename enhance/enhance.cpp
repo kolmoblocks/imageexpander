@@ -24,25 +24,23 @@ void setBlockInfo(int &w, int &h, int highResImgW, int highResImgH){
 void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector<unsigned char> &lowRes,
     int highResImgW, int highResImgH, int deltaUnitSize, int numDeltaPixelsPerBlock, int highFactor, int lowFactor, int lowResImgW){
     
-    int diffPos = 124, rangeSize, offset, r, g, b, refR, refG, refB, blockW, blockH;
+    int diffPos = 96, rangeSize, offset, r, g, b, refR, refG, refB, blockW, blockH;
     setBlockInfo(blockW, blockH, highResImgW, highResImgH);
-    int numBlocks = highResImgW * highResImgH / numDeltaPixelsPerBlock;
 
     //x,y = start of each block
-
-
-
+    
     for (int blockY = 0; blockY < highResImgH - blockH; blockY+= blockH){
         for (int blockX = 0; blockX < highResImgW - blockW; blockX+= blockW){
-            diffPos +=8;
             rangeSize = binToInt(getBits(diff, diffPos, 8));
+            cout<<"rangeSize:"<<rangeSize<<endl;
+            cout<<"diffpos:"<<diffPos<<endl;
             diffPos += 8;
             offset = binToInt(getBits(diff, diffPos, 8));
             diffPos += 8;    
             for (int deltaY = blockY; deltaY < blockY + blockH; deltaY += highFactor){
                 int deltaYCpy = deltaY;
-                for (int deltaX = blockX; deltaX < blockX + blockW; deltaX += highFactor) {
-                    int deltaXCpy = deltaX + highFactor - 1; //- low factor
+                for (int deltaX = blockX + highFactor - 1; deltaX < blockX + blockW; deltaX += highFactor) {
+                    int deltaXCpy = deltaX;
                     for (int unit = 0; unit < deltaUnitSize; unit++){
                         // cout<<diffPos<<endl;
                         // cout<<lowRes.size()<<endl;;
@@ -73,10 +71,9 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 
                             // refG = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy-1)) + 1];
                             // refB = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy-1)) + 2];
+                            deltaYCpy -= (highFactor-1);
 
-    
 
-    
                         } else if (unit < (deltaUnitSize - 1)/2){
                                                                                     // cout<<"if 2"<<endl;
                             // cout<<3*((1920 * (deltaYCpy)-1) + (deltaXCpy-1))<<endl;
@@ -101,7 +98,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         } else {
                             // cout<<"if 3"<<endl;
 
-                            if (unit == (deltaUnitSize - 1)/2) deltaXCpy = deltaX;
+                            if (unit == (deltaUnitSize - 1)/2) deltaXCpy -= (highFactor - 1);
                             // refR = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy))];
                             // refG = lowRes[3*(1920 * (deltaYCpy-1)-1 + (deltaXCpy)) + 1];
                             // refB = lowRes[3*(1920 * (deltaYCpy-1)-1 + (deltaXCpy)) + 2];
@@ -118,20 +115,21 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                             deltaXCpy +=1;
                         }
 
+
                         r = refR + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
                         pixels.push_back(r);
                         diffPos += rangeSize;
-                        cout<<"diffpos"<<diffPos<<endl;
+                        // cout<<"diffpos"<<diffPos<<endl;
 
                         g = refG + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
                         pixels.push_back(g);
                         diffPos += rangeSize;
-                        cout<<"diffpos"<<diffPos<<endl;
+                        // cout<<"diffpos"<<diffPos<<endl;
 
                         b = refB + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
                         pixels.push_back(b);
                         diffPos += rangeSize;
-                                                cout<<"diffpos"<<diffPos<<endl;
+                                                // cout<<"diffpos"<<diffPos<<endl;
 
                     }
 
