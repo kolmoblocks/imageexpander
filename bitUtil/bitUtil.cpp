@@ -71,7 +71,7 @@ std::vector<unsigned char> intToBin(int c, int range) {
     } else {
         v.push_back(0);
     }
-    for (int i = range-1; i >= 0; i--){
+    for (int i = range-2; i >= 0; i--){
             v.push_back((c & (1 << i)) != 0);
     }
 	return v;
