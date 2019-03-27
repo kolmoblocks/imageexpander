@@ -145,8 +145,10 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
             if (maxLim == 0){
                 maxLim = 1;
             }
+            if (maxLim < 0 ) cout<<maxLim<<endl;
             float power = log(maxLim)/log(2); // get the number of bits needed then + 1 for sign
             rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
+             cout<<rangeSize<<endl;
          
             if (maxLim >= 0 || (minLim <= 0 && maxLim <= 0)) {
                 offset = minLim;
@@ -212,10 +214,20 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
 //        vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
 //        diff.insert(diff.end(),typeV.begin(), typeV.end());
         vector<unsigned char> rangeSizeV = intToBin(rangeSize,8);
+        for(auto it: rangeSizeV){
+            cout<<(int)it;
+        }
+
+        cout<<endl;
         vector<unsigned char> offsetV = intToBin(offset,8);
         vector<unsigned char> numPixVec = intToBin(numPixels, 32);
 
         diff.insert(diff.end(),rangeSizeV.begin(), rangeSizeV.end());
+        cout<<diff.size();
+
+
+        cout<<endl;
+
         diff.insert(diff.end(), offsetV.begin(), offsetV.end());
         diff.insert(diff.end(), numPixVec.begin(), numPixVec.end());
         //RGB header
