@@ -187,14 +187,14 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
         v = intToUnsignedBin(targetHeight, 32);
 
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin('R', 8);
-        diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin('G', 8);
-        diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin('B', 8);
-        diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin(' ', 8);
-        diff.insert(diff.end(),v.begin(), v.end());
+//        v = intToUnsignedBin('R', 8);
+//        diff.insert(diff.end(),v.begin(), v.end());
+//        v = intToUnsignedBin('G', 8);
+//        diff.insert(diff.end(),v.begin(), v.end());
+//        v = intToUnsignedBin('B', 8);
+//        diff.insert(diff.end(),v.begin(), v.end());
+//        v = intToUnsignedBin(' ', 8);
+//        diff.insert(diff.end(),v.begin(), v.end());
 
         // fwrite(&w, w.length(), 1, f);
         // fwrite(&h, h.length(), 1, f);
@@ -209,8 +209,8 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
 //
     } else if (type == TYPE_RANGE) {
 
-        vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
-        diff.insert(diff.end(),typeV.begin(), typeV.end());
+//        vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
+//        diff.insert(diff.end(),typeV.begin(), typeV.end());
         vector<unsigned char> rangeSizeV = intToBin(rangeSize,8);
         vector<unsigned char> offsetV = intToBin(offset,8);
         vector<unsigned char> numPixVec = intToBin(numPixels, 8);
