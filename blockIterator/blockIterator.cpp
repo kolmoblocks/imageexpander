@@ -47,5 +47,6 @@ Color &blockIterator::operator*() {
 
 void blockIterator::reset() {
     pos = tl;
+    innerUnitPos = 0;
 }
 

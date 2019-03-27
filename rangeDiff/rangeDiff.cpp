@@ -16,12 +16,12 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
     // - range size, range start/
         ofstream f;
 
-       f.open("range.data", std::ios_base::app);
 
     insertRangeHeader(diff, rangeSize, offset);
     vector <unsigned char> r,g,b;
-    f << rangeSize<<":"<<offset<<endl;
+    int ct = 0;
     while (!it.end()){
+        ++ct;
         //use first bit to represent sign
         if ((*it).r < 0) {
             b.push_back(1);
@@ -39,6 +39,6 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
         g.clear();
         b.clear();
         ++it;
-    }      
-    f.close();
+    }
+    it.reset();
 }

@@ -120,12 +120,13 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     std::vector<blockParams> blocksConfig;
     populateDeltas(highResImage, highResWidth, highResHeight, highFactor, lowFactor, units);
     populateBlocks(blocksConfig, units, highResWidth, highResHeight, highFactor);
-    cerr<<"populated blocks"<<endl;;
+    cerr<<"populated blocks"<<endl;
     insertDiffHeader(diff, highResWidth, highResHeight, "RGB");
     cerr<<"diff header inserted"<<endl;
     int offset, rangeSize;
     for (auto block : blocksConfig) {
         // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
+        int numPixels = (block.br.x - block.tl.x + 1 )*(block.br.y - block.tl.y + 1)*units[0].size();
 
         blockIterator it{units, block.tl, block.br, highResWidth/highFactor};
         Color maxDelta{-255,-255,-255}, minDelta{255,255,255};
@@ -154,7 +155,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
             } else {
                 offset = (minLim + maxLim) / 2;
             }
-            insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset);
+            insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset, numPixels);
             insertRangeBlock(diff, it, rangeSize, offset);
         }
         else if (block.type == 'M') {
@@ -172,48 +173,30 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
 void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth, unsigned int targetHeight, string colormode){
         vector<unsigned char> v;
         v = intToUnsignedBin('D', 8);
-        for(auto it : v){
-            cout<<(int)it;
-        }
-        cout<<endl;
+
         diff.insert(diff.end(),v.begin(), v.end());
         v = intToUnsignedBin('I', 8);
-         for(auto it : v){
-            cout<<(int)it;
-        }
-        cout<<endl;
+
         diff.insert(diff.end(),v.begin(), v.end());
         v = intToUnsignedBin('F', 8);
-         for(auto it : v){
-            cout<<(int)it;
-        }
-        cout<<endl;
+
         diff.insert(diff.end(),v.begin(), v.end());
-         for(auto it : v){
-            cout<<(int)it;
-        }
-        cout<<endl;
+
         diff.insert(diff.end(),v.begin(), v.end());
         v = intToUnsignedBin(targetWidth, 32);
-         for(auto it : v){
-            cout<<(int)it;
-        }
-                cout<<endl;
+
         diff.insert(diff.end(),v.begin(), v.end());
         v = intToUnsignedBin(targetHeight, 32);
-         for(auto it : v){
-            cout<<(int)it;
-        }
-                cout<<endl;
+
         diff.insert(diff.end(),v.begin(), v.end());
-        // v = intToUnsignedBin('R', 8);
-        // diff.insert(diff.end(),v.begin(), v.end());
-        // v = intToUnsignedBin('G', 8);
-        // diff.insert(diff.end(),v.begin(), v.end());
-        // v = intToUnsignedBin('B', 8);
-        // diff.insert(diff.end(),v.begin(), v.end());
-        // v = intToUnsignedBin(' ', 8);
-        // diff.insert(diff.end(),v.begin(), v.end());
+//        v = intToUnsignedBin('R', 8);
+//        diff.insert(diff.end(),v.begin(), v.end());
+//        v = intToUnsignedBin('G', 8);
+//        diff.insert(diff.end(),v.begin(), v.end());
+//        v = intToUnsignedBin('B', 8);
+//        diff.insert(diff.end(),v.begin(), v.end());
+//        v = intToUnsignedBin(' ', 8);
+//        diff.insert(diff.end(),v.begin(), v.end());
 
         // fwrite(&w, w.length(), 1, f);
         // fwrite(&h, h.length(), 1, f);
@@ -223,13 +206,13 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
         // fwrite(&colormode, 4,1,f);
 }
 
-void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int offset){
+void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int offset, int numPixels){
     if (type == TYPE_MAP) {
 //
     } else if (type == TYPE_RANGE) {
 
-        // vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
-        // diff.insert(diff.end(),typeV.begin(), typeV.end());
+//        vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
+//        diff.insert(diff.end(),typeV.begin(), typeV.end());
         vector<unsigned char> rangeSizeV = intToBin(rangeSize,8);
         for(auto it: rangeSizeV){
             cout<<(int)it;
@@ -237,7 +220,7 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
 
         cout<<endl;
         vector<unsigned char> offsetV = intToBin(offset,8);
-        cout<<diff.size();
+        vector<unsigned char> numPixVec = intToBin(numPixels, 8);
 
         diff.insert(diff.end(),rangeSizeV.begin(), rangeSizeV.end());
         cout<<diff.size();
@@ -246,7 +229,9 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
         cout<<endl;
 
         diff.insert(diff.end(), offsetV.begin(), offsetV.end());
+        diff.insert(diff.end(), numPixVec.begin(), numPixVec.end());
         //RGB header
     }
+
 
 }

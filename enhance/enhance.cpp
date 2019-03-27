@@ -27,35 +27,29 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
     int diffPos = 96, rangeSize, offset, r, g, b, refR, refG, refB, blockW, blockH;
     setBlockInfo(blockW, blockH, highResImgW, highResImgH);
 
-    //x,y = start of each block
 
     for (int blockY = 0; blockY < highResImgH - blockH; blockY+= blockH){
         for (int blockX = 0; blockX < highResImgW - blockW; blockX+= blockW){
+
             rangeSize = binToInt(getBits(diff, diffPos, 8));
             cout<<"rangeSize:"<<rangeSize<<endl;
             cout<<"diffpos:"<<diffPos<<endl;
             diffPos += 8;
             offset = binToInt(getBits(diff, diffPos, 8));
-            diffPos += 8;    
+            diffPos += 8;
+            int nPix = binToInt(getBits(diff, diffPos, 8));
+            int lim = nPix*rangeSize*3 + diffPos + 8;
+            diffPos += 8;
+
             for (int deltaY = blockY; deltaY < blockY + blockH; deltaY += highFactor){
                 int deltaYCpy = deltaY;
                 for (int deltaX = blockX + highFactor - 1; deltaX < blockX + blockW; deltaX += highFactor) {
                     int deltaXCpy = deltaX;
                     for (int unit = 0; unit < deltaUnitSize; unit++){
                         // cout<<diffPos<<endl;
-                        // cout<<lowRes.size()<<endl;;
 
 
-                        // cout<<3*(highResImgW * (deltaYCpy) + (deltaXCpy-1)) + 2<<endl;
-                        // cout<<highResImgW<<endl;
-                        // cout<<deltaYCpy<<":"<<deltaXCpy<<endl;
-                    // cout<<deltaYCpy<<":"<<deltaXCpy<<endl;
-                    //     cout<<"unit"<<unit<<endl;
                         if (unit == deltaUnitSize - 1){
-                                                        //cout<<"if 1"<<endl;
-                        //                                 cout<<"size"<<lowRes.size()<<endl;
-                            // cout <<3*(1920 * (deltaYCpy-1)-1 + (deltaXCpy-1))<<endl;
-                            // refR = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy-1))];
 
 
 
@@ -114,22 +108,35 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 
                             deltaXCpy +=1;
                         }
+                        if (deltaXCpy == 1681 && deltaYCpy == 0) {
+                            std::cout << "here" << std::endl;
+                        }
 
 
                         r = refR + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
                         pixels.push_back(r);
                         diffPos += rangeSize;
-                        // cout<<"diffpos"<<diffPos<<endl;
+
 
                         g = refG + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
                         pixels.push_back(g);
                         diffPos += rangeSize;
-                        // cout<<"diffpos"<<diffPos<<endl;
-
                         b = refB + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
                         pixels.push_back(b);
                         diffPos += rangeSize;
-                                                // cout<<"diffpos"<<diffPos<<endl;
+                        if (diffPos >= lim) {
+                            std::cout << "here" << std::endl;
+                        }
+                        if (r>255){
+                            std::cout << "r: " << r << std::endl;
+                        }
+                        if (g>255) {
+                            std::cout << "g: " << g << std::endl;
+                        }
+                        if (b>255) {
+                            std::cout << "b: " << b << std::endl;
+                        }
+
 
                     }
 
@@ -264,7 +271,6 @@ bool checkFileHeader(vector<unsigned char>&diff){
     return res == "DIFF";
 }
 
-
 void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsigned oldImgH, std::vector<unsigned char> diffVec, unsigned loFactor, unsigned hiFactor, int diffW) {
 
 
@@ -371,7 +377,7 @@ void enhance(char *lowResFileName, char *diffFileName) {
     //iterate blocks
     // assuming aspect ratio is 16:9
     // assuming basic block configuration
-    int numDeltaPixelsPerBlock = unitSize - highResWidth*highResHeight*lowFactor*lowFactor/(16*9*highFactor*highFactor);
+    int numDeltaPixelsPerBlock =  3;
     // THIS SHOULD BE 3 SINCE WE ARE RESIZING 2:1
 
     getPixels(blocksPixelVec, diff, lowResImage, highResWidth, highResHeight, deltaUnitSize, numDeltaPixelsPerBlock, highFactor, lowFactor, lowResWidth);
