@@ -98,42 +98,48 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                             // refG = lowRes[3*(1920 * (deltaYCpy-1)-1 + (deltaXCpy)) + 1];
                             // refB = lowRes[3*(1920 * (deltaYCpy-1)-1 + (deltaXCpy)) + 2];
 
-                            refR = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
-                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor)];
+                            refR = lowRes[ 3*((deltaXCpy-1) * lowFactor/highFactor
+                            + lowResImgW * (deltaYCpy) * lowFactor/highFactor)];
 
-                            refG = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
-                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor ) + 1];
+                            refG = lowRes[ 3*((deltaXCpy-1) * lowFactor/highFactor
+                            + lowResImgW * (deltaYCpy) * lowFactor/highFactor ) + 1];
 
-                            refB = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
-                            + lowResImgW * (deltaYCpy -1) * lowFactor/highFactor) + 2];
+                            refB = lowRes[ 3*((deltaXCpy-1) * lowFactor/highFactor
+                            + lowResImgW * (deltaYCpy ) * lowFactor/highFactor) + 2];
 
                             deltaXCpy +=1;
                         }
 
 
 
+
                         r = refR + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
-                        pixels.push_back(r);
                         diffPos += rangeSize;
                         g = refG + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
-                        pixels.push_back(g);
                         diffPos += rangeSize;
                         b = refB + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
-                        pixels.push_back(b);
+
                         diffPos += rangeSize;
 
-//                        if (diffPos > lim) {
-//                            std::cout << "here" << std::endl;
-//                        }
+
                         if (r>255){
                             std::cout << "r: " << r << std::endl;
                         }
                         if (g>255) {
                             std::cout << "g: " << g << std::endl;
+                            g = 255;
                         }
                         if (b>255) {
                             std::cout << "b: " << b << std::endl;
                         }
+                        pixels.push_back(r);
+
+                        pixels.push_back(g);
+
+                        pixels.push_back(b);
+//                        if (diffPos > lim) {
+//                            std::cout << "here" << std::endl;
+//                        }
 
 
                     }
@@ -269,7 +275,7 @@ bool checkFileHeader(vector<unsigned char>&diff){
     return res == "DIFF";
 }
 
-void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsigned oldImgH, std::vector<unsigned char> diffVec, unsigned loFactor, unsigned hiFactor, int diffW) {
+void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsigned oldImgH, std::vector<unsigned char> &diffVec, unsigned loFactor, unsigned hiFactor, int diffW) {
 
 
     unsigned newW = oldImgW * hiFactor / loFactor;
