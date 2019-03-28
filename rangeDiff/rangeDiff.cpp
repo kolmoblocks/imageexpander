@@ -25,14 +25,11 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
         //use first bit to represent sign
 
         r =  intToBin((*it).r - offset, rangeSize);
-        diff.insert(diff.end(), r.begin(), r.end());
-
         g =  intToBin((*it).g - offset, rangeSize);
-        diff.insert(diff.end(), g.begin(), g.end());
-
         b =  intToBin((*it).b - offset, rangeSize);
-         //LTRIM then add 1 bit for sign
 
+        diff.insert(diff.end(), r.begin(), r.end());
+        diff.insert(diff.end(), g.begin(), g.end());
         diff.insert(diff.end(), b.begin(), b.end());
         r.clear();
         g.clear();

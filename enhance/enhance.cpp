@@ -27,12 +27,6 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
     int diffPos = 96, rangeSize, offset, r, g, b, refR, refG, refB, blockW, blockH;
     setBlockInfo(blockW, blockH, highResImgW, highResImgH);
 
-    cout<<"rangenumber2:";
-    for (int i = 388903; i < 388911;i++){
-        cout<<(int)diff[i];
-    }
-    cout<<endl;
-
     for (int blockY = 0; blockY < highResImgH - blockH; blockY+= blockH){
         for (int blockX = 0; blockX < highResImgW - blockW; blockX+= blockW){
 

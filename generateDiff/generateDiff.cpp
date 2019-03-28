@@ -41,7 +41,7 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                 for (int innerY = y; innerY < y+highFactor; ++innerY) {
                 
                     // only get and set pixel delta if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
-                    if (!(innerX < x+lowFactor) || !(innerY < y+lowFactor)) {
+                    if (innerX >= x+lowFactor || innerY >= y+lowFactor) {
                         // deltaColor is the delta to be pushed to the delta unit, deltaDonor is the Color that the delta is set relative to
                         Color deltaColor, donor;
 
