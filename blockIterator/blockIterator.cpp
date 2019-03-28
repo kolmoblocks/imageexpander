@@ -16,7 +16,7 @@ blockIterator &blockIterator::operator++() {
             pos.x = tl.x;
             ++pos.y;
         }
-        else if (pos.y > br.y || pos.x > br.x) {
+        else if ( pos.x > br.x) {
             throw std::logic_error("block iterator position out of range");
         }
         else {
@@ -27,7 +27,7 @@ blockIterator &blockIterator::operator++() {
 }
 
 bool blockIterator::end() {
-    return innerUnitPos == unitLength-1 && pos.x == br.x && pos.y == br.y;
+    return innerUnitPos == 0 && pos.y > br.y;
 }
 
 bool blockIterator::operator!=(blockIterator other) {

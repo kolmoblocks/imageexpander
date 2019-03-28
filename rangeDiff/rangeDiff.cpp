@@ -22,7 +22,6 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
 
     while (!it.end()){
         ++ct;
-        //use first bit to represent sign
 
         r =  intToBin((*it).r - offset, rangeSize);
         g =  intToBin((*it).g - offset, rangeSize);
