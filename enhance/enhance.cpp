@@ -62,7 +62,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                             refG = lowRes[ 3*((deltaXCpy - 1) * lowFactor/highFactor 
                             + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor ) + 1];
 
-                            refB = lowRes[ 3*((deltaXCpy - 1) * lowFactor/highFactor
+                            refB = lowRes[ 3*((deltaXCpy-1) * lowFactor/highFactor
                             + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor) + 2];
 
                             // refG = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy-1)) + 1];
@@ -81,6 +81,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 
                             refR = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
                             + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor)];
+
 
                             refG = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor 
                             + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor ) + 1];
@@ -111,7 +112,13 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                             deltaXCpy +=1;
                         }
 
+                        if (refR > 255 || refG > 255 || refB > 255 || refR < 0 || refG < 0 || refB < 0)
+                        cout<<refR<<":"<<refG<<":"<<refB<<endl;
 
+                        if (offset != 0) {
+                            cout << "here" << std::endl;
+                        }
+                       
 
 
                         r = refR + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
@@ -138,6 +145,17 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         }
                         diffPos += rangeSize;
 
+
+                        if (r>255 || r< 0){
+                            std::cout << "r: " << r << std::endl;
+                        }
+                        if (g>255|| g< 0) {
+                            std::cout << "g: " << g << std::endl;
+                            g = 255;
+                        }
+                        if (b>255|| b< 0) {
+                            std::cout << "b: " << b << std::endl;
+                        }
                         pixels.push_back(r);
 
                         pixels.push_back(g);
@@ -217,13 +235,13 @@ void populateBlocks(std::vector<blockParams> &blocks, int width, int height, int
 }
 
 
-void populateDiffPixelVec(std::vector<unsigned char> &diffPixelVec, std::vector<unsigned int> &blocksPixelVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
+void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<unsigned int> &blocksPixelVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
     // assuming is RANGE 
     // assuming default config for a 16:9 image
     unsigned blockDataSize = highResHeight*highResWidth / (16*9);
     unsigned numBlocks = 16*9;
 
-    // holds positions of blocks in diffPixelVec
+    cout<<blocksPixelVec.size()<<endl;
     std::vector<unsigned int> blockPosVec;
     for (int i=0; i<numBlocks; ++i) {
         blockPosVec.push_back(i * blockDataSize/4 * 3); // convert to number of diff pixels per unit
@@ -281,7 +299,7 @@ bool checkFileHeader(vector<unsigned char>&diff){
     return res == "DIFF";
 }
 
-void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsigned oldImgH, std::vector<unsigned char> &diffVec, unsigned loFactor, unsigned hiFactor, int diffW) {
+void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsigned oldImgH, std::vector<unsigned int> &diffVec, unsigned loFactor, unsigned hiFactor, int diffW) {
 
 
     unsigned newW = oldImgW * hiFactor / loFactor;
@@ -337,8 +355,8 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
 void enhance(char *lowResFileName, char *diffFileName) {
     FILE *pDiff;
     pDiff = fopen(diffFileName, "rb");
-    vector<unsigned char> deltas, diffPixelVec, lowResImage,diff;
-    vector <unsigned int> blocksPixelVec;
+    vector<unsigned char> deltas, lowResImage,diff;
+    vector <unsigned int> blocksPixelVec,diffPixelVec;
     unsigned lowResWidth, lowResHeight, highResWidth, highResHeight,lowFactor, highFactor, 
     unitSize, deltaUnitSize, totalDeltaUnits, error;
     ofstream f2;

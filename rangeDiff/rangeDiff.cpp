@@ -26,6 +26,10 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
         r =  intToBin((*it).r - offset, rangeSize);
         g =  intToBin((*it).g - offset, rangeSize);
         b =  intToBin((*it).b - offset, rangeSize);
+        if ((*it).r < -255 || (*it).r > 255) cout<<"out of range"<<(*it).r<<endl;
+        if ((*it).g < -255 || (*it).g > 255) cout<<"out of range"<<(*it).g<<endl;
+
+        if ((*it).b < -255 || (*it).b > 255) cout<<"out of range"<<(*it).b<<endl;
 
         diff.insert(diff.end(), r.begin(), r.end());
         diff.insert(diff.end(), g.begin(), g.end());

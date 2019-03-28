@@ -66,7 +66,8 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                         }
                         
                         deltaColor = donor - curColor;
-                        
+
+
                         // push delta Color to the unit
                         curDeltaUnit.push_back(deltaColor);
 
@@ -146,15 +147,20 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
                 maxLim = 1;
             }
             if (maxLim < 0 ) cout<<maxLim<<endl;
+
+            maxLim = max(maxLim, abs(minLim));
+
             float power = log(maxLim)/log(2); // get the number of bits needed then + 1 for sign
             rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
 
 
-            if (maxLim >= 0 || (minLim <= 0 && maxLim <= 0)) {
-                offset = minLim;
-            } else {
-                offset = (minLim + maxLim) / 2;
-            }
+            offset = 0;
+
+//            if (maxLim >= 0 || (minLim <= 0 && maxLim <= 0)) {
+//                offset = minLim;
+//            } else {
+//                offset = minLim;
+//            }
 
 
             insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset, numPixels);
