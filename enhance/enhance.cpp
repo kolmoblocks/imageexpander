@@ -260,6 +260,7 @@ void populateDiffPixelVec(std::vector<unsigned char> &diffPixelVec, std::vector<
         }
         ++bt;
     }
+    std::cout << diffPixelVec.size() << std::endl;
 }
 
 
@@ -384,8 +385,7 @@ void enhance(char *lowResFileName, char *diffFileName) {
 
     diffPixelVec.resize(3*totalDeltaUnits*deltaUnitSize, 0);
     blocksPixelVec.reserve(3*totalDeltaUnits*deltaUnitSize);
-    std::cout << diffPixelVec.size();
-    std::cout << blocksPixelVec.size();
+
 
     //iterate blocks
     // assuming aspect ratio is 16:9
