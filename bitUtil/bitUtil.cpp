@@ -106,7 +106,7 @@ int binToSignedInt(vector<unsigned char> bin){
     if (bin[0] == 1) {
         sign = -1;
     } 
-    for (auto it = bin.begin() + 1; it < bin.end(); ++it ){
+    for (auto it = bin.begin() + 1; it != bin.end(); ++it ){
         x += (int)*it * pow(2, exponent);
         exponent-=1;
     }
