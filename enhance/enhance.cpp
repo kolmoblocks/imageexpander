@@ -22,7 +22,7 @@ void setBlockInfo(int &w, int &h, int highResImgW, int highResImgH){
 }
 
 void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector<unsigned char> &lowRes,
-    int highResImgW, int highResImgH, int deltaUnitSize, int numDeltaPixelsPerBlock, int highFactor, int lowFactor, int lowResImgW){
+    int highResImgW, int highResImgH, int deltaUnitSize, int numDeltaPixelsPerBlock, int highFactor, int lowFactor, unsigned lowResImgW){
     
     int diffPos = 96, rangeSize, offset, refR, refG, refB, blockW, blockH;
     int r, g, b;
@@ -38,9 +38,6 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
             offset = binToSignedInt(getBits(diff, diffPos, 8));
             cout<<"offset"<<offset<<endl;
             diffPos += 8;
-//            unsigned int nPix = binToInt(getBits(diff, diffPos, 32));
-//            int lim = nPix*rangeSize*3 + diffPos + 32;
-//            diffPos += 32;
 
             for (int deltaY = blockY; deltaY < blockY + blockH; deltaY += highFactor){
                 int deltaYCpy = deltaY;
@@ -54,9 +51,6 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 
 
                         if (unit == deltaUnitSize - 1){
-
-
-
 
                             refR = lowRes[ 3*((deltaXCpy - 1) * lowFactor/highFactor 
                             + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor)];
