@@ -129,6 +129,9 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 //                            //std::cout << "r: " << r << std::endl;
 //                            r=255;
 //                        }
+                        if (r>255 || r< 0){
+                            std::cout << "r: " << r << " : refR : "<<refR<<" delta : "<< binToSignedInt(getBits(diff, diffPos, rangeSize))<<" : diffpos : "<< diffPos<<std::endl;
+                        }
                         diffPos += rangeSize;
 
                         g = refG + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
@@ -148,9 +151,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         diffPos += rangeSize;
 
 
-                        if (r>255 || r< 0){
-                            std::cout << "r: " << r << std::endl;
-                        }
+
                         if (g>255|| g< 0) {
                             std::cout << "g: " << g << std::endl;
                         }
