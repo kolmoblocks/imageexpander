@@ -123,15 +123,18 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 //
 
 
-                        r = refR + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        r = refR + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
 //                        if (r>255 || r<0){
 //                            //std::cout << binToSignedInt(getBits(diff, diffPos, rangeSize)) << std::endl;
 //                            //std::cout << "r: " << r << std::endl;
 //                            r=255;
 //                        }
+                        if (r>255 || r< 0){
+                            std::cout << "r: " << r << " : refR : "<<refR<<" delta : "<< binToSignedInt(getBits(diff, diffPos, rangeSize))<<" : diffpos : "<< diffPos<<std::endl;
+                        }
                         diffPos += rangeSize;
 
-                        g = refG + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        g = refG + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
 //                        if ( binToSignedInt(getBits(diff, diffPos, rangeSize))!=0) {
 //                            std::cout << binToSignedInt(getBits(diff, diffPos, rangeSize))<<";"<<diffPos << std::endl;
 ////                            std::cout << "g: " <<  << std::endl;
@@ -139,7 +142,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 //                        }
                         diffPos += rangeSize;
 
-                        b = refB + offset + binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        b = refB + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
 //                        if (b>255 || b<0) {
 //                            //std::cout << binToSignedInt(getBits(diff, diffPos, rangeSize)) << std::endl;
 //                            //std::cout << "b: " << b << std::endl;
@@ -148,9 +151,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         diffPos += rangeSize;
 
 
-                        if (r>255 || r< 0){
-                            std::cout << "r: " << r << std::endl;
-                        }
+
                         if (g>255|| g< 0) {
                             std::cout << "g: " << g << std::endl;
                         }
