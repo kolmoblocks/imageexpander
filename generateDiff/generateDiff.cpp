@@ -9,9 +9,10 @@ void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &un
     // logic here to statisticallly determine "good" configuration of blocks
     int xincr = width/16, yincr=height/9;
     
-    for (int i=0; i<width; i+=xincr) {
         for (int j=0; j<height; j+=yincr) {
-            blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
+            for (int i=0; i<width; i+=xincr) {
+
+                blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
         }
     }
     // for (auto it : blocks) {
@@ -37,9 +38,8 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
             curDeltaUnit.setMin(Color{255,255,255});
 
             // loop into each block
-            for (int innerX = x; innerX < x+highFactor; ++innerX) {
-                for (int innerY = y; innerY < y+highFactor; ++innerY) {
-                
+            for (int innerY = y; innerY < y+highFactor; ++innerY) {
+                for (int innerX = x; innerX < x+highFactor; ++innerX) {
                     // only get and set pixel delta if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                     if (innerX >= x+lowFactor || innerY >= y+lowFactor) {
                         // deltaColor is the delta to be pushed to the delta unit, deltaDonor is the Color that the delta is set relative to
@@ -66,6 +66,10 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                         }
                         
                         deltaColor = donor - curColor;
+
+                        if (deltaColor.r == 63|| deltaColor.g == 63 || deltaColor.b == 63) {
+                            std::cout << "here" << std::endl;
+                        }
 
 
                         // push delta Color to the unit
@@ -131,21 +135,18 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
 
         blockIterator it{units, block.tl, block.br, highResWidth/highFactor};
         Color maxDelta{-255,-255,-255}, minDelta{255,255,255};
+
         while (!it.end()) {
             maxDelta = max(*it, maxDelta);
             minDelta = min(*it, minDelta);
             ++it;
         }
+
         it.reset();
         //move to helper function to abstract for all streams
         int minLim = min(min(minDelta.r, minDelta.g), minDelta.b);
         int maxLim = max(max(maxDelta.r, maxDelta.g), maxDelta.b);
-        if (minLim > minDelta.r || minLim > minDelta.g || minLim > minDelta.b) {
-            throw logic_error("shit");
-        }
-        if (maxLim < maxDelta.r || maxLim < maxDelta.g || maxLim < maxDelta.b) {
-            throw logic_error("shit");
-        }
+
         //depending on config block - use either r or m
         if (block.type == 'R') {
             if (maxLim == 0){
