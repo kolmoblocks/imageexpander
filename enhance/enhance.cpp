@@ -251,34 +251,39 @@ void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<u
     populateBlocks(bPs, 1960, 1080, 2);
 
     auto bt = bPs.begin();
+    int blockNum=0;
 
-    for (auto it=blockPosVec.begin(); it<blockPosVec.end(); ++it) {
-
+    for (auto it=blockPosVec.begin(); it<blockPosVec.end()-1; ++it) {
         unsigned blockBegin = *it;
         unsigned blockEnd = *(std::next(it,1));
         // tl, br are in UNITS not PIXELS
         int diffPixPos = (bt->tl.x + bt->tl.y * highResWidth/2)*deltaUnitSize*3;
-        int blockW = blockEnd - blockBegin;
+        int blockW = 360;
         //int blockH = bt->br.y - bt->br.y;
 
         if (bt->br.x < bt->tl.x) {
             throw std::logic_error("error: br.x < tl.x");
         }
 
-        auto ct = diffPixelVec.begin() + diffPixPos;
-
+        int ct = diffPixPos;
         for (int i=blockBegin; i<blockEnd; i+=blockW) {
             // in delta unit, but we don't care since it's iterating through each pixel anyways..
             // it is reading from blocksPixelVec, ct is where you are putting the pixels in diffPixelVec
 
-            //std::cout << blocksPixelVec[i] << " at " << i << " of " << blocksPixelVec.size() << " into " << ct - diffPixelVec.begin() << " in diffPixelVec" << std::endl;
-            diffPixelVec.insert(ct, blocksPixelVec.begin() + i, blocksPixelVec.begin() + i + blockW);
+            for (int j=i; j<i+blockW*3*3; ++j) {
+                diffPixelVec[ct] = blocksPixelVec[j];
+                ++ct;
+            }
 
-            ct += (highResWidth/2 - blockW)*deltaUnitSize*3;
+            ct += 42120;
         }
         ++bt;
+        ++blockNum;
+        std::cout << blockNum << std::endl;
     }
-    std::cout << diffPixelVec.size() << std::endl;
+    for (auto col : diffPixelVec) {
+        if (col>255 || col < 0) std::cout << col << std::endl;
+    }
 }
 
 
@@ -402,6 +407,9 @@ void enhance(char *lowResFileName, char *diffFileName) {
     totalDeltaUnits = highResHeight*highResWidth / unitSize;
 
     diffPixelVec.resize(3*totalDeltaUnits*deltaUnitSize, 0);
+    for (auto it=diffPixelVec.begin(); it<diffPixelVec.end(); ++it) {
+        *it = 255;
+    }
     blocksPixelVec.reserve(3*totalDeltaUnits*deltaUnitSize);
 
 
@@ -416,6 +424,7 @@ cout<<"Gotpixels"<<endl;
     populateDiffPixelVec(diffPixelVec, blocksPixelVec, deltaUnitSize, highResWidth, highResHeight);
 cout<<"populated diff pix vec, size "<< diffPixelVec.size()<<endl;
     std::cout << "reserved " << 3*totalDeltaUnits*deltaUnitSize << std:: endl;
+    std::cout << "diffPixelVec.size() -> " << diffPixelVec.size() << std::endl;
 
 
     expand_image(lowResImage, lowResWidth, lowResHeight, diffPixelVec, lowFactor, highFactor, deltaUnitSize);

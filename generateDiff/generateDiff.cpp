@@ -140,7 +140,12 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         //move to helper function to abstract for all streams
         int minLim = min(min(minDelta.r, minDelta.g), minDelta.b);
         int maxLim = max(max(maxDelta.r, maxDelta.g), maxDelta.b);
-
+        if (minLim > minDelta.r || minLim > minDelta.g || minLim > minDelta.b) {
+            throw logic_error("shit");
+        }
+        if (maxLim < maxDelta.r || maxLim < maxDelta.g || maxLim < maxDelta.b) {
+            throw logic_error("shit");
+        }
         //depending on config block - use either r or m
         if (block.type == 'R') {
             if (maxLim == 0){
