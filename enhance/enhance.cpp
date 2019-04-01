@@ -28,6 +28,10 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
     int r, g, b;
     setBlockInfo(blockW, blockH, highResImgW, highResImgH);
     int blockCt = 0;
+
+    cout<<"ref : "<<(int)lowRes.at((3601/2 + 1014 * 2160/4) * 3)<<endl;
+
+
     for (int blockY = 0; blockY <= highResImgH - blockH; blockY+= blockH){
         for (int blockX = 0; blockX <= highResImgW - blockW; blockX+= blockW){
             ++blockCt;
@@ -52,14 +56,11 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 
                         if (unit == deltaUnitSize - 1){
 
-                            refR = lowRes[ 3*((deltaXCpy - 1) * lowFactor/highFactor 
-                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor)];
+                            refR = lowRes[ 3*(((deltaXCpy - 1) + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor)];
 
-                            refG = lowRes[ 3*((deltaXCpy - 1) * lowFactor/highFactor 
-                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor ) + 1];
+                            refG = lowRes[ 3*(((deltaXCpy - 1) + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor) + 1];
 
-                            refB = lowRes[ 3*((deltaXCpy-1) * lowFactor/highFactor
-                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor) + 2];
+                            refB = lowRes[ 3*(((deltaXCpy - 1) + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor) + 2];
 
                             // refG = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy-1)) + 1];
                             // refB = lowRes[3*((1920 * (deltaYCpy-1)-1) + (deltaXCpy-1)) + 2];
@@ -75,15 +76,12 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 
 
 
-                            refR = lowRes[ 3*((deltaXCpy-1) * lowFactor/highFactor
-                            + lowResImgW * (deltaYCpy) * lowFactor/highFactor)];
+                            refR = lowRes[ 3*(((deltaXCpy - 1) + lowResImgW * deltaYCpy)* lowFactor/highFactor)];
 
 
-                            refG = lowRes[ 3*((deltaXCpy-1) * lowFactor/highFactor
-                            + lowResImgW * (deltaYCpy) * lowFactor/highFactor ) + 1];
+                            refG = lowRes[ 3*(((deltaXCpy - 1) + lowResImgW * deltaYCpy)* lowFactor/highFactor) + 1];
 
-                            refB = lowRes[ 3*((deltaXCpy-1) * lowFactor/highFactor
-                            + lowResImgW * (deltaYCpy) * lowFactor/highFactor) + 2];
+                            refB = lowRes[ 3*(((deltaXCpy-1) + lowResImgW * deltaYCpy)* lowFactor/highFactor) + 2];
 
 
                             deltaYCpy +=1;
@@ -96,45 +94,40 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                             // refG = lowRes[3*(1920 * (deltaYCpy-1)-1 + (deltaXCpy)) + 1];
                             // refB = lowRes[3*(1920 * (deltaYCpy-1)-1 + (deltaXCpy)) + 2];
 
-                            refR = lowRes[ 3*lowFactor/highFactor * ((deltaXCpy)
-                            + lowResImgW * (deltaYCpy-1))];
+                            refR = lowRes[ 3*((deltaXCpy + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor)];
 
-                            refG = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor
-                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor ) + 1];
+                            refG = lowRes[ 3*((deltaXCpy + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor) + 1];
 
-                            refB = lowRes[ 3*((deltaXCpy) * lowFactor/highFactor
-                            + lowResImgW * (deltaYCpy-1) * lowFactor/highFactor) + 2];
+                            refB = lowRes[ 3*((deltaXCpy  + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor)+ 2];
 
                             deltaXCpy +=1;
                         }
 
-//                        if (refR > 255 || refG > 255 || refB > 255 || refR < 0 || refG < 0 || refB < 0)
-//                        cout<<refR<<":"<<refG<<":"<<refB<<endl;
 
-//                        if (offset != 0) {
-//                            cout << "here" << std::endl;
-//                        }
-//
+                        if (offset != 0) {
+                            cout << "here" << std::endl;
+                        }
+
 
 
                         r = refR + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
-//                        if (r>255 || r<0){
-//                            //std::cout << binToSignedInt(getBits(diff, diffPos, rangeSize)) << std::endl;
-//                            //std::cout << "r: " << r << std::endl;
-//                            r=255;
-//                        }
+
                         if (r>255 || r< 0){
                             std::cout << "r: " << r << " : refR : "<<refR<<" delta : "<< binToSignedInt(getBits(diff, diffPos, rangeSize))<<" : diffpos : "
-                            << diffPos<<" : deltaX : "<<deltaXCpy<< " : deltaY : "<<deltaYCpy<<std::endl;
+                            << diffPos<<" : deltaX : "<<deltaX<< " : deltaY : "<<deltaY<<std::endl;
+
+                            vector<unsigned char> v = getBits(diff, diffPos, rangeSize);
+                            for (auto it : v){
+                                cout<<(int)it;
+                            }
+                            cout<<endl;
+                            r=0;
+
                         }
                         diffPos += rangeSize;
 
                         g = refG + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
-//                        if ( binToSignedInt(getBits(diff, diffPos, rangeSize))!=0) {
-//                            std::cout << binToSignedInt(getBits(diff, diffPos, rangeSize))<<";"<<diffPos << std::endl;
-////                            std::cout << "g: " <<  << std::endl;
-//
-//                        }
+
                         if (g>255|| g< 0) {
                             std::cout << "g: " << g << " refG: " << refG << " delta : " << binToSignedInt((getBits(diff, diffPos, rangeSize))) << " : diffpos : " << diffPos<< std::endl;
                             g = 0;
@@ -144,12 +137,6 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 
 
                         b = refB + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
-//                        if (b>255 || b<0) {
-//                            //std::cout << binToSignedInt(getBits(diff, diffPos, rangeSize)) << std::endl;
-//                            //std::cout << "b: " << b << std::endl;
-//                            g=255;
-//                        }
-
                         if (b>255|| b< 0) {
                             std::cout << "b: " << b << " refB: " << refB << " delta : " << binToSignedInt((getBits(diff, diffPos, rangeSize))) << " : diffpos : " << diffPos
                                       << std::endl;
