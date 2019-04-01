@@ -1,6 +1,6 @@
 #include <iostream>
 #include <sstream>
-#include "lodepng.h"
+#include "../lodepng/lodepng.h"
 
 int main(int argc, char **argv) {
     char *imgFile = argv[1];

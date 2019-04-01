@@ -11,7 +11,6 @@ void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &un
     
         for (int j=0; j<height; j+=yincr) {
             for (int i=0; i<width; i+=xincr) {
-
                 blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
         }
     }
@@ -66,10 +65,6 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                         }
                         
                         deltaColor = donor - curColor;
-
-                        if (deltaColor.r == 63|| deltaColor.g == 63 || deltaColor.b == 63) {
-                            std::cout << "here" << std::endl;
-                        }
 
 
                         // push delta Color to the unit

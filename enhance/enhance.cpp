@@ -27,10 +27,10 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
     int diffPos = 96, rangeSize, offset, refR, refG, refB, blockW, blockH;
     int r, g, b;
     setBlockInfo(blockW, blockH, highResImgW, highResImgH);
-
-    for (int blockY = 0; blockY < highResImgH - blockH; blockY+= blockH){
-        for (int blockX = 0; blockX < highResImgW - blockW; blockX+= blockW){
-
+    int blockCt = 0;
+    for (int blockY = 0; blockY <= highResImgH - blockH; blockY+= blockH){
+        for (int blockX = 0; blockX <= highResImgW - blockW; blockX+= blockW){
+            ++blockCt;
             rangeSize = binToInt(getBits(diff, diffPos, 8));
             cout<<"rangeSize:"<<rangeSize<<endl;
             cout<<"diffpos:"<<diffPos<<endl;
@@ -175,6 +175,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 
         }
     }
+    std::cout << blockCt << std::endl;
 
 }
 
@@ -405,11 +406,7 @@ void enhance(char *lowResFileName, char *diffFileName) {
     deltaUnitSize = unitSize - lowFactor*lowFactor;
     totalDeltaUnits = highResHeight*highResWidth / unitSize;
 
-    diffPixelVec.resize(3*totalDeltaUnits*deltaUnitSize, 0);
-
-    for (auto it=diffPixelVec.begin(); it<diffPixelVec.end(); ++it) {
-        *it = 255;
-    }
+    diffPixelVec.resize(3*totalDeltaUnits*deltaUnitSize, 255);
     blocksPixelVec.reserve(3*totalDeltaUnits*deltaUnitSize);
 
 

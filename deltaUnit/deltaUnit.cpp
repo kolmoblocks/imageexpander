@@ -27,7 +27,7 @@ Color operator-(Color col1, Color col2) {
 }
 
 bool operator!=(posn p1, posn p2) {
-    return p1.x != p1.x || p1.y != p2.y;
+    return p1.x != p2.x || p1.y != p2.y;
 }
 
 deltaUnit::deltaUnit(unsigned int len): len(len) {
@@ -40,6 +40,8 @@ deltaUnit::deltaUnit(unsigned int len, Color max, Color min): len{len}, maxDelta
 
 void deltaUnit::push_back(Color col) {
     if (ct >= len) throw std::logic_error("pushing past specified deltaUnit length");
+    maxDeltas = max(col, maxDeltas);
+    minDeltas = min(col, minDeltas);
     colorDeltas[ct] = col;
     ++ct;
 }
