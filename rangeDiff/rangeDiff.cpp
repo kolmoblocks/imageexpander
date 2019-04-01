@@ -46,6 +46,7 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
 
         diff.insert(diff.end(), g.begin(), g.end());
         diff.insert(diff.end(), b.begin(), b.end());
+
         r.clear();
         g.clear();
         b.clear();

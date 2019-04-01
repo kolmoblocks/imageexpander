@@ -44,7 +44,6 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
             // loop into each block
             for (int innerY = y; innerY < y+highFactor; ++innerY) {
                 for (int innerX = x; innerX < x+highFactor; ++innerX) {
-
                     // only get and set pixel delta if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                     if (innerX >= x+lowFactor || innerY >= y+lowFactor) {
                         // deltaColor is the delta to be pushed to the delta unit, deltaDonor is the Color that the delta is set relative to
@@ -138,21 +137,17 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
 
         blockIterator it{units, block.tl, block.br, highResWidth/highFactor};
         Color maxDelta{-255,-255,-255}, minDelta{255,255,255};
+
         while (!it.end()) {
             maxDelta = max(*it, maxDelta);
             minDelta = min(*it, minDelta);
             ++it;
         }
+
         it.reset();
         //move to helper function to abstract for all streams
         int minLim = min(min(minDelta.r, minDelta.g), minDelta.b);
         int maxLim = max(max(maxDelta.r, maxDelta.g), maxDelta.b);
-        if (minLim > minDelta.r || minLim > minDelta.g || minLim > minDelta.b) {
-            throw logic_error("over");
-        }
-        if (maxLim < maxDelta.r || maxLim < maxDelta.g || maxLim < maxDelta.b) {
-            throw logic_error("over");
-        }
         //depending on config block - use either r or m
         if (block.type == 'R') {
             if (maxLim == 0){

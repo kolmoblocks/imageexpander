@@ -135,7 +135,13 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 ////                            std::cout << "g: " <<  << std::endl;
 //
 //                        }
+                        if (g>255|| g< 0) {
+                            std::cout << "g: " << g << " refG: " << refG << " delta : " << binToSignedInt((getBits(diff, diffPos, rangeSize))) << " : diffpos : " << diffPos<< std::endl;
+                            g = 0;
+                        }
+
                         diffPos += rangeSize;
+
 
                         b = refB + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
 //                        if (b>255 || b<0) {
@@ -143,20 +149,18 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 //                            //std::cout << "b: " << b << std::endl;
 //                            g=255;
 //                        }
+
+                        if (b>255|| b< 0) {
+                            std::cout << "b: " << b << " refB: " << refB << " delta : " << binToSignedInt((getBits(diff, diffPos, rangeSize))) << " : diffpos : " << diffPos
+                                      << std::endl;
+                            b = 0;
+                        }
                         diffPos += rangeSize;
 
 
 
-                        if (g>255|| g< 0) {
-                            std::cout << "g: " << g << std::endl;
-                        }
-                        if (b>255|| b< 0) {
-                            std::cout << "b: " << b << std::endl;
-                        }
                         pixels.push_back(r);
-
                         pixels.push_back(g);
-
                         pixels.push_back(b);
 //                        if (diffPos > lim) {
 //                            std::cout << "here" << std::endl;
@@ -224,9 +228,10 @@ void populateBlocks(std::vector<blockParams> &blocks, int width, int height, int
     // logic here to statisticallly determine "good" configuration of blocks
     int xincr = width/16, yincr=height/9;
 
-    for (int i=0; i<width; i+=xincr) {
         for (int j=0; j<height; j+=yincr) {
-            blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
+            for (int i=0; i<width; i+=xincr) {
+
+                blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor, (j+yincr)/highFactor}, 'R'});
         }
     }
 }
@@ -240,22 +245,21 @@ void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<u
 
     cout<<blocksPixelVec.size()<<endl;
     std::vector<unsigned int> blockPosVec;
-    for (int i=0; i<numBlocks; ++i) {
-        blockPosVec.push_back(i * blockDataSize/4 * 3); // convert to number of diff pixels per unit
+    for (int i=0; i<=numBlocks; ++i) {
+        blockPosVec.push_back(i * blockDataSize/4 * 3 * 3); // convert to number of diff pixels per unit
     }
 
     std::vector<blockParams> bPs;
-    populateBlocks(bPs, 1960, 1080, 2);
+    populateBlocks(bPs, 3840, 2160, 2);
 
     auto bt = bPs.begin();
     int blockNum=0;
-
     for (auto it=blockPosVec.begin(); it<blockPosVec.end()-1; ++it) {
         unsigned blockBegin = *it;
         unsigned blockEnd = *(std::next(it,1));
         // tl, br are in UNITS not PIXELS
         int diffPixPos = (bt->tl.x + bt->tl.y * highResWidth/2)*deltaUnitSize*3;
-        int blockW = 360;
+        int blockW = highResWidth / (16 * 2) *3*3;//(bt->br.x - bt->tl.x) * deltaUnitSize * 3;
         //int blockH = bt->br.y - bt->br.y;
 
         if (bt->br.x < bt->tl.x) {
@@ -267,20 +271,18 @@ void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<u
             // in delta unit, but we don't care since it's iterating through each pixel anyways..
             // it is reading from blocksPixelVec, ct is where you are putting the pixels in diffPixelVec
 
-            for (int j=i; j<i+blockW*3*3; ++j) {
+            for (int j=i; j<i+blockW; ++j) {
                 diffPixelVec[ct] = blocksPixelVec[j];
                 ++ct;
             }
 
-            ct += 42120;
+            ct += highResWidth/2 * 3 * 3 - blockW;
         }
         ++bt;
         ++blockNum;
         std::cout << blockNum << std::endl;
     }
-    for (auto col : diffPixelVec) {
-        if (col>255 || col < 0) std::cout << col << std::endl;
-    }
+
 }
 
 
@@ -404,6 +406,7 @@ void enhance(char *lowResFileName, char *diffFileName) {
     totalDeltaUnits = highResHeight*highResWidth / unitSize;
 
     diffPixelVec.resize(3*totalDeltaUnits*deltaUnitSize, 0);
+
     for (auto it=diffPixelVec.begin(); it<diffPixelVec.end(); ++it) {
         *it = 255;
     }
