@@ -8,10 +8,10 @@ const int TYPE_MAP = 0, TYPE_RANGE = 1;
 void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &units, int width, int height, int highFactor) {
     // logic here to statisticallly determine "good" configuration of blocks
     int xincr = width/16, yincr=height/9;
-    
-        for (int j=0; j<height; j+=yincr) {
-            for (int i=0; i<width; i+=xincr) {
-                blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
+
+    for (int j=0; j<height; j+=yincr) {
+        for (int i=0; i<width; i+=xincr) {
+            blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
         }
     }
     // for (auto it : blocks) {
@@ -28,9 +28,14 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
     }
 
 
+    cout<<"ref : "<<(int)image.at((1147 + 175 * width) * 3)<<endl;
+//    cout<<"delta : "<<(int)image.at((17 + 175 * width) * 3)<<endl;
+
+
+
     // loop across each block
-    for (std::size_t y=0; y<height; y += highFactor) {
-        for (std::size_t x=0; x<width; x+= highFactor) {
+    for (int y=0; y<height; y += highFactor) {
+        for (int x=0; x<width; x+= highFactor) {
             int r, g, b;
             deltaUnit curDeltaUnit(deltaUnitLength);
             curDeltaUnit.setMax(Color{-255,-255,-255});
@@ -65,7 +70,6 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                         }
                         
                         deltaColor = donor - curColor;
-
 
                         // push delta Color to the unit
                         curDeltaUnit.push_back(deltaColor);
@@ -141,7 +145,6 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
         //move to helper function to abstract for all streams
         int minLim = min(min(minDelta.r, minDelta.g), minDelta.b);
         int maxLim = max(max(maxDelta.r, maxDelta.g), maxDelta.b);
-
         //depending on config block - use either r or m
         if (block.type == 'R') {
             if (maxLim == 0){
@@ -231,13 +234,10 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
         vector<unsigned char> offsetV = intToBin(offset,8);
 //        vector<unsigned char> numPixVec = intToUnsignedBin(numPixels, 32);
 
-    cout<<diff.size();
 
         diff.insert(diff.end(),rangeSizeV.begin(), rangeSizeV.end());
-        cout<<offset;
 
 
-        cout<<endl;
 
         diff.insert(diff.end(), offsetV.begin(), offsetV.end());
 //        diff.insert(diff.end(), numPixVec.begin(), numPixVec.end());
