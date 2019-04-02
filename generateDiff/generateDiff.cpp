@@ -14,9 +14,6 @@ void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &un
             blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
         }
     }
-    // for (auto it : blocks) {
-    //     std::cout << it.tl.x << " " << it.tl.y << " " << it.br.x << " " << it.br.y << std::endl;
-    // }
 }
 
 void populateDeltas(std::vector<unsigned char> &image, int width, int height, int highFactor, int lowFactor, std::vector<deltaUnit> &units) {
@@ -26,10 +23,6 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
     if (deltaUnitLength < 0) {
         throw std::logic_error("delta unit length less than 0");
     }
-
-
-    cout<<"ref : "<<(int)image.at((1147 + 175 * width) * 3)<<endl;
-//    cout<<"delta : "<<(int)image.at((17 + 175 * width) * 3)<<endl;
 
 
 
@@ -50,9 +43,9 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                         Color deltaColor, donor;
 
                         // current loop-specified Color
-                        Color curColor{image.at((innerX+innerY*width)*3),
-                                        image.at((innerX+innerY*width)*3+1),
-                                        image.at((innerX+innerY*width)*3+2)};
+                        Color curColor{image.at((innerX + innerY * width) * 3),
+                                       image.at((innerX + innerY * width) * 3 + 1),
+                                       image.at((innerX + innerY * width) * 3 + 2)};
 
                         // setting donor pixel logically as top, left, or top-left pixel relative to current pixel.
                         if (innerX-x == innerY-y){
@@ -64,14 +57,12 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                                         image.at(((innerX-1)+innerY*width)*3+1),
                                         image.at(((innerX-1)+innerY*width)*3+2)};
                         } else {
-                            donor = {image.at((innerX+(innerY-1)*width)*3),
-                                        image.at((innerX+(innerY-1)*width)*3+1),
-                                        image.at((innerX+(innerY-1)*width)*3+2)};
-                        }
-                        
-                        deltaColor = donor - curColor;
+                            donor = {image.at((innerX + (innerY - 1) * width) * 3),
+                                     image.at((innerX + (innerY - 1) * width) * 3 + 1),
+                                     image.at((innerX + (innerY - 1) * width) * 3 + 2)};
 
-                        // push delta Color to the unit
+                        }
+                        deltaColor = donor - curColor;
                         curDeltaUnit.push_back(deltaColor);
 
                         curDeltaUnit.setMax(max(deltaColor, curDeltaUnit.getMax()));
@@ -79,7 +70,6 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                     }
                 }
             }
-
             units.push_back(curDeltaUnit);
         }
     }
@@ -91,7 +81,6 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     std::vector<unsigned char> highResImage;
     std::vector<unsigned char> diff;
 
-    // diff.reserve( 100000 );
 
     unsigned lowResWidth, lowResHeight, highResWidth, highResHeight;
 
@@ -128,6 +117,11 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     insertDiffHeader(diff, highResWidth, highResHeight, "RGB");
     cerr<<"diff header inserted"<<endl;
     int offset, rangeSize;
+
+
+    diff.reserve(highResHeight * lowResWidth * 3 * 2);
+
+
     for (auto block : blocksConfig) {
         // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
         int numPixels = (block.br.x - block.tl.x + 1 )*(block.br.y - block.tl.y + 1)*units[0].size();
@@ -200,12 +194,6 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
 //        v = intToUnsignedBin(' ', 8);
 //        diff.insert(diff.end(),v.begin(), v.end());
 
-        // fwrite(&w, w.length(), 1, f);
-        // fwrite(&h, h.length(), 1, f);
-        // diff.push_back();
-        // fwrite(&targetWidth, sizeof(unsigned int), 1, f);
-        // fwrite(&targetHeight, sizeof(unsigned int), 1, f);
-        // fwrite(&colormode, 4,1,f);
 }
 
 void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int offset, int numPixels){
@@ -216,21 +204,9 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
 //        vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
 //        diff.insert(diff.end(),typeV.begin(), typeV.end());
         vector<unsigned char> rangeSizeV = intToBin(rangeSize,8);
-//        for(auto it: rangeSizeV){
-//            cout<<(int)it;
-//        }
-//
-//        cout<<endl;
         vector<unsigned char> offsetV = intToBin(offset,8);
-//        vector<unsigned char> numPixVec = intToUnsignedBin(numPixels, 32);
-
-
         diff.insert(diff.end(),rangeSizeV.begin(), rangeSizeV.end());
-
-
-
         diff.insert(diff.end(), offsetV.begin(), offsetV.end());
-//        diff.insert(diff.end(), numPixVec.begin(), numPixVec.end());
         //RGB header
     }
 
