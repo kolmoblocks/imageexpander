@@ -36,11 +36,8 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
         for (int blockX = 0; blockX <= highResImgW - blockW; blockX+= blockW){
             ++blockCt;
             rangeSize = binToInt(getBits(diff, diffPos, 8));
-            cout<<"rangeSize:"<<rangeSize<<endl;
-            cout<<"diffpos:"<<diffPos<<endl;
             diffPos += 8;
             offset = binToSignedInt(getBits(diff, diffPos, 8));
-            cout<<"offset"<<offset<<endl;
             diffPos += 8;
 
             for (int deltaY = blockY; deltaY < blockY + blockH; deltaY += highFactor){
@@ -104,13 +101,8 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         }
 
 
-                        if (offset != 0) {
-                            cout << "here" << std::endl;
-                        }
 
-
-
-                        r = refR + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        r = refR - offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
 
                         if (r>255 || r< 0){
                             std::cout << "r: " << r << " : refR : "<<refR<<" delta : "<< binToSignedInt(getBits(diff, diffPos, rangeSize))<<" : diffpos : "
@@ -126,7 +118,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         }
                         diffPos += rangeSize;
 
-                        g = refG + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        g = refG - offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
 
                         if (g>255|| g< 0) {
                             std::cout << "g: " << g << " refG: " << refG << " delta : " << binToSignedInt((getBits(diff, diffPos, rangeSize))) << " : diffpos : " << diffPos<< std::endl;
@@ -136,7 +128,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         diffPos += rangeSize;
 
 
-                        b = refB + offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        b = refB - offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
                         if (b>255|| b< 0) {
                             std::cout << "b: " << b << " refB: " << refB << " delta : " << binToSignedInt((getBits(diff, diffPos, rangeSize))) << " : diffpos : " << diffPos
                                       << std::endl;
@@ -144,7 +136,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                         }
                         diffPos += rangeSize;
 
-
+                        std::cout << offset << std::endl;
 
                         pixels.push_back(r);
                         pixels.push_back(g);
@@ -310,22 +302,22 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
             // increment diffY, reset diffX to 0 each time we go to a new block
             ++diffY;
             diffX = 0;
-            for (int innerX = x; innerX < x+hiFactor; ++innerX) {
                 for (int innerY = y; innerY < y+hiFactor; ++innerY) {
-                    // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
-                    if (!(innerX < x+loFactor) || !(innerY < y+loFactor)) {
+                    for (int innerX = x; innerX < x+hiFactor; ++innerX) {
+                        // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
+                    if (innerX >= x+loFactor || innerY >= y+loFactor) {
                         // grab pixel from the diff
-                        newImgVec[innerX + innerY*newW + 4].r = diffVec[3*(diffX + diffY*diffW)];
-                        newImgVec[innerX + innerY*newW + 4].g = diffVec[3*(diffX + diffY*diffW)+1];
-                        newImgVec[innerX + innerY*newW + 4].b = diffVec[3*(diffX + diffY*diffW)+2];
+                        newImgVec[innerX + innerY*newW].r = diffVec[3*(diffX + diffY*diffW)];
+                        newImgVec[innerX + innerY*newW].g = diffVec[3*(diffX + diffY*diffW)+1];
+                        newImgVec[innerX + innerY*newW].b = diffVec[3*(diffX + diffY*diffW)+2];
                         // increment diffX every time we increment through the inner block.
                         ++diffX;
                     }
                     else {
                         // grab pixel from the old image
-                        newImgVec[innerX + innerY*newW].r = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y)))];
-                        newImgVec[innerX + innerY*newW].g = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y))) + 1];
-                        newImgVec[innerX + innerY*newW].b = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x) + oldImgW * (y * loFactor/hiFactor + (innerY - y))) + 2];
+                        newImgVec[innerX + innerY*newW].r = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x+1) + oldImgW * (y * loFactor/hiFactor + (innerY - y)))];
+                        newImgVec[innerX + innerY*newW].g = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x+1) + oldImgW * (y * loFactor/hiFactor + (innerY - y))) + 1];
+                        newImgVec[innerX + innerY*newW].b = oldImgVec[ 3*(x * loFactor/hiFactor + (innerX - x+1) + oldImgW * (y * loFactor/hiFactor + (innerY - y))) + 2];
                     }
 
                 }
@@ -367,7 +359,7 @@ void enhance(char *lowResFileName, char *diffFileName) {
     cout<<"after loop"<<endl;
 
     cout<<diff.size()<<endl;
-    // diff = decodeRLE(diff);
+     diff = decodeRLE(diff);
 
     cout<<"successfully decoded"<<endl;
     if (!checkFileHeader(diff)){

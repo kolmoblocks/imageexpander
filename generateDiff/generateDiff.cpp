@@ -55,11 +55,11 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                                         image.at((innerX+innerY*width)*3+2)};
 
                         // setting donor pixel logically as top, left, or top-left pixel relative to current pixel.
-                        if (innerX == innerY){
+                        if (innerX-x == innerY-y){
                             donor = {image.at(((innerX-1)+(innerY-1)*width)*3),
                                         image.at(((innerX-1)+(innerY-1)*width)*3+1),
                                         image.at(((innerX-1)+(innerY-1)*width)*3+2)};
-                        } else if (innerX > innerY){
+                        } else if (innerX-x > innerY-y){
                             donor = {image.at(((innerX-1)+innerY*width)*3),
                                         image.at(((innerX-1)+innerY*width)*3+1),
                                         image.at(((innerX-1)+innerY*width)*3+2)};
@@ -152,20 +152,10 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
             }
             if (maxLim < 0 ) cout<<maxLim<<endl;
 
-            maxLim = max(maxLim, abs(minLim));
+            offset = (maxLim + minLim) / 2 + 2*((maxLim + minLim) % 2);
 
-            float power = log(maxLim)/log(2); // get the number of bits needed then + 1 for sign
+            float power = log(maxLim - minLim)/log(2); // get the number of bits needed then + 1 for sign
             rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
-
-
-            offset = 0;
-
-//            if (maxLim >= 0 || (minLim <= 0 && maxLim <= 0)) {
-//                offset = minLim;
-//            } else {
-//                offset = minLim;
-//            }
-
 
             insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset, numPixels);
             insertRangeBlock(diff, it, rangeSize, offset);

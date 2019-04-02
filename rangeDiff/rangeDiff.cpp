@@ -34,16 +34,6 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
 //        }
 
         diff.insert(diff.end(), r.begin(), r.end());
-//        if ((*it).g != 0) {
-//            cout<<(*it).g<<";"<<diff.size()<<endl;
-//            for (auto it: g){
-//                cout<<(int)it;
-//            }
-//            cout<<endl;
-//        }
-
-
-
         diff.insert(diff.end(), g.begin(), g.end());
         diff.insert(diff.end(), b.begin(), b.end());
 
