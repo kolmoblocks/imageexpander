@@ -28,7 +28,7 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
     }
 
 
-    cout<<"ref : "<<(int)image.at((1147 + 175 * width) * 3)<<endl;
+    cout<<"ref : "<<(int)image.at((78 + 779 * width) * 3)<<endl;
 //    cout<<"delta : "<<(int)image.at((17 + 175 * width) * 3)<<endl;
 
 
@@ -50,27 +50,36 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                         Color deltaColor, donor;
 
                         // current loop-specified Color
-                        Color curColor{image.at((innerX+innerY*width)*3),
-                                        image.at((innerX+innerY*width)*3+1),
-                                        image.at((innerX+innerY*width)*3+2)};
+                        Color curColor{image.at((innerX + innerY * width) * 3),
+                                       image.at((innerX + innerY * width) * 3 + 1),
+                                       image.at((innerX + innerY * width) * 3 + 2)};
 
                         // setting donor pixel logically as top, left, or top-left pixel relative to current pixel.
-                        if (innerX == innerY){
-                            donor = {image.at(((innerX-1)+(innerY-1)*width)*3),
-                                        image.at(((innerX-1)+(innerY-1)*width)*3+1),
-                                        image.at(((innerX-1)+(innerY-1)*width)*3+2)};
-                        } else if (innerX > innerY){
-                            donor = {image.at(((innerX-1)+innerY*width)*3),
-                                        image.at(((innerX-1)+innerY*width)*3+1),
-                                        image.at(((innerX-1)+innerY*width)*3+2)};
+                        if (innerX - x == innerY - y) {
+                            donor = {image.at(((innerX - 1) + (innerY - 1) * width) * 3),
+                                     image.at(((innerX - 1) + (innerY - 1) * width) * 3 + 1),
+                                     image.at(((innerX - 1) + (innerY - 1) * width) * 3 + 2)};
+
+                        } else if (innerX - x > innerY - y) {
+                            donor = {image.at(((innerX - 1) + innerY * width) * 3),
+                                     image.at(((innerX - 1) + innerY * width) * 3 + 1),
+                                     image.at(((innerX - 1) + innerY * width) * 3 + 2)};
+
                         } else {
-                            donor = {image.at((innerX+(innerY-1)*width)*3),
-                                        image.at((innerX+(innerY-1)*width)*3+1),
-                                        image.at((innerX+(innerY-1)*width)*3+2)};
+                            donor = {image.at((innerX + (innerY - 1) * width) * 3),
+                                     image.at((innerX + (innerY - 1) * width) * 3 + 1),
+                                     image.at((innerX + (innerY - 1) * width) * 3 + 2)};
+
                         }
-                        
+
                         deltaColor = donor - curColor;
 
+//                        if (deltaColor.r == -100){
+//                            cout << innerX <<" : "<<innerY<<endl;
+//                            cout<<"donor"<<donor.r<<" cur : " <<curColor.r<<endl;
+//
+//
+//                        }
                         // push delta Color to the unit
                         curDeltaUnit.push_back(deltaColor);
 
@@ -166,7 +175,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
 //                offset = minLim;
 //            }
 
-
+            cout<<rangeSize<<endl;
             insertBlockHeader(diff,TYPE_RANGE, rangeSize, offset, numPixels);
             insertRangeBlock(diff, it, rangeSize, offset);
         }

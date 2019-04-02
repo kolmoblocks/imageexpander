@@ -4,9 +4,10 @@ using namespace std;
 
 
 void insertRangeHeader(vector<unsigned char> &diff, int rangeSize, int offset){
-    vector <unsigned char> offsetByte= intToBin(offset,8);
     vector <unsigned char> rangeSizeByte = intToBin(rangeSize, 8);
     diff.insert(diff.end(), rangeSizeByte.begin(), rangeSizeByte.end());
+
+    vector <unsigned char> offsetByte= intToBin(offset,8);
     diff.insert(diff.end(), offsetByte.begin(), offsetByte.end());
 
 }
@@ -23,7 +24,19 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
     while (!it.end()){
         ++ct;
 
+
+
         r =  intToBin((*it).r - offset, rangeSize);
+
+//        if ((*it).r!= 0){
+//            cout<<(*it).r - offset<<endl;
+//            cout<<rangeSize<<endl;
+//            for (auto it: r){
+//                cout<<(int)it;
+//            }
+//            cout<<endl;
+//        }
+
         g =  intToBin((*it).g - offset, rangeSize);
         b =  intToBin((*it).b - offset, rangeSize);
 
@@ -33,7 +46,6 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
 //            cout<<endl;
 //        }
 
-        diff.insert(diff.end(), r.begin(), r.end());
 //        if ((*it).g != 0) {
 //            cout<<(*it).g<<";"<<diff.size()<<endl;
 //            for (auto it: g){
@@ -43,7 +55,7 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
 //        }
 
 
-
+        diff.insert(diff.end(), r.begin(), r.end());
         diff.insert(diff.end(), g.begin(), g.end());
         diff.insert(diff.end(), b.begin(), b.end());
 
