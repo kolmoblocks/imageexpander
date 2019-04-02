@@ -6,6 +6,7 @@ int main(int argc, char *argv[]){
     vector<unsigned char> diff;
     diff.reserve(239202 * 8);
     diff = generateDiff(argv[1], argv[2]);
+    diff = encodeRLE(diff);
     writeBitsToFile(diff, diffFile);
     fclose(diffFile);
     //writeDiffHeader(1920,1080,"RGB");

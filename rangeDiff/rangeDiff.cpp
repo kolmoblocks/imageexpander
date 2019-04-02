@@ -27,12 +27,6 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
         g =  intToBin((*it).g - offset, rangeSize);
         b =  intToBin((*it).b - offset, rangeSize);
 
-
-//        if (diff.size() >= 2886576) {
-//            cout<<(*it).r<<endl;
-//            cout<<endl;
-//        }
-
         diff.insert(diff.end(), r.begin(), r.end());
         diff.insert(diff.end(), g.begin(), g.end());
         diff.insert(diff.end(), b.begin(), b.end());

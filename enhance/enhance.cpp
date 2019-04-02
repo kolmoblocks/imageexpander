@@ -1,18 +1,11 @@
 #include "enhance.h"
 
 vector<unsigned char> getBits(vector<unsigned char>&buffer, int start, int len){
-    vector<unsigned char> res;    
+    vector<unsigned char> res;
     res.reserve(len);
-    // for (int i = start+len - 1; i >= start ; i--){
-    //     res.push_back(buffer[i]); 
-    //     cout<<(int)buffer[i];
-    // }
-
     for (int i = start; i< start +len; i++){
-        res.push_back(buffer[i]); 
-        // cout<<(int)buffer[i];
+        res.push_back(buffer[i]);
     }
-    // cout<<endl;
     return res;
 }
 
@@ -158,38 +151,6 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 
 }
 
-
-char* getDiffFromFile(FILE *pFile){
-    long lSize;
-    char * buffer;
-    size_t result = 0;
-
-    pFile = fopen ( "diff.dat" , "rb" );
-    if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
-
-    // obtain file size:
-    fseek (pFile , 0 , SEEK_END);
-    lSize = ftell (pFile);
-    cout<<"lSize"<<lSize<<endl;
-    rewind (pFile);
-
-    // allocate memory to contain the whole file:
-    buffer = (char*) malloc (sizeof(char)*lSize);
-    if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
-
-    // copy the file into the buffer:
-     fread (buffer,1,lSize,pFile);
-    // for(int i = 0; i < lSize; i++) {
-    //    fread(buffer+i, 1, 1, pFile); 
-    // }
-    //  for (int i = 0; i < 8 * lSize; i++){
-    //      cout<<(int)buffer[i]<<endl;
-    //  }
-    fclose (pFile);
-    free (buffer);
-    cout<<"end getdiff"<<endl;
-    return buffer;
-}
 void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned &highResHeight) {
     vector<unsigned char> v;
     v.reserve(32);

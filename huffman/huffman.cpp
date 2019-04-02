@@ -48,12 +48,12 @@ dNode *encodeHuffman(std::vector<unsigned char> &rawData) {
     int charFreq[TOKENSIZE] = {0};
     int rawDataSize = rawData.size();
 
-    if (rawDataSize % 8 != 0) std::cout << "sum ting wong" << std::endl;
+    int incr = floor(log(TOKENSIZE)/log(2));
 
     std::vector<unsigned char> binVector;
 
-    for (int i=0; i<rawDataSize; i+=8) {
-        for (int j=i; j<i+8; ++j) {
+    for (int i=0; i<rawDataSize; i+=incr) {
+        for (int j=i; j<i+incr; ++j) {
             binVector.push_back(rawData[j]);
         }
         int index = binToInt(binVector);
@@ -94,15 +94,14 @@ dNode *encodeHuffman(std::vector<unsigned char> &rawData) {
 
     std::vector<unsigned char> bitstring;
     inOrder(encodeDictPtr, bitstring, encTable);
-    std::cout << "here" << std::endl;
 
     std::vector<unsigned char> curCharVec;
     auto leadingIt = rawData.begin();
     auto trailingIt = rawData.begin();
+
     int i=0;
-    int incr = floor(log(TOKENSIZE)/log(2));
     while ( i<rawDataSize ) {
-        int lim = i+8;
+        int lim = i+incr;
         for (; i<lim; ++i) {
             curCharVec.push_back(*leadingIt);
             ++leadingIt;
@@ -134,6 +133,7 @@ void decodeHuffman(std::vector<unsigned char> &encoded, std::vector<unsigned cha
     while (encodedIt != encoded.end()) {
         if (!(dictPtr->left) && !(dictPtr->right)) {
             decoded.insert(decoded.end(), curBinaryVec.begin(), curBinaryVec.end());
+
             dictPtr = encodeDict;
             curBinaryVec.clear();
         }
