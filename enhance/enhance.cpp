@@ -52,7 +52,7 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                             deltaXCpy +=1;
                        }
 
-                        r = refR - offset - binToSignedInt(getBits(diff, diffPos, rangeSize));         
+                        r = refR - offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
                         diffPos += rangeSize;
 
                         g = refG - offset - binToSignedInt(getBits(diff, diffPos, rangeSize));

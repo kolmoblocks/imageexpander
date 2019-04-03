@@ -111,8 +111,10 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     // get units from pixels somehow
     std::vector<deltaUnit> units;
     std::vector<blockParams> blocksConfig;
+
     populateDeltas(highResImage, highResWidth, highResHeight, highFactor, lowFactor, units);
     populateBlocks(blocksConfig, units, highResWidth, highResHeight, highFactor);
+
     cerr<<"populated blocks"<<endl;
     insertDiffHeader(diff, highResWidth, highResHeight, "RGB");
     cerr<<"diff header inserted"<<endl;
@@ -146,7 +148,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
             }
             if (maxLim < 0 ) cout<<maxLim<<endl;
 
-            offset = (maxLim + minLim) / 2 + 2*((maxLim + minLim) % 2);
+            offset = (maxLim + minLim) / 2 ;
 
             float power = log(maxLim - minLim)/log(2); // get the number of bits needed then + 1 for sign
             rangeSize = (int)floor(power) + 2; //+1 for ceil and 1 for signed binary
