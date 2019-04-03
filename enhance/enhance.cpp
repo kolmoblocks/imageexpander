@@ -17,38 +17,49 @@ void setBlockInfo(int &w, int &h, int highResImgW, int highResImgH){
 void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector<unsigned char> &lowRes,
     int highResImgW, int highResImgH, int deltaUnitSize, int numDeltaPixelsPerBlock, int highFactor, int lowFactor, unsigned lowResImgW){
     
-    int diffPos = 96, rangeSize, offset, refR, refG, refB, blockW, blockH, r, g, b;
+    int diffPos = 96, rangeSize, offset, refR, refG, refB, blockW, blockH, r, g, b,
+    index, upperBlockY, upperBlockX, deltaYCpy, deltaXCpy, upperDeltaY, upperDeltaX;
     setBlockInfo(blockW, blockH, highResImgW, highResImgH);
 
-    for (int blockY = 0; blockY <= highResImgH - blockH; blockY+= blockH){
-        for (int blockX = 0; blockX <= highResImgW - blockW; blockX+= blockW){
+    upperBlockY = highResImgH - blockH;
+
+    for (int blockY = 0; blockY <= upperBlockY; blockY+= blockH){
+        upperBlockX = highResImgW - blockW;
+        for (int blockX = 0; blockX <= upperBlockX; blockX+= blockW){
             rangeSize = binToInt(getBits(diff, diffPos, 8));
             diffPos += 8;
             offset = binToSignedInt(getBits(diff, diffPos, 8));
             diffPos += 8;
 
-            for (int deltaY = blockY; deltaY < blockY + blockH; deltaY += highFactor){
-                int deltaYCpy = deltaY;
-                for (int deltaX = blockX + highFactor - 1; deltaX < blockX + blockW; deltaX += highFactor) {
+            upperDeltaY = blockY + blockH;
+            for (int deltaY = blockY; deltaY < upperDeltaY; deltaY += highFactor){
+
+                deltaYCpy = deltaY;
+                upperDeltaX = blockX + blockW;
+                for (int deltaX = blockX + highFactor - 1; deltaX < upperDeltaX; deltaX += highFactor) {
                     int deltaXCpy = deltaX;
                     for (int unit = 0; unit < deltaUnitSize; unit++){
                         if (unit == deltaUnitSize - 1){
-                            refR = lowRes[ 3*(((deltaXCpy - 1) + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor)];
-                            refG = lowRes[ 3*(((deltaXCpy - 1) + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor) + 1];
-                            refB = lowRes[ 3*(((deltaXCpy - 1) + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor) + 2];
+
+                            index =  3*(((deltaXCpy - 1) + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor);
+                            refR = lowRes[index];
+                            refG = lowRes[index + 1];
+                            refB = lowRes[index + 2];
                             deltaYCpy -= (highFactor-1);
 
                         } else if (unit < (deltaUnitSize - 1)/2){
-                            refR = lowRes[ 3*(((deltaXCpy - 1) + lowResImgW * deltaYCpy)* lowFactor/highFactor)];
-                            refG = lowRes[ 3*(((deltaXCpy - 1) + lowResImgW * deltaYCpy)* lowFactor/highFactor) + 1];
-                            refB = lowRes[ 3*(((deltaXCpy-1) + lowResImgW * deltaYCpy)* lowFactor/highFactor) + 2];
+                            index =  3*(((deltaXCpy - 1) + lowResImgW * deltaYCpy)* lowFactor/highFactor);
+                            refR = lowRes[index];
+                            refG = lowRes[index + 1];
+                            refB = lowRes[index + 2];
                             deltaYCpy +=1;
 
                         } else {
                             if (unit == (deltaUnitSize - 1)/2) deltaXCpy -= (highFactor - 1);
-                            refR = lowRes[ 3*((deltaXCpy + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor)];
-                            refG = lowRes[ 3*((deltaXCpy + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor) + 1];
-                            refB = lowRes[ 3*((deltaXCpy  + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor)+ 2];
+                            index =  3*((deltaXCpy + lowResImgW * (deltaYCpy-1))* lowFactor/highFactor);
+                            refR = lowRes[index];
+                            refG = lowRes[index + 1];
+                            refB = lowRes[index + 2];
                             deltaXCpy +=1;
                        }
 
@@ -164,7 +175,7 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
     unsigned newW = oldImgW * hiFactor / loFactor;
     unsigned newH = oldImgH * hiFactor / loFactor;
     std::vector<Color> newImgVec(newW * newH * 3);
-    int diffX = 0, diffY = 0;
+    int diffX = 0, diffY = 0, newImgIndex, targetIndex, upperInnerY, upperInnerX;
 
     for (std::size_t y=0; y<newH; y+= hiFactor) {
         for (std::size_t x=0; x<newW; x+= hiFactor) {
@@ -172,23 +183,28 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
             // increment diffY, reset diffX to 0 each time we go to a new block
             ++diffY;
             diffX = 0;
-                for (int innerY = y; innerY < y+hiFactor; ++innerY) {
-                    for (int innerX = x; innerX < x+hiFactor; ++innerX) {
+            upperInnerY = y+hiFactor;
+                for (int innerY = y; innerY < upperInnerY; ++innerY) {
+                    upperInnerX = x+hiFactor;
+                    for (int innerX = x; innerX < upperInnerX; ++innerX) {
                         // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
-                    if (innerX >= x+loFactor || innerY >= y+loFactor) {
-                        // grab pixel from the diff
-                        newImgVec[innerX + innerY*newW].r = diffVec[3*(diffX + diffY*diffW)];
-                        newImgVec[innerX + innerY*newW].g = diffVec[3*(diffX + diffY*diffW)+1];
-                        newImgVec[innerX + innerY*newW].b = diffVec[3*(diffX + diffY*diffW)+2];
-                        // increment diffX every time we increment through the inner block.
-                        ++diffX;
-                    }
-                    else {
-                        // grab pixel from the old image           
-                        newImgVec[innerX + innerY*newW].r =  oldImgVec[ 3*(((innerX+1) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x + 1))];
-                        newImgVec[innerX + innerY*newW].g = oldImgVec[ 3*(((innerX+1) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x + 1)) + 1];
-                        newImgVec[innerX + innerY*newW].b = oldImgVec[ 3*(((innerX+1) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x + 1)) + 2];
-                    }
+                        newImgIndex = innerX + innerY*newW;
+                        if (innerX >= x+loFactor || innerY >= y+loFactor) {
+                            targetIndex = 3*(diffX + diffY*diffW);
+                            // grab pixel from the diff
+                            newImgVec[newImgIndex].r = diffVec[targetIndex];
+                            newImgVec[newImgIndex].g = diffVec[targetIndex + 1];
+                            newImgVec[newImgIndex].b = diffVec[targetIndex + 2];
+                            // increment diffX every time we increment through the inner block.
+                            ++diffX;
+                        }
+                        else {
+                            // grab pixel from the old image
+                            targetIndex = 3*(((innerX+1) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x + 1));
+                            newImgVec[newImgIndex].r =  oldImgVec[targetIndex];
+                            newImgVec[newImgIndex].g = oldImgVec[targetIndex + 1];
+                            newImgVec[newImgIndex].b = oldImgVec[targetIndex + 2];
+                        }
 
                 }
             }

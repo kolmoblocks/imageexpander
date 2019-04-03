@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+LOW_RES=$1
+HIGH_RES=$2
+IMG_DIR=$3
+
+rm benchmark.txt
+
+for i in $(ls $IMG_DIR); do
+
+    # ./generateDiff/diff $IMG_DIR$i  $(echo $IMG_DIR$i | awk '{split($0,a,"."); print a[0]}')-2to1.png
+    # ./enhance/enhance $i ./generateDiff/diff.dat 
+    diffSize=$(echo $(wc -c generateDiff/diff.dat) | awk '{split($0,a," "); print a[1]}')
+    lowResSize=$(echo $(wc -c $IMG_DIR$i) | awk '{split($0,a," "); print a[1]}')
+    highResSize=$(echo $(wc -c $IMG_DIR$i) | awk '{split($0,a," "); print a[1]}')
+
+    echo $((diff + ))>> benchmark.txt
+
+done
