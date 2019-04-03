@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <sstream>
 #include "../lodepng/lodepng.h"
 
@@ -37,6 +38,11 @@ int main(int argc, char **argv) {
     ur1 = r1;
     ur2 = r2;
     std::cout << ht*ur1/ur2 << " " << width*r1/r2 << std::endl;
-    err = lodepng::encode("resized.png", newImgVec,  wid*ur1/ur2, ht*ur1/ur2, LCT_RGB, 8);
+    std::string a = "-";
+    std::string suffix = a+argv[2]+"to"+argv[3]+".png";
+    std::string prefix = argv[1];
+    prefix = prefix.substr(0, prefix.length()-4);
+    err = lodepng::encode(prefix+suffix, newImgVec,  wid*ur1/ur2, ht*ur1/ur2, LCT_RGB, 8);
+
     std::cout << lodepng_error_text(err) << std::endl;
 }
