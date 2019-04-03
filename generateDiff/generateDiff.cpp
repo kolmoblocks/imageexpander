@@ -19,6 +19,7 @@ void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &un
 void populateDeltas(std::vector<unsigned char> &image, int width, int height, int highFactor, int lowFactor, std::vector<deltaUnit> &units) {
     // calculate the delta unit length from default block configuration
     int deltaUnitLength = highFactor*highFactor - lowFactor*lowFactor;
+    int upperInnerY, upperInnerX, index;
     
     if (deltaUnitLength < 0) {
         throw std::logic_error("delta unit length less than 0");
@@ -35,31 +36,39 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
             curDeltaUnit.setMin(Color{255,255,255});
 
             // loop into each block
-            for (int innerY = y; innerY < y+highFactor; ++innerY) {
-                for (int innerX = x; innerX < x+highFactor; ++innerX) {
+            upperInnerY = y+highFactor;
+            for (int innerY = y; innerY < upperInnerY ; ++innerY) {
+                upperInnerX = x + highFactor;
+                for (int innerX = x; innerX < upperInnerX; ++innerX) {
                     // only get and set pixel delta if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                     if (innerX >= x+lowFactor || innerY >= y+lowFactor) {
                         // deltaColor is the delta to be pushed to the delta unit, deltaDonor is the Color that the delta is set relative to
                         Color deltaColor, donor;
 
                         // current loop-specified Color
-                        Color curColor{image.at((innerX + innerY * width) * 3),
-                                       image.at((innerX + innerY * width) * 3 + 1),
-                                       image.at((innerX + innerY * width) * 3 + 2)};
+                        index = (innerX + innerY * width) * 3;
+
+                        Color curColor{image.at(index),
+                                       image.at(index + 1),
+                                       image.at(index + 2)};
 
                         // setting donor pixel logically as top, left, or top-left pixel relative to current pixel.
                         if (innerX-x == innerY-y){
-                            donor = {image.at(((innerX-1)+(innerY-1)*width)*3),
-                                        image.at(((innerX-1)+(innerY-1)*width)*3+1),
-                                        image.at(((innerX-1)+(innerY-1)*width)*3+2)};
+                            index = ((innerX-1)+(innerY-1)*width)*3;
+                            donor = {image.at(index),
+                                        image.at(index+1),
+                                        image.at(index+2)};
                         } else if (innerX-x > innerY-y){
-                            donor = {image.at(((innerX-1)+innerY*width)*3),
-                                        image.at(((innerX-1)+innerY*width)*3+1),
-                                        image.at(((innerX-1)+innerY*width)*3+2)};
+
+                            index = ((innerX-1)+innerY*width)*3;
+                            donor = {image.at(index),
+                                        image.at(index+1),
+                                        image.at(index+2)};
                         } else {
-                            donor = {image.at((innerX + (innerY - 1) * width) * 3),
-                                     image.at((innerX + (innerY - 1) * width) * 3 + 1),
-                                     image.at((innerX + (innerY - 1) * width) * 3 + 2)};
+                            index = (innerX + (innerY - 1) * width) * 3;
+                            donor = {image.at(index),
+                                     image.at(index + 1),
+                                     image.at(index + 2)};
 
                         }
                         deltaColor = donor - curColor;
