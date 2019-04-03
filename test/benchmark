@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+LOW_RES=$1
+HIGH_RES=$2
+IMG_DIR=$3
+
+for i in $(ls $IMG_DIR); do
+
+ ./diff i ....
+ ./enhance i diff.dat
+
+done

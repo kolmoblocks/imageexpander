@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+
+IMAGES_DIR="AllImages/"
+
+
+for IMG_NAME in $(ls $IMAGES_DIR); do
+
+	echo $IMAGES_DIR$IMG_NAME
+
+	RES=$(file $IMAGES_DIR$IMG_NAME | awk '{split($0,a,","); print a[2]}')
+
+	cp AllImages/$IMG_NAME $(echo $RES | awk '{print $3}')
+
+
+done

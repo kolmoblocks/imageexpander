@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+COUNTER=0
+
+DIR=$1
+
+for i in $(ls $DIR); do
+    mv $DIR/$i  $DIR/$DIR-$COUNTER-HighRes.png
+    COUNTER=$((COUNTER+1))
+
+done
