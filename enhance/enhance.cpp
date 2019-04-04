@@ -196,9 +196,9 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
             for (int innerY = y; innerY < upperInnerY; ++innerY) {
                     for (int innerX = x; innerX < upperInnerX; ++innerX) {
                         // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
-                        newImgIndex = innerX + innerY*newW;
+                        newImgIndex = innerX + (innerY)*newW;
                         if (innerX >= x+loFactor || innerY >= y+loFactor) {
-                            targetIndex = 3*(diffX + diffY*diffW);
+                            targetIndex = 3*(diffX-3 + diffY*diffW);
                             // grab pixel from the diff
                             newImgVec[newImgIndex].r = diffVec[targetIndex];
                             newImgVec[newImgIndex].g = diffVec[targetIndex + 1];
@@ -208,7 +208,7 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
                         }
                         else {
                             // grab pixel from the old image
-                            targetIndex = 3*(((innerX+1) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x + 1));
+                            targetIndex = 3*(((innerX) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x));
                             if (targetIndex == oldImgVec.size() - 9){
                                 std::cout << "last" << std::endl;
                             }
