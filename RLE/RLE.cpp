@@ -7,8 +7,7 @@ using namespace std;
 
 
 
-vector <unsigned char> encodeRLE (vector<unsigned char> &bits){
-    vector <unsigned char> encoded;
+void encodeRLE (vector<unsigned char> &bits, vector<unsigned char> &encoded){
     vector <unsigned char> binary;
     int len = bits.size();
     encoded.reserve(len);
@@ -19,38 +18,34 @@ vector <unsigned char> encodeRLE (vector<unsigned char> &bits){
         while ((i + k < len) && bits[i + k] == bits[i]){
             k++;
         }
-
-        for (int l = 1; l <= floor(log(k)/log(2)); l++){
+        int upper = (int)floor(log(k)/log(2));
+        for (int l = 1; l <= upper; l++){
             encoded.push_back(0);
         }
-        binary = intToUnsignedBin(k, floor(log(k)/log(2))+1);
+        binary = intToUnsignedBin(k, upper+1);
         encoded.insert(encoded.end(), binary.begin(), binary.end());
-        // compressed.push_back();
         i+=k;
         binary.clear();
             
     }
-    return encoded;
 }
 
 
-vector <unsigned char> decodeRLE (vector<unsigned char> &bits){
-    unsigned char b = bits[0];
-    vector<unsigned char> decoded;
+void decodeRLE (vector<unsigned char> &encoded, vector<unsigned char>&decoded, int size){
+    unsigned char b = encoded[32];
     vector<unsigned char> bin;
-    int size = bits.size();
 
-    for (int i = 1; i < size;){
+    for (int i = 33; i < size + 33;){
         int l = 0;
-        while (bits[i + l] == 0){
+        while (encoded[i + l] == 0){
             l++;
         }
-        if (size < i + l + 1) {
+        if (size + 33 < i + l + 1) {
             cout<<"invalid encoding";
-            return decoded;
         }
-        for(int j = i + l; j<i + 2*l + 1; j++){
-            bin.push_back(bits[j]);
+        int upper = i + 2*l + 1;
+        for(int j = i + l; j<upper; j++){
+            bin.push_back(encoded[j]);
         }
         int k = binToInt(bin);
         for (int j = 1; j <=k; j++){
@@ -60,7 +55,6 @@ vector <unsigned char> decodeRLE (vector<unsigned char> &bits){
         b = 1 - b;
         bin.clear();
     }
-    return decoded;
 }
 
 

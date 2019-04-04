@@ -45,23 +45,6 @@ void writeBit (int bit, int &current_bit, unsigned char &bit_buffer, FILE *f) {
   }
 }
 
-void writeBitsToFile (std::vector<unsigned char> &bitBuff, FILE *f) {
-    unsigned char bit_buffer=0;
-    int current_bit=0, bitBuffLen = bitBuff.size();
-    int nextWholeByte = bitBuffLen + ((bitBuffLen%8 == 0)? 0 : 8-bitBuffLen%8);
-
-    for (int i = bitBuffLen; i < nextWholeByte; ++i) {
-        bitBuff.push_back(0);
-    }
-
-    if (bitBuff.size() % 8 != 0) std::cout << "bitBuffLen not 8 after padding!" << std::endl;
-
-    bitBuff = encodeRLE(bitBuff);
-
-    for (auto it : bitBuff) {
-        writeBit(it, current_bit, bit_buffer, f);
-    }
-}
 
 std::vector<unsigned char> intToBin(int c, int range) {
 	std::vector<unsigned char> v;
@@ -115,3 +98,44 @@ int binToSignedInt(vector<unsigned char> bin){
 }
 
 
+void writeBitsToFile (std::vector<unsigned char> &bitBuff, FILE *f) {
+    unsigned char bit_buffer=0;
+    vector<unsigned char> encoded;
+    int current_bit=0;
+
+
+    encoded.reserve(bitBuff.size());
+
+    encodeRLE(bitBuff, encoded);
+    int RLElen = encoded.size();
+
+    int nextWholeByte = RLElen + ((RLElen%8 == 0)? 0 : 8-RLElen%8);
+
+
+    cout<<encoded.size()%8<<endl;
+
+    for (int i = RLElen; i < nextWholeByte; ++i) {
+        encoded.push_back(0);
+    }
+    cout<<encoded.size()%8<<endl;
+    if (encoded.size() % 8 != 0) std::cout << "bitBuffLen not 8 after padding!" << std::endl;
+
+    auto startTime = std::chrono::high_resolution_clock::now();
+
+    vector<unsigned char> RLEHeader = intToUnsignedBin(RLElen, 32);
+   cout<<RLElen<<endl;
+    for (auto it : RLEHeader){
+        writeBit(it, current_bit, bit_buffer, f);
+    }
+
+    for (auto it : encoded) {
+        writeBit(it, current_bit, bit_buffer, f);
+    }
+
+//    fwrite(&bitBuff[0], 1, bitBuff.size()/8, f);
+
+    auto endTime = std::chrono::high_resolution_clock::now();
+
+    cout<<std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count()<<endl;
+
+}

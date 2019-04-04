@@ -1,7 +1,6 @@
 #include "generateDiff.h"
 using namespace std;
 
-FILE *f;
 const int TYPE_MAP = 0, TYPE_RANGE = 1;
 
 
@@ -29,16 +28,15 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
 
     // loop across each block
     for (int y=0; y<height; y += highFactor) {
+        upperInnerY = y+highFactor;
         for (int x=0; x<width; x+= highFactor) {
-            int r, g, b;
             deltaUnit curDeltaUnit(deltaUnitLength);
             curDeltaUnit.setMax(Color{-255,-255,-255});
             curDeltaUnit.setMin(Color{255,255,255});
 
             // loop into each block
-            upperInnerY = y+highFactor;
+            upperInnerX = x + highFactor;
             for (int innerY = y; innerY < upperInnerY ; ++innerY) {
-                upperInnerX = x + highFactor;
                 for (int innerX = x; innerX < upperInnerX; ++innerX) {
                     // only get and set pixel delta if the block is not included in the old block (for now it is the top left smaller square with sides of length "lowFactor")
                     if (innerX >= x+lowFactor || innerY >= y+lowFactor) {
@@ -110,11 +108,7 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     unsigned int lowFactor = lowResWidth / denom;
     unsigned int highFactor = highResWidth / denom;
     // finding diffWidth from the difference between smaller vs newer chunk sizes
-    int diffWidth = highFactor * highFactor - lowFactor * lowFactor;
-    int highResArea = highResWidth * highResHeight;
 
-    const unsigned int height = highResHeight;
-    const unsigned int width  = highResWidth;
 
     // iterating through blocks, x and y indicate the top left positions of each block.
     // get units from pixels somehow

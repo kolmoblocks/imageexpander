@@ -9,6 +9,13 @@ vector<unsigned char> getBits(vector<unsigned char>&buffer, int start, int len){
     return res;
 }
 
+
+int getRLELength(vector<unsigned char>&diff){
+    vector<unsigned char> v;
+    v = getBits(diff, 0, 32);
+    return binToInt(v);
+}
+
 void setBlockInfo(int &w, int &h, int highResImgW, int highResImgH){
     w = highResImgW / 16;
     h = highResImgH / 9;
@@ -22,22 +29,22 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
     setBlockInfo(blockW, blockH, highResImgW, highResImgH);
 
     upperBlockY = highResImgH - blockH;
-
+    upperBlockX = highResImgW - blockW;
     for (int blockY = 0; blockY <= upperBlockY; blockY+= blockH){
-        upperBlockX = highResImgW - blockW;
+        upperDeltaY = blockY + blockH;
         for (int blockX = 0; blockX <= upperBlockX; blockX+= blockW){
             rangeSize = binToInt(getBits(diff, diffPos, 8));
             diffPos += 8;
             offset = binToSignedInt(getBits(diff, diffPos, 8));
             diffPos += 8;
 
-            upperDeltaY = blockY + blockH;
+            upperDeltaX = blockX + blockW;
+
             for (int deltaY = blockY; deltaY < upperDeltaY; deltaY += highFactor){
 
                 deltaYCpy = deltaY;
-                upperDeltaX = blockX + blockW;
                 for (int deltaX = blockX + highFactor - 1; deltaX < upperDeltaX; deltaX += highFactor) {
-                    int deltaXCpy = deltaX;
+                    deltaXCpy = deltaX;
                     for (int unit = 0; unit < deltaUnitSize; unit++){
                         if (unit == deltaUnitSize - 1){
 
@@ -85,6 +92,8 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned &highResHeight) {
     vector<unsigned char> v;
     v.reserve(32);
+
+
     v = getBits(diff,32,32);
     highResWidth = (unsigned)binToInt(v);
     v = getBits(diff,64,32);
@@ -122,7 +131,7 @@ void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<u
     }
 
     std::vector<blockParams> bPs;
-    populateBlocks(bPs, 3840, 2160, 2);
+    populateBlocks(bPs, highResWidth, highResHeight, 2);
 
     auto bt = bPs.begin();
     for (auto it=blockPosVec.begin(); it<blockPosVec.end()-1; ++it) {
@@ -154,7 +163,6 @@ void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<u
 }
 
 
-
 bool checkFileHeader(vector<unsigned char>&diff){
     vector<unsigned char> v;
     string res = "";
@@ -178,14 +186,14 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
     int diffX = 0, diffY = 0, newImgIndex, targetIndex, upperInnerY, upperInnerX;
 
     for (std::size_t y=0; y<newH; y+= hiFactor) {
+        upperInnerY = y+hiFactor;
         for (std::size_t x=0; x<newW; x+= hiFactor) {
             // iterating through inner block pixels, innerX and innerY indicate the current position of the block we are at.
             // increment diffY, reset diffX to 0 each time we go to a new block
             ++diffY;
             diffX = 0;
-            upperInnerY = y+hiFactor;
-                for (int innerY = y; innerY < upperInnerY; ++innerY) {
-                    upperInnerX = x+hiFactor;
+            upperInnerX = x+hiFactor;
+            for (int innerY = y; innerY < upperInnerY; ++innerY) {
                     for (int innerX = x; innerX < upperInnerX; ++innerX) {
                         // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
                         newImgIndex = innerX + innerY*newW;
@@ -201,7 +209,7 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
                         else {
                             // grab pixel from the old image
                             targetIndex = 3*(((innerX+1) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x + 1));
-                            newImgVec[newImgIndex].r =  oldImgVec[targetIndex];
+                            newImgVec[newImgIndex].r = oldImgVec[targetIndex];
                             newImgVec[newImgIndex].g = oldImgVec[targetIndex + 1];
                             newImgVec[newImgIndex].b = oldImgVec[targetIndex + 2];
                         }
@@ -223,7 +231,7 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
 void enhance(char *lowResFileName, char *diffFileName) {
     FILE *pDiff;
     pDiff = fopen(diffFileName, "rb");
-    vector<unsigned char> deltas, lowResImage,diff;
+    vector<unsigned char> deltas, lowResImage,diff, encoded;
     vector <unsigned int> blocksPixelVec,diffPixelVec;
     unsigned lowResWidth, lowResHeight, highResWidth, highResHeight,lowFactor, highFactor, 
     unitSize, deltaUnitSize, totalDeltaUnits, error;
@@ -233,11 +241,16 @@ void enhance(char *lowResFileName, char *diffFileName) {
 
     ifstream f("diff.dat", ios::binary | ios::in);
     char c;
+
+
+
     while (f.get(c)) {
-        for (int i = 0; i < 8; i++) diff.push_back((c >> i) & 1);
+        for (int i = 0; i < 8; i++) encoded.push_back((c >> i) & 1);
     }
 
-     diff = decodeRLE(diff);
+    int RLELen = getRLELength(encoded);
+    cout<<RLELen<<endl;
+    decodeRLE(encoded, diff, RLELen);
 
     cout<<"successfully decoded"<<endl;
     if (!checkFileHeader(diff)){
