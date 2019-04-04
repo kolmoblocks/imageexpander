@@ -107,6 +107,7 @@ void writeBitsToFile (std::vector<unsigned char> &bitBuff, FILE *f) {
     encoded.reserve(bitBuff.size());
 
     encodeRLE(bitBuff, encoded);
+//    encoded.insert(encoded.end(), bitBuff.begin(), bitBuff.end());
     int RLElen = encoded.size();
 
     int nextWholeByte = RLElen + ((RLElen%8 == 0)? 0 : 8-RLElen%8);
