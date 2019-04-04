@@ -41,6 +41,8 @@ void decodeRLE (vector<unsigned char> &encoded, vector<unsigned char>&decoded, i
             l++;
         }
         if (size + 33 < i + l + 1) {
+            cout <<size + 33<<" : "<<i + l + 1<<endl;
+
             cout<<"invalid encoding";
         }
         int upper = i + 2*l + 1;

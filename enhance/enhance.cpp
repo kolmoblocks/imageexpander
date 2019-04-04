@@ -184,7 +184,7 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
     unsigned newH = oldImgH * hiFactor / loFactor;
     std::vector<Color> newImgVec(newW * newH * 3);
     int diffX = 0, diffY = 0, newImgIndex, targetIndex, upperInnerY, upperInnerX;
-
+    int ct=0;
     for (std::size_t y=0; y<newH; y+= hiFactor) {
         upperInnerY = y+hiFactor;
         for (std::size_t x=0; x<newW; x+= hiFactor) {
@@ -209,6 +209,10 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
                         else {
                             // grab pixel from the old image
                             targetIndex = 3*(((innerX+1) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x + 1));
+                            if (targetIndex == oldImgVec.size() - 9){
+                                std::cout << "last" << std::endl;
+                            }
+
                             newImgVec[newImgIndex].r = oldImgVec[targetIndex];
                             newImgVec[newImgIndex].g = oldImgVec[targetIndex + 1];
                             newImgVec[newImgIndex].b = oldImgVec[targetIndex + 2];
@@ -216,7 +220,9 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
 
                 }
             }
+
         }
+        ++ct;
     }
     std::vector<unsigned char> finalImage;
     for (auto it : newImgVec) {
