@@ -176,6 +176,7 @@ bool checkFileHeader(vector<unsigned char>&diff){
     v.clear();
     v = getBits(diff,24,8);
     res += (char)binToInt(v);
+    cout<<res<<endl;
     return res == "DIFF";
 }
 
@@ -257,12 +258,13 @@ void enhance(char *lowResFileName, char *diffFileName) {
     int RLELen = getRLELength(encoded);
     cout<<RLELen<<endl;
 
-    diff.resize(encoded.size());
+    // diff.resize(encoded.size());
 
     decodeRLE(encoded, diff, RLELen);
 cout<<encoded.size()<<endl;
 //    diff.insert(diff.end(),encoded.begin() + 32, encoded.end());
     cout<<"successfully decoded"<<endl;
+    cout<<"size"<<diff.size()<<endl;
     if (!checkFileHeader(diff)){
         cerr<<"File is not in DIFF format"<<endl;
         return;

@@ -105,7 +105,7 @@ void writeBitsToFile (std::vector<unsigned char> &bitBuff, FILE *f) {
 
 
     encoded.reserve(bitBuff.size());
-
+    cout<<bitBuff.size()<<endl;
     encodeRLE(bitBuff, encoded);
 //    encoded.insert(encoded.end(), bitBuff.begin(), bitBuff.end());
     int RLElen = encoded.size();
