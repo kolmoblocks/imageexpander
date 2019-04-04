@@ -5,7 +5,7 @@
 #include "../bitUtil/bitUtil.h"
 using namespace std;
 
-vector <unsigned char> encodeRLE (vector<unsigned char> &bits);
-vector <unsigned char> decodeRLE (vector<unsigned char> &bits);
+void encodeRLE (vector<unsigned char> &bits, vector<unsigned char> &encoded);
+void decodeRLE (vector<unsigned char> &bits, vector<unsigned char>&decoded, int size);
 
 #endif
