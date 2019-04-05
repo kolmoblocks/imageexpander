@@ -173,30 +173,30 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
 
 void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth, unsigned int targetHeight, string colormode){
         vector<unsigned char> v;
-        v = intToUnsignedBin('D', 8);
+        v = intToBin(false,'D', 8);
 
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin('I', 8);
+        v = intToBin(false,'I', 8);
 
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin('F', 8);
+        v = intToBin(false,'F', 8);
 
         diff.insert(diff.end(),v.begin(), v.end());
 
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin(targetWidth, 32);
+        v = intToBin(false,targetWidth, 32);
 
         diff.insert(diff.end(),v.begin(), v.end());
-        v = intToUnsignedBin(targetHeight, 32);
+        v = intToBin(false,targetHeight, 32);
 
         diff.insert(diff.end(),v.begin(), v.end());
-//        v = intToUnsignedBin('R', 8);
+//        v = intToBin(false,'R', 8);
 //        diff.insert(diff.end(),v.begin(), v.end());
-//        v = intToUnsignedBin('G', 8);
+//        v = intToBin(false,'G', 8);
 //        diff.insert(diff.end(),v.begin(), v.end());
-//        v = intToUnsignedBin('B', 8);
+//        v = intToBin(false,'B', 8);
 //        diff.insert(diff.end(),v.begin(), v.end());
-//        v = intToUnsignedBin(' ', 8);
+//        v = intToBin(false,' ', 8);
 //        diff.insert(diff.end(),v.begin(), v.end());
 
 }
@@ -208,8 +208,8 @@ void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int
 
 //        vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
 //        diff.insert(diff.end(),typeV.begin(), typeV.end());
-        vector<unsigned char> rangeSizeV = intToBin(rangeSize,8);
-        vector<unsigned char> offsetV = intToBin(offset,8);
+        vector<unsigned char> rangeSizeV = intToBin(true,rangeSize,8);
+        vector<unsigned char> offsetV = intToBin(true,offset,8);
         diff.insert(diff.end(),rangeSizeV.begin(), rangeSizeV.end());
         diff.insert(diff.end(), offsetV.begin(), offsetV.end());
         //RGB header

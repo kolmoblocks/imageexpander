@@ -46,25 +46,13 @@ void writeBit (int bit, int &current_bit, unsigned char &bit_buffer, FILE *f) {
 }
 
 
-std::vector<unsigned char> intToBin(int c, int range) {
+std::vector<unsigned char> intToBin(bool signedBin ,int c, int range) {
 	std::vector<unsigned char> v;
-
-	if (c < 0) {
+	if (signedBin && c < 0){
         v.push_back(1);
         c *= -1;
-    } else {
-        v.push_back(0);
+        range-=1;
     }
-    for (int i = range-2; i >= 0; i--){
-            v.push_back((c & (1 << i)) != 0);
-    }
-	return v;
-}
-
-
-std::vector<unsigned char> intToUnsignedBin(int c, int range) {
-	std::vector<unsigned char> v;
-
 
     for (int i = range-1; i >= 0; i--){
             v.push_back((c & (1 << i)) != 0);
@@ -73,29 +61,18 @@ std::vector<unsigned char> intToUnsignedBin(int c, int range) {
 }
 
 
-int binToInt(vector<unsigned char> bin){
-    int exponent = bin.size() - 1;
-    int x = 0;
-    for (auto it: bin){
-        x += (int)it * pow(2, exponent);
-        exponent-=1;
-    }
-    return x;
-}
 
-int binToSignedInt(vector<unsigned char> bin){
-    int exponent = bin.size() - 2;
+int binToInt(bool signedBin, vector<unsigned char> bin){
+    int exponent = signedBin?bin.size()-2:bin.size() - 1;
+    int sign = signedBin && bin[0] == 1?-1:1;
     int x = 0;
-    int sign = 1;
-    if (bin[0] == 1) {
-        sign = -1;
-    } 
-    for (auto it = bin.begin() + 1; it != bin.end(); ++it ){
+    for (auto it = signedBin?bin.begin()+1:bin.begin();it!=bin.end();++it){
         x += (int)*it * pow(2, exponent);
         exponent-=1;
     }
-    return sign * x;
+    return sign*x;
 }
+
 
 
 void writeBitsToFile (std::vector<unsigned char> &bitBuff, FILE *f) {
@@ -123,7 +100,7 @@ void writeBitsToFile (std::vector<unsigned char> &bitBuff, FILE *f) {
 
     auto startTime = std::chrono::high_resolution_clock::now();
 
-    vector<unsigned char> RLEHeader = intToUnsignedBin(RLElen, 32);
+    vector<unsigned char> RLEHeader = intToBin(false,RLElen, 32);
    cout<<RLElen<<endl;
     for (auto it : RLEHeader){
         writeBit(it, current_bit, bit_buffer, f);

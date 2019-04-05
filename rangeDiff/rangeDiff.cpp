@@ -8,9 +8,9 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
     ofstream f;
     vector <unsigned char> r,g,b;
     while (!it.end()){
-        r =  intToBin((*it).r - offset, rangeSize);
-        g =  intToBin((*it).g - offset, rangeSize);
-        b =  intToBin((*it).b - offset, rangeSize);
+        r =  intToBin(true,(*it).r - offset, rangeSize);
+        g =  intToBin(true,(*it).g - offset, rangeSize);
+        b =  intToBin(true,(*it).b - offset, rangeSize);
 
         diff.insert(diff.end(), r.begin(), r.end());
         diff.insert(diff.end(), g.begin(), g.end());

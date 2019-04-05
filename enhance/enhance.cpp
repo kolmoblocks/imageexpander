@@ -15,7 +15,7 @@ vector<unsigned char> getBits(vector<unsigned char>&buffer, int start, int len){
 int getRLELength(vector<unsigned char>&diff){
     vector<unsigned char> v;
     v = getBits(diff, 0, 32);
-    return binToInt(v);
+    return binToInt(false,v);
 }
 
 void setBlockInfo(int &w, int &h, int highResImgW, int highResImgH){
@@ -35,9 +35,9 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
     for (int blockY = 0; blockY <= upperBlockY; blockY+= blockH){
         upperDeltaY = blockY + blockH;
         for (int blockX = 0; blockX <= upperBlockX; blockX+= blockW){
-            rangeSize = binToInt(getBits(diff, diffPos, 8));
+            rangeSize = binToInt(false,getBits(diff, diffPos, 8));
             diffPos += 8;
-            offset = binToSignedInt(getBits(diff, diffPos, 8));
+            offset = binToInt(true,(getBits(diff, diffPos, 8)));
             diffPos += 8;
 
             upperDeltaX = blockX + blockW;
@@ -72,13 +72,13 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
                             deltaXCpy +=1;
                        }
 
-                        r = refR - offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        r = refR - offset - binToInt(true,(getBits(diff, diffPos, rangeSize)));
                         diffPos += rangeSize;
 
-                        g = refG - offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        g = refG - offset - binToInt(true,(getBits(diff, diffPos, rangeSize)));
                         diffPos += rangeSize;
 
-                        b = refB - offset - binToSignedInt(getBits(diff, diffPos, rangeSize));
+                        b = refB - offset - binToInt(true,(getBits(diff, diffPos, rangeSize)));
                         diffPos += rangeSize;
                         pixels.push_back(r);
                         pixels.push_back(g);
@@ -97,9 +97,9 @@ void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned 
 
 
     v = getBits(diff,32,32);
-    highResWidth = (unsigned)binToInt(v);
+    highResWidth = (unsigned)binToInt(false,v);
     v = getBits(diff,64,32);
-    highResHeight = (unsigned)binToInt(v);
+    highResHeight = (unsigned)binToInt(false,v);
     // for (int i = 86; i < 124; i++){
     //     v.push_back(diff[i]);
     // }
@@ -169,15 +169,15 @@ bool checkFileHeader(vector<unsigned char>&diff){
     vector<unsigned char> v;
     string res = "";
     v = getBits(diff,0,8);
-    res += (char)binToInt(v);
+    res += (char)binToInt(false,v);
     cout<<"size"<<v.size()<<endl;
     v = getBits(diff,8,8);
-    res += (char)binToInt(v);
+    res += (char)binToInt(false,v);
     v = getBits(diff,16,8);
-    res += (char)binToInt(v);
+    res += (char)binToInt(false,v);
     v.clear();
     v = getBits(diff,24,8);
-    res += (char)binToInt(v);
+    res += (char)binToInt(false,v);
     cout<<res<<endl;
     return res == "DIFF";
 }
