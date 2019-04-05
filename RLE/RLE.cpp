@@ -22,7 +22,7 @@ void encodeRLE (vector<unsigned char> &bits, vector<unsigned char> &encoded){
         for (int l = 1; l <= upper; l++){
             encoded.push_back(0);
         }
-        binary = intToUnsignedBin(k, upper+1);
+        binary = intToBin(false,k, upper+1);
         encoded.insert(encoded.end(), binary.begin(), binary.end());
         i+=k;
         binary.clear();
@@ -49,7 +49,7 @@ void decodeRLE (vector<unsigned char> &encoded, vector<unsigned char>&decoded, i
         for(int j = i; j<upper; j++){
             bin.push_back(encoded.at(j));
         }
-        int k = binToInt(bin);
+        int k = binToInt(false,bin);
         for (int j = 1; j <=k; j++){
             decoded.push_back(b);
         }
