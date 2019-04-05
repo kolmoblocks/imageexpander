@@ -1,5 +1,7 @@
 #include "enhance.h"
 
+const int RGB_CHANNELS = 3;
+
 vector<unsigned char> getBits(vector<unsigned char>&buffer, int start, int len){
     vector<unsigned char> res;
     res.reserve(len);
@@ -22,7 +24,7 @@ void setBlockInfo(int &w, int &h, int highResImgW, int highResImgH){
 }
 
 void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector<unsigned char> &lowRes,
-    int highResImgW, int highResImgH, int deltaUnitSize, int numDeltaPixelsPerBlock, int highFactor, int lowFactor, unsigned lowResImgW){
+    int highResImgW, int highResImgH, int deltaUnitSize, int highFactor, int lowFactor, unsigned lowResImgW){
     
     int diffPos = 96, rangeSize, offset, refR, refG, refB, blockW, blockH, r, g, b,
     index, upperBlockY, upperBlockX, deltaYCpy, deltaXCpy, upperDeltaY, upperDeltaX;
@@ -118,7 +120,7 @@ void populateBlocks(std::vector<blockParams> &blocks, int width, int height, int
 }
 
 
-void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<unsigned int> &blocksPixelVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight) {
+void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<unsigned int> &blocksPixelVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight, int highFactor) {
     // assuming is RANGE 
     // assuming default config for a 16:9 image
     unsigned blockDataSize = highResHeight*highResWidth / (16*9);
@@ -127,19 +129,19 @@ void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<u
     cout<<blocksPixelVec.size()<<endl;
     std::vector<unsigned int> blockPosVec;
     for (int i=0; i<=numBlocks; ++i) {
-        blockPosVec.push_back(i * blockDataSize/4 * 3 * 3); // convert to number of diff pixels per unit
+        blockPosVec.push_back(i * blockDataSize/(highFactor*highFactor) * deltaUnitSize * RGB_CHANNELS); // convert to number of diff pixels per unit
     }
 
     std::vector<blockParams> bPs;
-    populateBlocks(bPs, highResWidth, highResHeight, 2);
+    populateBlocks(bPs, highResWidth, highResHeight, highFactor);
 
     auto bt = bPs.begin();
     for (auto it=blockPosVec.begin(); it<blockPosVec.end()-1; ++it) {
         unsigned blockBegin = *it;
         unsigned blockEnd = *(std::next(it,1));
         // tl, br are in UNITS not PIXELS
-        int diffPixPos = (bt->tl.x + bt->tl.y * highResWidth/2)*deltaUnitSize*3;
-        int blockW = highResWidth / (16 * 2) *3*3;//(bt->br.x - bt->tl.x) * deltaUnitSize * 3;
+        int diffPixPos = (bt->tl.x + bt->tl.y * highResWidth/highFactor)*deltaUnitSize*3;
+        int blockW = highResWidth / (16 * highFactor) *deltaUnitSize*RGB_CHANNELS;//(bt->br.x - bt->tl.x) * deltaUnitSize * 3;
         //int blockH = bt->br.y - bt->br.y;
 
         if (bt->br.x < bt->tl.x) {
@@ -156,7 +158,7 @@ void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<u
                 ++ct;
             }
 
-            ct += highResWidth/2 * 3 * 3 - blockW;
+            ct += highResWidth/highFactor * deltaUnitSize * RGB_CHANNELS - blockW;
         }
         ++bt;
     }
@@ -185,6 +187,7 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
     unsigned newH = oldImgH * hiFactor / loFactor;
     std::vector<Color> newImgVec(newW * newH * 3);
     int diffX = 0, diffY = 0, newImgIndex, targetIndex, upperInnerY, upperInnerX;
+    int deltaUnitSize = 5;
     int ct=0;
     for (std::size_t y=0; y<newH; y+= hiFactor) {
         upperInnerY = y+hiFactor;
@@ -199,7 +202,7 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
                         // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
                         newImgIndex = innerX + (innerY)*newW;
                         if (innerX >= x+loFactor || innerY >= y+loFactor) {
-                            targetIndex = 3*(diffX-3 + diffY*diffW);
+                            targetIndex = 3*(diffX-deltaUnitSize + diffY*diffW);
                             // grab pixel from the diff
                             newImgVec[newImgIndex].r = diffVec[targetIndex];
                             newImgVec[newImgIndex].g = diffVec[targetIndex + 1];
@@ -210,7 +213,7 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
                         else {
                             // grab pixel from the old image
                             targetIndex = 3*(((innerX) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x));
-                            if (targetIndex == oldImgVec.size() - 9){
+                            if (targetIndex == oldImgVec.size() - 5 * 3){
                                 std::cout << "last" << std::endl;
                             }
 
@@ -293,9 +296,9 @@ cout<<encoded.size()<<endl;
     int numDeltaPixelsPerBlock =  3;
     // THIS SHOULD BE 3 SINCE WE ARE RESIZING 2:1
 
-    getPixels(blocksPixelVec, diff, lowResImage, highResWidth, highResHeight, deltaUnitSize, numDeltaPixelsPerBlock, highFactor, lowFactor, lowResWidth);
+    getPixels(blocksPixelVec, diff, lowResImage, highResWidth, highResHeight, deltaUnitSize, highFactor, lowFactor, lowResWidth);
     cout<<"Gotpixels"<<endl;
-    populateDiffPixelVec(diffPixelVec, blocksPixelVec, deltaUnitSize, highResWidth, highResHeight);
+    populateDiffPixelVec(diffPixelVec, blocksPixelVec, deltaUnitSize, highResWidth, highResHeight, highFactor);
     cout<<"populated diff pix vec, size "<< diffPixelVec.size()<<endl;
     expand_image(lowResImage, lowResWidth, lowResHeight, diffPixelVec, lowFactor, highFactor, deltaUnitSize);
 
