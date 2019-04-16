@@ -7,13 +7,13 @@ const int TYPE_MAP = 0, TYPE_RANGE = 1;
 void populateBlocks(std::vector<blockParams> &blocks, std::vector<deltaUnit> &units, int width, int height, int highFactor) {
     // logic here to statisticallly determine "good" configuration of blocks
     int xincr = width/16, yincr=height/9;
-
     for (int j=0; j<height; j+=yincr) {
         for (int i=0; i<width; i+=xincr) {
             blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor-1, (j+yincr)/highFactor-1}, 'R'});
         }
     }
 }
+
 
 void populateDeltas(std::vector<unsigned char> &image, int width, int height, int highFactor, int lowFactor, std::vector<deltaUnit> &units) {
     // calculate the delta unit length from default block configuration
@@ -23,9 +23,6 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
     if (deltaUnitLength < 0) {
         throw std::logic_error("delta unit length less than 0");
     }
-
-
-
     // loop across each block
     for (int y=0; y<height; y += highFactor) {
         upperInnerY = y+highFactor;
@@ -71,7 +68,6 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
                         }
                         deltaColor = donor - curColor;
                         curDeltaUnit.push_back(deltaColor);
-
                         curDeltaUnit.setMax(max(deltaColor, curDeltaUnit.getMax()));
                         curDeltaUnit.setMin(min(deltaColor, curDeltaUnit.getMin()));
                     }
@@ -84,11 +80,7 @@ void populateDeltas(std::vector<unsigned char> &image, int width, int height, in
 
 
 std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes){
-    std::vector<unsigned char> lowResImage;
-    std::vector<unsigned char> highResImage;
-    std::vector<unsigned char> diff;
-
-
+    std::vector<unsigned char> lowResImage, highResImage, diff;
     unsigned lowResWidth, lowResHeight, highResWidth, highResHeight;
 
     unsigned error = lodepng::decode(lowResImage, lowResWidth, lowResHeight, lowRes, LCT_RGB, 8);
@@ -108,8 +100,6 @@ std::vector<unsigned char> generateDiff (const char *lowRes, const char *highRes
     unsigned int lowFactor = lowResWidth / denom;
     unsigned int highFactor = highResWidth / denom;
     // finding diffWidth from the difference between smaller vs newer chunk sizes
-
-
     // iterating through blocks, x and y indicate the top left positions of each block.
     // get units from pixels somehow
     std::vector<deltaUnit> units;
@@ -203,9 +193,7 @@ void insertDiffHeader(std::vector<unsigned char> &diff, unsigned int targetWidth
 
 void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int offset, int numPixels){
     if (type == TYPE_MAP) {
-//
     } else if (type == TYPE_RANGE) {
-
 //        vector<unsigned char> typeV = {0,0,0,0,0,0,0,1};
 //        diff.insert(diff.end(),typeV.begin(), typeV.end());
         vector<unsigned char> rangeSizeV = intToBin(true,rangeSize,8);

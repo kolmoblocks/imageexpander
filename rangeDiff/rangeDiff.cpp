@@ -11,7 +11,6 @@ void insertRangeBlock(vector<unsigned char> &diff, blockIterator &it, int rangeS
         r =  intToBin(true,(*it).r - offset, rangeSize);
         g =  intToBin(true,(*it).g - offset, rangeSize);
         b =  intToBin(true,(*it).b - offset, rangeSize);
-
         diff.insert(diff.end(), r.begin(), r.end());
         diff.insert(diff.end(), g.begin(), g.end());
         diff.insert(diff.end(), b.begin(), b.end());

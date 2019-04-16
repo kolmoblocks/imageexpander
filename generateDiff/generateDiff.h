@@ -21,13 +21,6 @@ extern unsigned lodepng::decode(std::vector<unsigned char>& out, unsigned& w, un
 const std::string& filename,
         LodePNGColorType colortype = LCT_RGBA, unsigned bitdepth = 8);
 
-vector<unsigned char> intToBin(int c, int range) ;
-
-void writeBit (int bit);
-
-void padZeroes(vector <unsigned char> c);
-
-void flushBits();
 
 void insertBlockHeader(vector<unsigned char> &diff, int type, int rangeSize, int offset, int numPixels );
 

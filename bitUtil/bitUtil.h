@@ -17,6 +17,4 @@ std::vector<unsigned char> intToBin(bool signedBin ,int c, int range);
 
 int binToInt(bool signedBin, std::vector<unsigned char> bin);
 
-
-
 #endif

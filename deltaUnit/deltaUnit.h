@@ -11,10 +11,12 @@ typedef struct {
     int x, y;
 } posn;
 
+
 bool operator!=(posn p1, posn p2);
 typedef struct {
      int r, g, b;
 } Color;
+
 
 Color operator-(Color col1, Color col2);
 

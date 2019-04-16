@@ -18,10 +18,12 @@ int getRLELength(vector<unsigned char>&diff){
     return binToInt(false,v);
 }
 
+
 void setBlockInfo(int &w, int &h, int highResImgW, int highResImgH){
     w = highResImgW / 16;
     h = highResImgH / 9;
 }
+
 
 void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector<unsigned char> &lowRes,
     int highResImgW, int highResImgH, int deltaUnitSize, int highFactor, int lowFactor, unsigned lowResImgW){
@@ -94,8 +96,6 @@ void getPixels(vector<unsigned int> &pixels, vector<unsigned char> &diff, vector
 void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned &highResHeight) {
     vector<unsigned char> v;
     v.reserve(32);
-
-
     v = getBits(diff,32,32);
     highResWidth = (unsigned)binToInt(false,v);
     v = getBits(diff,64,32);
@@ -103,24 +103,23 @@ void extractHeader(vector<unsigned char> diff, unsigned &highResWidth, unsigned 
     // for (int i = 86; i < 124; i++){
     //     v.push_back(diff[i]);
     // }
-    //colormode = assume RGB for now
+    //colormode = Default to RGB for now
 
 }
 
-void populateBlocks(std::vector<blockParams> &blocks, int width, int height, int highFactor) {
-    // logic here to statisticallly determine "good" configuration of blocks
-    int xincr = width/16, yincr=height/9;
 
+void populateBlocks(std::vector<blockParams> &blocks, int width, int height, int highFactor) {
+    int xincr = width/16, yincr=height/9;
         for (int j=0; j<height; j+=yincr) {
             for (int i=0; i<width; i+=xincr) {
-
                 blocks.push_back(blockParams{posn{i/highFactor,j/highFactor}, posn{(i+xincr)/highFactor, (j+yincr)/highFactor}, 'R'});
         }
     }
 }
 
 
-void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<unsigned int> &blocksPixelVec, unsigned deltaUnitSize, unsigned highResWidth, unsigned highResHeight, int highFactor) {
+void populateDiffPixelVec(std::vector<unsigned int> &diffPixelVec, std::vector<unsigned int> &blocksPixelVec, unsigned deltaUnitSize,
+        unsigned highResWidth, unsigned highResHeight, int highFactor) {
     // assuming is RANGE 
     // assuming default config for a 16:9 image
     unsigned blockDataSize = highResHeight*highResWidth / (16*9);
@@ -182,6 +181,7 @@ bool checkFileHeader(vector<unsigned char>&diff){
     return res == "DIFF";
 }
 
+
 void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsigned oldImgH, std::vector<unsigned int> &diffVec, unsigned loFactor, unsigned hiFactor, int diffW) {
     unsigned newW = oldImgW * hiFactor / loFactor;
     unsigned newH = oldImgH * hiFactor / loFactor;
@@ -198,33 +198,30 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
             diffX = 0;
             upperInnerX = x+hiFactor;
             for (int innerY = y; innerY < upperInnerY; ++innerY) {
-                    for (int innerX = x; innerX < upperInnerX; ++innerX) {
-                        // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
-                        newImgIndex = innerX + (innerY)*newW;
-                        if (innerX >= x+loFactor || innerY >= y+loFactor) {
-                            targetIndex = 3*(diffX-deltaUnitSize + diffY*diffW);
-                            // grab pixel from the diff
-                            newImgVec[newImgIndex].r = diffVec[targetIndex];
-                            newImgVec[newImgIndex].g = diffVec[targetIndex + 1];
-                            newImgVec[newImgIndex].b = diffVec[targetIndex + 2];
-                            // increment diffX every time we increment through the inner block.
-                            ++diffX;
+                for (int innerX = x; innerX < upperInnerX; ++innerX) {
+                    // only get and set pixel if the block is not included in the old block (for now it is the top left smaller square with sides of length "loFactor")
+                    newImgIndex = innerX + (innerY)*newW;
+                    if (innerX >= x+loFactor || innerY >= y+loFactor) {
+                        targetIndex = 3*(diffX-deltaUnitSize + diffY*diffW);
+                        // grab pixel from the diff
+                        newImgVec[newImgIndex].r = diffVec[targetIndex];
+                        newImgVec[newImgIndex].g = diffVec[targetIndex + 1];
+                        newImgVec[newImgIndex].b = diffVec[targetIndex + 2];
+                        // increment diffX every time we increment through the inner block.
+                        ++diffX;
+                    }
+                    else {
+                        // grab pixel from the old image
+                        targetIndex = 3*(((innerX) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x));
+                        if (targetIndex == oldImgVec.size() - 5 * 3){
+                            std::cout << "last" << std::endl;
                         }
-                        else {
-                            // grab pixel from the old image
-                            targetIndex = 3*(((innerX) + oldImgW * (innerY))* loFactor/hiFactor + (innerX - x));
-                            if (targetIndex == oldImgVec.size() - 5 * 3){
-                                std::cout << "last" << std::endl;
-                            }
-
-                            newImgVec[newImgIndex].r = oldImgVec[targetIndex];
-                            newImgVec[newImgIndex].g = oldImgVec[targetIndex + 1];
-                            newImgVec[newImgIndex].b = oldImgVec[targetIndex + 2];
-                        }
-
+                        newImgVec[newImgIndex].r = oldImgVec[targetIndex];
+                        newImgVec[newImgIndex].g = oldImgVec[targetIndex + 1];
+                        newImgVec[newImgIndex].b = oldImgVec[targetIndex + 2];
+                    }
                 }
             }
-
         }
         ++ct;
     }
@@ -241,18 +238,13 @@ void expand_image( std::vector<unsigned char> oldImgVec, unsigned oldImgW, unsig
 void enhance(char *lowResFileName, char *diffFileName) {
     FILE *pDiff;
     pDiff = fopen(diffFileName, "rb");
-    vector<unsigned char> deltas, lowResImage,diff, encoded;
+    char c;
+    vector<unsigned char> deltas, lowResImage,diff, encoded, bin;
     vector <unsigned int> blocksPixelVec,diffPixelVec;
     unsigned lowResWidth, lowResHeight, highResWidth, highResHeight,lowFactor, highFactor, 
     unitSize, deltaUnitSize, totalDeltaUnits, error;
     ofstream f2;
-    // rle decode diff, then put into diffFileVector
-    vector<unsigned char> bin;
-
     ifstream f("diff.dat", ios::binary | ios::in);
-    char c;
-
-
 
     while (f.get(c)) {
         for (int i = 0; i < 8; i++) encoded.push_back((c >> i) & 1);
@@ -261,11 +253,7 @@ void enhance(char *lowResFileName, char *diffFileName) {
     int RLELen = getRLELength(encoded);
     cout<<RLELen<<endl;
 
-    // diff.resize(encoded.size());
-
     decodeRLE(encoded, diff, RLELen);
-cout<<encoded.size()<<endl;
-//    diff.insert(diff.end(),encoded.begin() + 32, encoded.end());
     cout<<"successfully decoded"<<endl;
     cout<<"size"<<diff.size()<<endl;
     if (!checkFileHeader(diff)){
@@ -288,7 +276,6 @@ cout<<encoded.size()<<endl;
 
     diffPixelVec.resize(3*totalDeltaUnits*deltaUnitSize, 255);
     blocksPixelVec.reserve(3*totalDeltaUnits*deltaUnitSize);
-
 
     //iterate blocks
     // assuming aspect ratio is 16:9
